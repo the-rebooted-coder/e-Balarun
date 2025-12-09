@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balarun | Coming Soon</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,900;1,900&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #F2F0E9; /* Paper White */
+            --text-color: #000000; /* Deepest Black */
+            --accent-color: #E63946; /* Vogue Red */
+            --line-color: #000000;
+            --font-display: 'Playfair Display', serif;
+            --font-ui: 'Space Grotesk', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-ui);
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* --- THE GRID --- */
+        .poster-grid {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            height: 100%;
+            padding: 20px;
+            border: 15px solid var(--bg-color);
+            outline: 2px solid var(--line-color);
+            position: relative;
+        }
+
+        /* --- HEADER --- */
+        .header {
+            display: flex;
+            justify-content: flex-end; /* Aligns Digital Edition to the right */
+            align-items: flex-start;
+            border-bottom: 2px solid var(--line-color);
+            padding-bottom: 15px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-stage {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+            width: 100%;
+        }
+
+        /* The Big Title */
+        h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 16vw, 12rem); 
+            line-height: 1;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-align: center;
+            color: var(--text-color);
+            opacity: 0;
+            letter-spacing: -0.02em; 
+            animation: riseUp 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+        }
+
+        /* The "Coming Soon" Sticker */
+        .sticker {
+            position: absolute;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            padding: 0;
+            font-family: var(--font-ui);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 50%;
+            width: 110px;
+            height: 110px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transform: rotate(15deg) scale(0);
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.2);
+            z-index: 20;
+            font-size: 0.9rem;
+            line-height: 1.1;
+            animation: popIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.8s forwards;
+            
+            /* Mobile positioning */
+            top: 65%;
+            right: 0;
+            left: 0;
+            margin: auto;
+        }
+
+        /* --- DECORATIVE LINES --- */
+        .barcode {
+            display: flex;
+            gap: 4px;
+            height: 40px;
+            opacity: 0.8;
+        }
+        .bar {
+            background: var(--text-color);
+            width: 2px;
+        }
+        .bar:nth-child(even) { width: 5px; }
+        .bar:nth-child(3n) { width: 1px; }
+
+        /* --- FOOTER --- */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 15px;
+            border-top: 2px solid var(--line-color);
+        }
+
+        .location-bold {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-style: italic;
+        }
+
+        /* --- DESKTOP TWEAKS --- */
+        @media (min-width: 1024px) {
+            .poster-grid {
+                padding: 40px;
+                border-width: 30px;
+            }
+            
+            .main-stage {
+                align-items: center; 
+            }
+
+            h1 {
+                font-size: clamp(6rem, 20vw, 16rem); 
+            }
+
+            .sticker {
+                width: 160px;
+                height: 160px;
+                font-size: 1.2rem;
+                /* Desktop positioning */
+                top: 25%;
+                right: 15%;
+                left: auto;
+                transform: rotate(-10deg) scale(0);
+            }
+
+            /* Abstract circle graphic */
+            .graphic-circle {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                width: 60vh;
+                height: 60vh;
+                border: 1px solid var(--text-color);
+                border-radius: 50%;
+                z-index: 1;
+                opacity: 0.08;
+                pointer-events: none;
+            }
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes riseUp {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes popIn {
+            to { transform: rotate(-10deg) scale(1); opacity: 1; }
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div class="poster-grid">
+        <header class="header">
+            <span>Digital Edition</span>
+        </header>
+
+        <main class="main-stage">
+            <h1>BALARUN</h1>
+            
+            <div class="sticker">
+                Coming<br>Soon
+            </div>
+
+            <div class="graphic-circle"></div>
+        </main>
+
+        <footer class="footer">
+            <div class="barcode">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+            
+            <div style="text-align: right;">
+                <span style="display:block; font-size: 0.7rem; text-transform:uppercase; letter-spacing:1px;">Made in</span>
+                <span class="location-bold">Jabalpur</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Subtle Mouse Parallax for Desktop
+        document.addEventListener('mousemove', (e) => {
+            if(window.innerWidth > 1024) {
+                const x = (window.innerWidth - e.pageX) / 60;
+                const y = (window.innerHeight - e.pageY) / 60;
+                
+                const title = document.querySelector('h1');
+                const sticker = document.querySelector('.sticker');
+
+                if(title) title.style.transform = `translateX(${x}px) translateY(${y}px)`;
+                if(sticker) sticker.style.transform = `rotate(-10deg) translateX(${-x*1.5}px) translateY(${-y*1.5}px)`;
+            }
+        });
+    </script>
+</body>
+</html>
