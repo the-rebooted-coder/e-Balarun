@@ -2,365 +2,459 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>E-Balarun 2026</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Balarun 2026 | Digital Edition</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;700&family=Playfair+Display:wght@400;700;900&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,900&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     
-    <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
-
     <style>
         :root {
-            --bg-body: #111; 
-            --paper: #F2F0E9;
-            --text: #111;
-            --accent: #D00000;
+            --bg-color: #F2F0E9; /* Paper White */
+            --text-color: #111111; /* Deep Black */
+            --accent-color: #E63946; /* Vogue Red */
+            --line-color: #111111;
+            --modal-overlay: rgba(242, 240, 233, 0.95);
+            
+            --font-display: 'Playfair Display', serif;
+            --font-ui: 'Space Grotesk', sans-serif;
+            --font-hindi: 'Noto Serif Devanagari', serif;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* --- RESET & BASE --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background-color: var(--bg-body);
-            height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-ui);
+            overflow-x: hidden;
             width: 100vw;
-            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        /* --- LAYOUT GRID --- */
+        .poster-grid {
+            display: grid;
+            grid-template-rows: auto 1fr auto; /* Header, Main, Footer */
+            min-height: 100vh;
+            padding: 15px;
+            border: 8px solid var(--bg-color);
+            outline: 2px solid var(--line-color);
+            position: relative;
+            transition: all 0.5s ease;
+        }
+
+        /* --- HEADER --- */
+        .header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            font-family: 'Space Grotesk', sans-serif;
+            border-bottom: 2px solid var(--line-color);
+            padding-bottom: 15px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            font-weight: 700;
+            z-index: 50;
         }
 
-        /* STAGE: Wrapper for centering */
-        .stage {
-            transition: transform 0.5s ease-out; /* Smooth slide */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: auto;
-            height: auto;
+        .lang-switch {
+            cursor: pointer;
+            padding: 4px 12px;
+            border: 1px solid var(--line-color);
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            font-family: var(--font-ui);
+        }
+        .lang-switch:hover {
+            background: var(--text-color);
+            color: var(--bg-color);
         }
 
-        /* PAGE STYLES */
-        .page {
-            background-color: var(--paper);
-            overflow: hidden;
-            border: 1px solid #dcdcdc;
-            box-shadow: inset 4px 0 10px rgba(0,0,0,0.03);
-        }
-
-        .page-content {
-            width: 100%;
-            height: 100%;
-            padding: 25px; /* Reduced padding for more space */
+        /* --- MAIN STAGE --- */
+        .main-stage {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
+            align-items: center;
             position: relative;
-        }
-
-        /* Hard Cover Spine */
-        .cover-page { border-right: 4px solid #bbb; }
-
-        /* --- TYPOGRAPHY --- */
-        /* Title: Much smaller clamp to prevent overflow */
-        h1 { 
-            font-family: 'Playfair Display', serif; 
-            color: var(--text); 
-            line-height: 1; 
-            text-transform: uppercase;
-            font-weight: 900;
+            z-index: 10;
+            padding: 40px 0;
             text-align: center;
-            font-size: clamp(1.8rem, 8vw, 3.5rem); /* Fixed overflow issue */
-            margin: 10px 0;
-            width: 100%;
-            word-wrap: break-word; /* Safety break */
         }
 
-        .hindi h1, .hindi h2 { font-family: 'Noto Serif Devanagari', serif; }
+        /* The Title */
+        h1 {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 14vw, 10rem); 
+            line-height: 0.9;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: var(--text-color);
+            opacity: 0;
+            letter-spacing: -0.04em; 
+            margin-bottom: 30px;
+            animation: riseUp 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+        }
 
-        /* HEADER */
-        .header {
-            width: 100%;
-            border-bottom: 2px solid var(--text);
-            padding-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.7rem;
+        /* Hindi Title Override */
+        body.hindi-active h1 {
+            font-family: var(--font-hindi);
+            font-weight: 700;
+            letter-spacing: 0;
+            line-height: 1.1;
+            font-size: clamp(2.5rem, 12vw, 9rem);
+        }
+
+        /* The Edition Tag */
+        .edition-tag {
+            font-family: var(--font-ui);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-size: clamp(0.8rem, 2vw, 1.2rem);
+            margin-bottom: 10px;
+            opacity: 0;
+            animation: fadeIn 1s ease 0.5s forwards;
+        }
+
+        /* The Video Button (CTA) */
+        .video-cta {
+            position: relative;
+            margin-top: 20px;
+            opacity: 0;
+            animation: popIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.8s forwards;
+            z-index: 20;
+        }
+
+        .btn-watch {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            font-family: var(--font-ui);
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
-        }
-
-        /* CENTER BLOCK */
-        .center-block {
-            flex-grow: 1;
+            padding: 18px 32px;
+            border-radius: 0; /* Sharp edges for magazine look */
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            text-align: center;
-            width: 100%;
+            gap: 10px;
+            box-shadow: 6px 6px 0px rgba(0,0,0,1);
         }
 
-        .logo {
-            width: 120px;
-            height: auto;
-            margin-bottom: 15px;
+        .btn-watch:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0px rgba(0,0,0,1);
+        }
+        
+        .btn-watch:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px rgba(0,0,0,1);
         }
 
-        .year {
-            color: var(--accent);
-            font-weight: 700;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            margin-bottom: 5px;
+        .play-icon {
+            width: 0; 
+            height: 0; 
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-left: 10px solid var(--bg-color);
         }
 
-        /* FOOTER ACTIONS */
+        /* --- FOOTER --- */
         .footer {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            width: 100%;
+            justify-content: space-between;
+            align-items: flex-end;
             padding-top: 15px;
+            border-top: 2px solid var(--line-color);
         }
 
-        /* Language Button */
-        .lang-btn {
-            background: transparent;
-            border: 1px solid var(--text);
-            padding: 5px 16px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            font-size: 0.7rem;
-            transition: all 0.2s;
+        .location-bold {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-style: italic;
         }
-        .lang-btn:hover { background: var(--text); color: var(--paper); }
-
-        /* Open Prompt */
-        .open-btn {
-            cursor: pointer;
-            text-align: center;
+        
+        /* Barcode Decoration */
+        .barcode {
+            display: flex;
+            gap: 4px;
+            height: 30px;
             opacity: 0.8;
-            transition: 0.3s;
         }
-        .open-btn:hover { opacity: 1; transform: translateY(-2px); }
-        .arrow { font-size: 1.5rem; color: var(--accent); display: block; line-height: 1; margin-bottom: 5px; }
+        .bar { background: var(--text-color); width: 2px; }
+        .bar:nth-child(even) { width: 4px; }
+        .bar:nth-child(3n) { width: 1px; }
 
-        /* VIDEO CONTAINER */
-        .video-box {
-            width: 100%;
-            aspect-ratio: 16/9;
+        /* --- MODAL (Video Overlay) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--modal-overlay);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            width: 90%;
+            max-width: 900px;
+            background: transparent;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--text-color);
+            padding-bottom: 10px;
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-style: italic;
+        }
+        
+        body.hindi-active .modal-title {
+            font-family: var(--font-hindi);
+            font-style: normal;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-family: var(--font-ui);
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 0.5;
+            color: var(--text-color);
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
             background: #000;
-            margin: 20px 0;
-            border: 2px solid var(--text);
-            box-shadow: 6px 6px 0 rgba(0,0,0,0.15);
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.2);
+            border: 2px solid var(--text-color);
         }
-        iframe { width: 100%; height: 100%; }
 
-        /* MOBILE FIXES */
-        @media (max-width: 768px) {
-            .arrow { transform: rotate(90deg); }
-            .page-content { padding: 20px; }
-            h1 { font-size: clamp(1.8rem, 10vw, 3rem); } /* Even smaller for mobile safety */
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
+
+        /* --- DESKTOP TWEAKS --- */
+        @media (min-width: 1024px) {
+            .poster-grid {
+                padding: 40px;
+                border-width: 30px;
+            }
+            .header {
+                font-size: 0.9rem;
+            }
+            .btn-watch {
+                padding: 24px 48px;
+                font-size: 1.2rem;
+            }
+            /* Decorative Circle */
+            .graphic-circle {
+                position: absolute;
+                left: 50%; top: 50%;
+                transform: translate(-50%, -50%);
+                width: 70vh; height: 70vh;
+                border: 1px solid var(--text-color);
+                border-radius: 50%;
+                z-index: 1;
+                opacity: 0.08;
+                pointer-events: none;
+            }
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes riseUp {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        @keyframes popIn {
+            to { opacity: 1; }
+        }
+
     </style>
 </head>
-<body id="body-app">
+<body id="body">
 
-    <div class="stage" id="stage-app">
-        
-        <div id="book-app">
+    <div class="poster-grid">
+        <header class="header">
+            <span id="label-digital">Digital Edition</span>
+            <button class="lang-switch" onclick="toggleLanguage()" id="btn-lang">हिंदी</button>
+        </header>
+
+        <main class="main-stage">
+            <div class="edition-tag" id="label-edition">Year 2026</div>
             
-            <div class="page cover-page" data-density="hard">
-                <div class="page-content">
-                    
-                    <div class="header">
-                        <span id="txt-digital">Digital Edition</span>
-                        <span id="txt-vol">Vol. 1</span>
-                    </div>
-
-                    <div class="center-block">
-                        <img src="https://i.ibb.co/yFpnpVTy/balarun-logo.png" alt="Logo" class="logo">
-                        <div class="year" id="txt-year">Year 2026</div>
-                        <h1 id="txt-title">E-Balarun</h1>
-                    </div>
-
-                    <div class="footer">
-                        <button class="lang-btn" onclick="toggleLang()" id="btn-lang">हिंदी</button>
-                        
-                        <div class="open-btn" onclick="flipNext()">
-                            <span class="arrow" id="icon-arrow">➜</span>
-                            <span style="font-size:0.7rem; font-weight:700; letter-spacing:1px;" id="txt-hint">CLICK TO OPEN</span>
-                        </div>
-                    </div>
-
-                </div>
+            <h1 id="main-title">E-Balarun</h1>
+            
+            <div class="video-cta">
+                <button class="btn-watch" onclick="openModal()">
+                    <div class="play-icon"></div>
+                    <span id="btn-watch-text">Video Messages</span>
+                </button>
             </div>
 
-            <div class="page" data-density="soft">
-                <div class="page-content">
-                    <div style="flex:1; display:flex; justify-content:center; align-items:center; opacity:0.1;">
-                        <img src="https://i.ibb.co/yFpnpVTy/balarun-logo.png" style="width:100px; filter:grayscale(1);">
-                    </div>
-                </div>
-            </div>
+            <div class="graphic-circle"></div>
+        </main>
 
-            <div class="page" data-density="soft">
-                <div class="page-content">
-                    <div>
-                        <h2 style="font-family:'Playfair Display', serif; font-size:1.5rem; border-bottom:1px solid #ccc; padding-bottom:10px; margin-bottom:20px;" id="txt-msg">Message from Principal</h2>
-                        
-                        <div class="video-box">
-                             <iframe src="https://www.youtube.com/embed/CzQg5KaU26g" title="Principal Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                        </div>
-                    </div>
-                </div>
+        <footer class="footer">
+            <div class="barcode">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
             </div>
-
-            <div class="page cover-page" data-density="hard">
-                <div class="page-content">
-                    <div style="margin-top:auto; text-align:right;">
-                        <div style="display:flex; justify-content:flex-end; gap:3px; height:25px; margin-bottom:10px; opacity:0.7;">
-                            <div style="width:2px; background:#000;"></div><div style="width:4px; background:#000;"></div>
-                            <div style="width:1px; background:#000;"></div><div style="width:3px; background:#000;"></div>
-                            <div style="width:2px; background:#000;"></div><div style="width:1px; background:#000;"></div>
-                        </div>
-                        <span style="display:block; font-size:0.7rem; text-transform:uppercase;" id="txt-made">Made in</span>
-                        <span style="font-family:'Playfair Display', serif; font-size:1.5rem;" id="txt-loc">Jabalpur</span>
-                    </div>
-                </div>
+            
+            <div style="text-align: right;">
+                <span style="display:block; font-size: 0.7rem; text-transform:uppercase; letter-spacing:1px;" id="label-madein">Made in</span>
+                <span class="location-bold" id="label-location">Jabalpur</span>
             </div>
+        </footer>
+    </div>
 
+    <div class="modal-overlay" id="videoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title" id="modal-title-text">Message from Principal</span>
+                <button class="btn-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="video-wrapper">
+                <iframe id="youtube-frame" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- TEXT DATA ---
+        // --- CONTENT DATA ---
         const content = {
             en: {
                 digital: "Digital Edition",
-                vol: "Vol. 1",
-                year: "Year 2026",
+                edition: "Year 2026",
                 title: "E-Balarun",
-                hint: "CLICK TO OPEN",
-                hintMob: "SWIPE TO OPEN",
-                msg: "Message from Principal",
-                made: "Made in",
-                loc: "Jabalpur",
-                btn: "हिंदी"
+                watch: "Video Messages",
+                madein: "Made in",
+                location: "Jabalpur",
+                modalTitle: "Message from Principal",
+                langBtn: "हिंदी"
             },
             hi: {
                 digital: "डिजिटल संस्करण",
-                vol: "खंड १",
-                year: "वर्ष 2026",
+                edition: "वर्ष 2026",
                 title: "ई-बालारुण",
-                hint: "खोलने के लिए क्लिक करें",
-                hintMob: "खोलने के लिए स्वाइप करें",
-                msg: "प्राचार्य महोदय का संदेश",
-                made: "स्थान",
-                loc: "जबलपुर",
-                btn: "English"
+                watch: "वीडियो संदेश देखें",
+                madein: "स्थान",
+                location: "जबलपुर",
+                modalTitle: "प्राचार्य महोदय का संदेश",
+                langBtn: "English"
             }
         };
 
         let currentLang = 'en';
-        let pageFlip;
-        const stage = document.getElementById('stage-app');
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const el = document.getElementById('book-app');
-            
-            // 1. DIMENSIONS
-            // Keep it compact to avoid overflow on small screens
-            const screenW = window.innerWidth;
-            const screenH = window.innerHeight;
-            
-            // Width limited to 400px or 90% of screen
-            const pWidth = Math.min(400, screenW * 0.9);
-            const pHeight = Math.min(600, screenH * 0.85);
+        // --- FUNCTIONS ---
 
-            pageFlip = new St.PageFlip(el, {
-                width: pWidth,
-                height: pHeight,
-                size: "fixed",
-                showCover: true,
-                mobileScrollSupport: false
-            });
-
-            pageFlip.loadFromHTML(document.querySelectorAll('.page'));
-
-            // 2. CENTERING LOGIC (Fixed)
-            const alignBook = () => {
-                // If window width > 768, library uses Spread Mode.
-                const isSpread = window.innerWidth > 768;
-
-                if (isSpread) {
-                    const pageIndex = pageFlip.getCurrentPageIndex();
-                    
-                    if (pageIndex === 0) {
-                        // Book Closed (Cover). Cover is Right Page.
-                        // We must shift the entire container LEFT by 25% to center the right page.
-                        stage.style.transform = `translateX(-25%)`; 
-                    } else if (pageIndex === pageFlip.getPageCount() - 1) {
-                        // Back Cover. Shift RIGHT.
-                        stage.style.transform = `translateX(25%)`;
-                    } else {
-                        // Open. Center.
-                        stage.style.transform = `translateX(0)`;
-                    }
-                } else {
-                    // Mobile (Single Page). Always Center.
-                    stage.style.transform = `translateX(0)`;
-                    
-                    // Mobile Text Updates
-                    document.getElementById('txt-hint').textContent = content[currentLang].hintMob;
-                    document.getElementById('icon-arrow').style.transform = "rotate(-90deg)";
-                }
-            };
-
-            // Event Listeners
-            pageFlip.on('flip', alignBook);
-            pageFlip.on('changeState', alignBook);
-            
-            // Delay initial align to ensure library render
-            setTimeout(alignBook, 150);
-            window.addEventListener('resize', alignBook);
-        });
-
-        function flipNext() { pageFlip.flipNext(); }
-
-        function toggleLang() {
+        function toggleLanguage() {
             currentLang = currentLang === 'en' ? 'hi' : 'en';
             const data = content[currentLang];
-            const b = document.getElementById('body-app');
+            const body = document.getElementById('body');
 
-            if(currentLang === 'hi') b.classList.add('hindi');
-            else b.classList.remove('hindi');
+            // Toggle Hindi Styling Class
+            if(currentLang === 'hi') {
+                body.classList.add('hindi-active');
+            } else {
+                body.classList.remove('hindi-active');
+            }
 
-            setText('txt-digital', data.digital);
-            setText('txt-vol', data.vol);
-            setText('txt-year', data.year);
-            setText('txt-title', data.title);
-            setText('txt-msg', data.msg);
-            setText('txt-made', data.made);
-            setText('txt-loc', data.loc);
-            setText('btn-lang', data.btn);
-
-            if(window.innerWidth > 768) setText('txt-hint', data.hint);
-            else setText('txt-hint', data.hintMob);
+            // Update Text
+            document.getElementById('label-digital').textContent = data.digital;
+            document.getElementById('label-edition').textContent = data.edition;
+            document.getElementById('main-title').textContent = data.title;
+            document.getElementById('btn-watch-text').textContent = data.watch;
+            document.getElementById('label-madein').textContent = data.madein;
+            document.getElementById('label-location').textContent = data.location;
+            document.getElementById('modal-title-text').textContent = data.modalTitle;
+            document.getElementById('btn-lang').textContent = data.langBtn;
         }
 
-        function setText(id, txt) {
-            const e = document.getElementById(id);
-            if(e) e.textContent = txt;
+        function openModal() {
+            const modal = document.getElementById('videoModal');
+            const iframe = document.getElementById('youtube-frame');
+            
+            // Set source only when opening to prevent background playing
+            // Using the specific ID from your link: CzQg5KaU26g
+            iframe.src = "https://www.youtube.com/embed/CzQg5KaU26g?autoplay=1&rel=0";
+            
+            modal.classList.add('active');
         }
+
+        function closeModal() {
+            const modal = document.getElementById('videoModal');
+            const iframe = document.getElementById('youtube-frame');
+            
+            modal.classList.remove('active');
+            // Clear source to stop video
+            setTimeout(() => {
+                iframe.src = "";
+            }, 400); // Wait for transition
+        }
+
+        // Close modal on clicking outside
+        document.getElementById('videoModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('videoModal')) {
+                closeModal();
+            }
+        });
+
+        // --- PARALLAX EFFECT (Desktop Only) ---
+        document.addEventListener('mousemove', (e) => {
+            if(window.innerWidth > 1024) {
+                const x = (window.innerWidth - e.pageX) / 60;
+                const y = (window.innerHeight - e.pageY) / 60;
+                
+                const title = document.querySelector('h1');
+                const btn = document.querySelector('.video-cta');
+
+                if(title) title.style.transform = `translateX(${x}px) translateY(${y}px)`;
+                if(btn) btn.style.transform = `translateX(${-x*0.5}px) translateY(${-y*0.5}px)`;
+            }
+        });
     </script>
 </body>
 </html>
