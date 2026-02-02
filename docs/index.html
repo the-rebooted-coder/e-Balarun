@@ -11,11 +11,11 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="E-Balarun 2026 | Digital Edition">
     <meta property="og:description" content="Experience the Digital Edition of E-Balarun 2026.">
-    <meta property="og:image" content="https://i.ibb.co/xS7VkTVX/og-image.png">
+    <meta property="og:image" content="https://i.ibb.co/rKPF6PHv/og-image.png">
     
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="E-Balarun 2026 | Digital Edition">
-    <meta name="twitter:image" content="https://i.ibb.co/xS7VkTVX/og-image.png">
+    <meta name="twitter:image" content="https://i.ibb.co/rKPF6PHv/og-image.png">
 
     <link rel="icon" type="image/png" href="https://i.ibb.co/ymGmHBXm/balarun-logo.png">
     
@@ -80,6 +80,7 @@
             background-color: var(--paper);
             z-index: 99999;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             transition: opacity 0.5s ease-out, visibility 0.5s;
@@ -94,35 +95,32 @@
         .loader-logo {
             width: 150px;
             height: auto;
-            /* Start Black & White */
             filter: grayscale(100%); 
             animation: popZoom 2.8s forwards cubic-bezier(0.65, 0, 0.35, 1);
+            margin-bottom: 20px;
+        }
+
+        .loader-text {
+            font-family: var(--font-title);
+            font-size: 2.5rem;
+            color: var(--accent);
+            opacity: 0;
+            animation: fadeText 2.5s forwards ease-in-out;
         }
 
         @keyframes popZoom {
-            0% { 
-                transform: scale(0.8); 
-                filter: grayscale(100%);
-                opacity: 0; 
-            }
-            15% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            40% {
-                /* Color kicks in */
-                filter: grayscale(0%);
-                transform: scale(1.1);
-            }
-            70% {
-                /* Anticipation shrink */
-                transform: scale(0.95);
-            }
-            100% {
-                /* Massive Zoom Out to Screen */
-                transform: scale(30); 
-                opacity: 0; /* Fade out as it zooms past camera */
-            }
+            0% { transform: scale(0.8); filter: grayscale(100%); opacity: 0; }
+            15% { opacity: 1; transform: scale(1); }
+            40% { filter: grayscale(0%); transform: scale(1.1); }
+            70% { transform: scale(0.95); opacity: 1; }
+            100% { transform: scale(30); opacity: 0; }
+        }
+
+        @keyframes fadeText {
+            0% { opacity: 0; transform: translateY(10px); }
+            20% { opacity: 1; transform: translateY(0); }
+            70% { opacity: 1; }
+            100% { opacity: 0; transform: scale(1.1); }
         }
 
         /* --- CHALK TRAIL CANVAS --- */
@@ -141,9 +139,7 @@
             transition: all 0.3s var(--ease);
         }
         
-        a, button, .sketch-card {
-            cursor: pointer; 
-        }
+        a, button, .sketch-card { cursor: pointer; }
 
         /* --- HEADER --- */
         .container {
@@ -186,8 +182,9 @@
 
         .lang-btn {
             background: transparent;
-            font-family: var(--font-body);
-            font-size: 1.2rem;
+            font-family: var(--font-hindi); 
+            font-weight: 700;
+            font-size: 1.1rem;
             color: var(--ink);
             padding: 5px 20px;
             border: 2px solid var(--ink);
@@ -259,6 +256,9 @@
             max-width: 350px;
             position: relative;
             text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Centering content since tags are gone */
         }
 
         .sketch-card:hover {
@@ -276,6 +276,7 @@
             color: var(--accent);
         }
 
+        /* Card tag removed but CSS kept for safety if you add it back */
         .card-tag {
             font-size: 1rem;
             text-transform: uppercase;
@@ -392,7 +393,8 @@
 <body id="body">
     
     <div id="loader">
-        <img src="https://i.ibb.co/ymGmHBXm/balarun-logo.png" alt="Loading" class="loader-logo">
+        <img src="https://i.ibb.co/ymGmHBXm/balarun-logo.png" alt="Logo" class="loader-logo">
+        <div class="loader-text">Loading E-Balarun...</div>
     </div>
 
     <canvas id="trail-canvas"></canvas>
@@ -404,7 +406,7 @@
                 <span class="digital-badge" id="label-digital">Digital Edition</span>
             </div>
             <button class="lang-btn" onclick="toggleLanguage()" id="btn-lang">
-                Switch to HINDI
+                हिन्दी
             </button>
         </header>
 
@@ -422,8 +424,7 @@
                             <path d="M5 3l14 9-14 9V3z" />
                         </svg>
                     </div>
-                    <div class="card-tag" id="label-exclusive">Exclusive</div>
-                    <div class="card-title" id="btn-watch-text">Principal's Msg</div>
+                    <div class="card-title" id="btn-watch-text">Principal's Message</div>
                 </div>
 
                 <div class="sketch-card wobbly-box" onclick="openModal('tour')">
@@ -433,7 +434,6 @@
                             <path d="M12 2C7.5 2 4 5.5 4 10c0 5 8 12 8 12s8-7 8-12c0-4.5-3.5-8-8-8z" />
                         </svg>
                     </div>
-                    <div class="card-tag" id="label-explore">Explore</div>
                     <div class="card-title" id="btn-tour-text">Campus Tour</div>
                 </div>
             </div>
@@ -466,28 +466,26 @@
         // --- Content Data ---
         const content = {
             en: {
+                tabTitle: "E-Balarun 2026 | Digital Edition",
                 digital: "Digital Edition",
                 title: "E-Balarun",
-                watch: "Principal's Msg",
+                watch: "Principal's Message",
                 tour: "Campus Tour",
-                exclusive: "Exclusive",
-                explore: "Explore",
                 principalTitle: "Principal's Message",
                 tourTitle: "Virtual Campus Tour",
-                langBtn: "Switch to HINDI",
+                langBtn: "हिन्दी",
                 footerHtml: 'Published with ❤️ in <span class="loc-text">Jabalpur</span>'
             },
             hi: {
+                tabTitle: "ई-बालारुण २०२६ | डिजिटल संस्करण",
                 digital: "डिजिटल संस्करण",
                 title: "ई-बालारुण",
-                watch: "प्राचार्य संदेश",
+                watch: "प्राचार्य का संदेश",
                 tour: "कैंपस दर्शन",
-                exclusive: "विशेष",
-                explore: "खोजें", 
                 principalTitle: "प्राचार्य महोदय का संदेश",
                 tourTitle: "कैंपस का भ्रमण",
-                langBtn: "Switch to ENGLISH",
-                footerHtml: '<span class="loc-text">जबलपुर</span> से सप्रेम ❤️ प्रकाशित'
+                langBtn: "English",
+                footerHtml: '<span class="loc-text">जबलपुर</span> से ❤️ प्रकाशित'
             }
         };
 
@@ -530,7 +528,6 @@
         function animateTrail() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Fixed White Color as requested
             const strokeColor = '#ffffff';
 
             ctx.beginPath();
@@ -569,12 +566,13 @@
 
             body.classList.toggle('hindi-active', currentLang === 'hi');
 
+            // Update Tab Title
+            document.title = data.tabTitle;
+
             document.getElementById('label-digital').textContent = data.digital;
             document.getElementById('main-title').textContent = data.title;
             document.getElementById('btn-watch-text').textContent = data.watch;
             document.getElementById('btn-tour-text').textContent = data.tour;
-            document.getElementById('label-exclusive').textContent = data.exclusive;
-            document.getElementById('label-explore').textContent = data.explore;
             document.getElementById('footer-dynamic').innerHTML = data.footerHtml;
             document.getElementById('btn-lang').textContent = data.langBtn;
         }
