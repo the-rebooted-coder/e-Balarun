@@ -97,15 +97,6 @@
             height: auto;
             filter: grayscale(100%); 
             animation: popZoom 2.8s forwards cubic-bezier(0.65, 0, 0.35, 1);
-            margin-bottom: 20px;
-        }
-
-        .loader-text {
-            font-family: var(--font-title);
-            font-size: 2.5rem;
-            color: var(--accent);
-            opacity: 0;
-            animation: fadeText 2.5s forwards ease-in-out;
         }
 
         @keyframes popZoom {
@@ -114,13 +105,6 @@
             40% { filter: grayscale(0%); transform: scale(1.1); }
             70% { transform: scale(0.95); opacity: 1; }
             100% { transform: scale(30); opacity: 0; }
-        }
-
-        @keyframes fadeText {
-            0% { opacity: 0; transform: translateY(10px); }
-            20% { opacity: 1; transform: translateY(0); }
-            70% { opacity: 1; }
-            100% { opacity: 0; transform: scale(1.1); }
         }
 
         /* --- CHALK TRAIL CANVAS --- */
@@ -387,7 +371,7 @@
             padding: 10px;
             border: 2px solid var(--ink);
             box-shadow: 15px 15px 0px var(--accent); 
-            /* transform: rotate(-1deg); REMOVED: Makes modal straight */
+            /* Straight modal - no rotation */
         }
 
         .modal-header {
@@ -446,7 +430,6 @@
     
     <div id="loader">
         <img src="https://i.ibb.co/ymGmHBXm/balarun-logo.png" alt="Logo" class="loader-logo">
-        <div class="loader-text">Loading E-Balarun...</div>
     </div>
 
     <canvas id="trail-canvas"></canvas>
