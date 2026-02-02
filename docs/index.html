@@ -3,7 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>E-Balarun 2026 | Digital Edition</title>
+    <meta name="description" content="Digital Edition of E-Balarun 2026. Watch video messages and take a virtual campus tour.">
+    <meta name="keywords" content="E-Balarun, 2026, Digital Edition, Campus Tour, Jabalpur">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="E-Balarun 2026 | Digital Edition">
+    <meta property="og:description" content="Experience the Digital Edition of E-Balarun 2026.">
+    <meta property="og:image" content="https://i.ibb.co/yFpnpVTy/balarun-logo.png">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="E-Balarun 2026 | Digital Edition">
+    <meta name="twitter:image" content="https://i.ibb.co/yFpnpVTy/balarun-logo.png">
+
+    <link rel="icon" type="image/png" href="https://i.ibb.co/yFpnpVTy/balarun-logo.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,7 +51,7 @@
         /* --- LAYOUT GRID --- */
         .poster-grid {
             display: grid;
-            grid-template-rows: auto 1fr auto; 
+            grid-template-rows: auto 1fr auto; /* Header, Main, Footer */
             min-height: 100vh;
             padding: 15px;
             border: 8px solid var(--bg-color);
@@ -52,7 +66,11 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid var(--line-color);
-            padding-bottom: 10px;
+            padding-bottom: 15px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            font-weight: 700;
             z-index: 50;
         }
 
@@ -63,16 +81,8 @@
         }
 
         .org-logo {
-            height: 50px; /* Small footprint to avoid blur */
+            height: 45px;
             width: auto;
-            display: block;
-        }
-
-        .header-center {
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-            font-weight: 700;
         }
 
         .lang-switch {
@@ -82,9 +92,6 @@
             border-radius: 50px;
             transition: all 0.3s ease;
             font-family: var(--font-ui);
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            font-weight: 700;
         }
         .lang-switch:hover {
             background: var(--text-color);
@@ -103,6 +110,7 @@
             text-align: center;
         }
 
+        /* The Title */
         h1 {
             font-family: var(--font-display);
             font-size: clamp(3rem, 14vw, 10rem); 
@@ -116,6 +124,7 @@
             animation: riseUp 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
         }
 
+        /* Hindi Title Override */
         body.hindi-active h1 {
             font-family: var(--font-hindi);
             font-weight: 700;
@@ -124,6 +133,7 @@
             font-size: clamp(2.5rem, 12vw, 9rem);
         }
 
+        /* The Edition Tag */
         .edition-tag {
             font-family: var(--font-ui);
             text-transform: uppercase;
@@ -158,12 +168,13 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             padding: 18px 32px;
+            border-radius: 0; /* Sharp edges for magazine look */
             cursor: pointer;
             font-size: 1rem;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             box-shadow: 6px 6px 0px rgba(0,0,0,1);
         }
 
@@ -181,9 +192,9 @@
             box-shadow: 2px 2px 0px rgba(0,0,0,1);
         }
 
-        /* Icons */
         .play-icon {
-            width: 0; height: 0; 
+            width: 0; 
+            height: 0; 
             border-top: 6px solid transparent;
             border-bottom: 6px solid transparent;
             border-left: 10px solid var(--bg-color);
@@ -197,7 +208,33 @@
             clip-path: polygon(50% 0%, 100% 40%, 100% 100%, 0% 100%, 0% 40%);
         }
 
-        /* --- MODAL --- */
+        /* --- FOOTER --- */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 15px;
+            border-top: 2px solid var(--line-color);
+        }
+
+        .location-bold {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-style: italic;
+        }
+        
+        /* Barcode Decoration */
+        .barcode {
+            display: flex;
+            gap: 4px;
+            height: 30px;
+            opacity: 0.8;
+        }
+        .bar { background: var(--text-color); width: 2px; }
+        .bar:nth-child(even) { width: 4px; }
+        .bar:nth-child(3n) { width: 1px; }
+
+        /* --- MODAL (Video Overlay) --- */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -212,16 +249,23 @@
             backdrop-filter: blur(5px);
         }
 
-        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
 
         .modal-content {
-            width: 90%; max-width: 900px;
+            width: 90%;
+            max-width: 900px;
+            background: transparent;
             position: relative;
             transform: translateY(20px);
             transition: transform 0.4s ease;
         }
 
-        .modal-overlay.active .modal-content { transform: translateY(0); }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
 
         .modal-header {
             display: flex;
@@ -232,53 +276,86 @@
             padding-bottom: 10px;
         }
 
-        .modal-title { font-family: var(--font-display); font-size: 1.5rem; font-style: italic; }
-        body.hindi-active .modal-title { font-family: var(--font-hindi); font-style: normal; }
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-style: italic;
+        }
+        
+        body.hindi-active .modal-title {
+            font-family: var(--font-hindi);
+            font-style: normal;
+        }
 
-        .btn-close { background: none; border: none; font-size: 2rem; cursor: pointer; color: var(--text-color); }
+        .btn-close {
+            background: none;
+            border: none;
+            font-family: var(--font-ui);
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 0.5;
+            color: var(--text-color);
+        }
 
         .video-wrapper {
             position: relative;
-            padding-bottom: 56.25%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
             height: 0;
             background: #000;
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.2);
             border: 2px solid var(--text-color);
-            box-shadow: 10px 10px 0px rgba(0,0,0,0.1);
         }
 
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-
-        /* --- FOOTER --- */
-        .footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            padding-top: 15px;
-            border-top: 2px solid var(--line-color);
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
 
-        .location-bold { font-family: var(--font-display); font-size: 1.5rem; font-style: italic; }
-
-        .barcode { display: flex; gap: 4px; height: 30px; opacity: 0.8; }
-        .bar { background: var(--text-color); width: 2px; }
-        .bar:nth-child(even) { width: 4px; }
-
+        /* --- DESKTOP TWEAKS --- */
         @media (min-width: 1024px) {
-            .poster-grid { padding: 40px; border-width: 30px; }
-            .org-logo { height: 60px; }
-            .btn-watch { padding: 24px 48px; font-size: 1.2rem; }
+            .poster-grid {
+                padding: 40px;
+                border-width: 30px;
+            }
+            .header {
+                font-size: 0.9rem;
+            }
+            .org-logo {
+                height: 55px;
+            }
+            .btn-watch {
+                padding: 24px 48px;
+                font-size: 1.2rem;
+            }
+            /* Decorative Circle */
             .graphic-circle {
-                position: absolute; left: 50%; top: 50%;
+                position: absolute;
+                left: 50%; top: 50%;
                 transform: translate(-50%, -50%);
                 width: 70vh; height: 70vh;
                 border: 1px solid var(--text-color);
-                border-radius: 50%; z-index: 1; opacity: 0.08; pointer-events: none;
+                border-radius: 50%;
+                z-index: 1;
+                opacity: 0.08;
+                pointer-events: none;
             }
         }
 
-        @keyframes riseUp { from { transform: translateY(60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes fadeIn { to { opacity: 1; } }
-        @keyframes popIn { to { opacity: 1; } }
+        /* --- ANIMATIONS --- */
+        @keyframes riseUp {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        @keyframes popIn {
+            to { opacity: 1; }
+        }
+
     </style>
 </head>
 <body id="body">
@@ -286,18 +363,15 @@
     <div class="poster-grid">
         <header class="header">
             <div class="header-left">
-                <img src="https://i.ibb.co/yFpnpVTy/balarun-logo.png" alt="Organization Logo" class="org-logo">
+                <img src="https://i.ibb.co/yFpnpVTy/balarun-logo.png" alt="Logo" class="org-logo">
             </div>
-            <div class="header-center">
-                <span id="label-digital">Digital Edition</span>
-            </div>
-            <div class="header-right">
-                <button class="lang-switch" onclick="toggleLanguage()" id="btn-lang">हिंदी</button>
-            </div>
+            <span id="label-digital">Digital Edition</span>
+            <button class="lang-switch" onclick="toggleLanguage()" id="btn-lang">हिंदी</button>
         </header>
 
         <main class="main-stage">
             <div class="edition-tag" id="label-edition">Year 2026</div>
+            
             <h1 id="main-title">E-Balarun</h1>
             
             <div class="cta-group">
@@ -323,7 +397,9 @@
             <div class="barcode">
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
             </div>
+            
             <div style="text-align: right;">
                 <span style="display:block; font-size: 0.7rem; text-transform:uppercase; letter-spacing:1px;" id="label-madein">Made in</span>
                 <span class="location-bold" id="label-location">Jabalpur</span>
@@ -344,6 +420,7 @@
     </div>
 
     <script>
+        // --- CONTENT DATA ---
         const content = {
             en: {
                 digital: "Digital Edition",
@@ -378,14 +455,21 @@
 
         let currentLang = 'en';
 
+        // --- FUNCTIONS ---
+
         function toggleLanguage() {
             currentLang = currentLang === 'en' ? 'hi' : 'en';
             const data = content[currentLang];
             const body = document.getElementById('body');
 
-            if(currentLang === 'hi') body.classList.add('hindi-active');
-            else body.classList.remove('hindi-active');
+            // Toggle Hindi Styling Class
+            if(currentLang === 'hi') {
+                body.classList.add('hindi-active');
+            } else {
+                body.classList.remove('hindi-active');
+            }
 
+            // Update Text
             document.getElementById('label-digital').textContent = data.digital;
             document.getElementById('label-edition').textContent = data.edition;
             document.getElementById('main-title').textContent = data.title;
@@ -401,31 +485,44 @@
             const iframe = document.getElementById('youtube-frame');
             const titleText = document.getElementById('modal-title-text');
             
+            // Set Title based on video key and language
             titleText.textContent = videoKey === 'principal' ? content[currentLang].principalTitle : content[currentLang].tourTitle;
+            
+            // Set YouTube Source
             iframe.src = `https://www.youtube.com/embed/${videoLinks[videoKey]}?autoplay=1&rel=0`;
+            
             modal.classList.add('active');
         }
 
         function closeModal() {
             const modal = document.getElementById('videoModal');
             const iframe = document.getElementById('youtube-frame');
+            
             modal.classList.remove('active');
-            setTimeout(() => { iframe.src = ""; }, 400);
+            // Clear source to stop video
+            setTimeout(() => {
+                iframe.src = "";
+            }, 400); // Wait for transition
         }
 
+        // Close modal on clicking outside
         document.getElementById('videoModal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('videoModal')) closeModal();
+            if (e.target === document.getElementById('videoModal')) {
+                closeModal();
+            }
         });
 
-        // Parallax Effect
+        // --- PARALLAX EFFECT (Desktop Only) ---
         document.addEventListener('mousemove', (e) => {
             if(window.innerWidth > 1024) {
-                const x = (window.innerWidth - e.pageX) / 80;
-                const y = (window.innerHeight - e.pageY) / 80;
+                const x = (window.innerWidth - e.pageX) / 60;
+                const y = (window.innerHeight - e.pageY) / 60;
+                
                 const title = document.querySelector('h1');
-                const group = document.querySelector('.cta-group');
+                const btnGroup = document.querySelector('.cta-group');
+
                 if(title) title.style.transform = `translateX(${x}px) translateY(${y}px)`;
-                if(group) group.style.transform = `translateX(${-x*0.5}px) translateY(${-y*0.5}px)`;
+                if(btnGroup) btnGroup.style.transform = `translateX(${-x*0.5}px) translateY(${-y*0.5}px)`;
             }
         });
     </script>
