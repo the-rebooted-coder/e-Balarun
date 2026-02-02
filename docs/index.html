@@ -167,9 +167,19 @@
             gap: 15px;
         }
 
+        /* --- LOGO STYLING --- */
         .logo-sketch {
             height: 50px;
+            /* Default: Grayscale */
             filter: grayscale(1) contrast(1.2);
+            transition: all 0.4s ease; /* Smooth transition */
+            transform-origin: center;
+        }
+
+        /* Hover Effect: Colorize & Scale */
+        .logo-sketch:hover {
+            filter: grayscale(0) contrast(1);
+            transform: scale(1.1) rotate(-2deg);
         }
 
         .digital-badge {
@@ -258,7 +268,7 @@
             text-align: left;
             display: flex;
             flex-direction: column;
-            justify-content: center; /* Centering content since tags are gone */
+            justify-content: center;
         }
 
         .sketch-card:hover {
@@ -276,20 +286,59 @@
             color: var(--accent);
         }
 
-        /* Card tag removed but CSS kept for safety if you add it back */
-        .card-tag {
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--ink-dim);
-            font-weight: 700;
-        }
-
         .card-title {
             font-family: var(--font-title);
             font-size: 2.5rem;
             font-weight: 700;
             line-height: 1;
+        }
+
+        /* --- MOBILE STICKY NOTE --- */
+        #mobile-note {
+            display: none; /* Hidden on desktop */
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 250px;
+            background: #fef3c7; /* Sticky note yellow */
+            color: #1e1e1e;
+            padding: 15px;
+            transform: rotate(-3deg);
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            line-height: 1.3;
+            z-index: 500;
+            animation: slideUp 1s ease-out 4s backwards; /* Appears after loader */
+        }
+        
+        /* Tape effect on note */
+        #mobile-note::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 15px;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .note-close {
+            position: absolute;
+            top: 2px;
+            right: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.2rem;
+            opacity: 0.5;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%) rotate(-3deg); opacity: 0; }
+            to { transform: translateY(0) rotate(-3deg); opacity: 1; }
         }
 
         /* --- FOOTER --- */
@@ -387,6 +436,9 @@
             h1 { margin-bottom: 2rem; }
             .cards-container { flex-direction: column; }
             .sketch-card { max-width: 100%; }
+            
+            /* Show the sticky note only on mobile */
+            #mobile-note { display: block; }
         }
     </style>
 </head>
@@ -398,6 +450,11 @@
     </div>
 
     <canvas id="trail-canvas"></canvas>
+
+    <div id="mobile-note">
+        <span class="note-close" onclick="dismissMobileNote()">×</span>
+        ✨ <b>Tip:</b> Open this on a Laptop/PC for a better experience 🖱️
+    </div>
 
     <div class="container">
         <header>
@@ -499,7 +556,25 @@
             setTimeout(() => {
                 loader.classList.add('hidden');
             }, 3000);
+
+            // Check if mobile note is already dismissed
+            checkMobileNote();
         });
+
+        // --- Mobile Note Logic (Local Storage) ---
+        function checkMobileNote() {
+            const note = document.getElementById('mobile-note');
+            if (localStorage.getItem('mobileNoteDismissed') === 'true') {
+                note.style.display = 'none'; // Ensure it stays hidden
+                // Important: Override CSS !important if needed, but display:none on inline style works high specificity
+            }
+        }
+
+        function dismissMobileNote() {
+            const note = document.getElementById('mobile-note');
+            note.style.display = 'none';
+            localStorage.setItem('mobileNoteDismissed', 'true');
+        }
 
         // --- Chalk Trail Logic ---
         const canvas = document.getElementById('trail-canvas');
