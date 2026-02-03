@@ -25,7 +25,7 @@
     
     <style>
         :root {
-            /* --- THEME: Blackboard (Dark Mode Default) --- */
+            /* --- DEFAULT THEME: Blackboard (Dark) --- */
             --paper: #18181b; /* Zinc 900 */
             --ink: #f4f4f5;   /* Zinc 100 */
             --ink-dim: #a1a1aa;
@@ -36,19 +36,36 @@
             --font-body: 'Patrick Hand', cursive;
             --font-hindi: 'Noto Serif Devanagari', serif;
             
-            --wobbly-border: 255px 15px 225px 15px / 15px 225px 15px 255px;
             --ease: cubic-bezier(0.25, 1, 0.5, 1);
         }
 
+        /* Class for manual Whiteboard mode override */
+        body.theme-whiteboard {
+            --paper: #fffbeb; /* Cream Paper */
+            --ink: #1e293b;   /* Navy Ink */
+            --ink-dim: #64748b;
+            --accent: #d97706; /* Orange Highlighter */
+            --grid-color: #e5e7eb;
+        }
+
+        /* Check system preference if no manual override is set */
         @media (prefers-color-scheme: light) {
-            :root {
-                /* --- THEME: Sketchbook (Light Mode) --- */
-                --paper: #fffbeb; /* Cream Paper */
-                --ink: #1e293b;   /* Navy Ink */
+            body:not(.theme-blackboard) {
+                --paper: #fffbeb; 
+                --ink: #1e293b;   
                 --ink-dim: #64748b;
-                --accent: #d97706; /* Orange Highlighter */
+                --accent: #d97706; 
                 --grid-color: #e5e7eb;
             }
+        }
+
+        /* Class for manual Blackboard mode override (if system is light) */
+        body.theme-blackboard {
+            --paper: #18181b; 
+            --ink: #f4f4f5;   
+            --ink-dim: #a1a1aa;
+            --accent: #facc15; 
+            --grid-color: #27272a;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
@@ -62,6 +79,7 @@
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
             
             /* Custom Chalk Cursor */
             cursor: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="2.5" width="10" height="20" rx="1" transform="rotate(-30 8 12)" fill="white" stroke="gray" stroke-width="1"/></svg>') 0 20, auto;
@@ -116,10 +134,27 @@
             z-index: 9999;
         }
 
-        /* --- UTILS --- */
-        .wobbly-box {
+        /* --- STYLES FOR CHALK BORDERS --- */
+        .chalk-border-1 {
             border: 2px solid var(--ink);
-            border-radius: var(--wobbly-border);
+            /* Shape 1: Top-heavy wobble */
+            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+            transition: all 0.3s var(--ease);
+        }
+
+        .chalk-border-2 {
+            border: 2px solid var(--ink);
+            /* Shape 2: Bottom-heavy wobble, distinct from Shape 1 */
+            border-radius: 25px 225px 25px 225px / 225px 25px 225px 25px;
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+            transition: all 0.3s var(--ease);
+        }
+
+        .chalk-border-sm {
+            border: 2px solid var(--ink);
+            /* Shape 3: Tighter wobble for small buttons */
+            border-radius: 255px 25px 225px 25px / 25px 225px 25px 255px;
             transition: all 0.3s var(--ease);
         }
         
@@ -169,7 +204,7 @@
 
         .digital-badge {
             font-family: var(--font-title);
-            font-size: 1.5rem; /* Increased size */
+            font-size: 1.5rem; 
             font-weight: 700;
             border-bottom: 2px solid var(--accent);
             padding-bottom: 2px;
@@ -183,8 +218,6 @@
             font-size: 1.1rem;
             color: var(--ink);
             padding: 5px 20px;
-            border: 2px solid var(--ink);
-            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
             white-space: nowrap;
         }
 
@@ -333,11 +366,14 @@
             border-top: 2px dashed var(--ink-dim);
             padding-top: 1.5rem;
             display: flex;
+            flex-direction: column;
+            align-items: center;
             justify-content: center;
             font-size: 1.1rem;
             color: var(--ink-dim);
             margin-top: auto;
             text-align: center;
+            gap: 1rem;
         }
 
         .loc-text {
@@ -346,6 +382,25 @@
             text-decoration: underline;
             text-decoration-style: wavy;
             text-decoration-color: var(--accent);
+        }
+        
+        /* --- THEME TOGGLE BUTTON --- */
+        .theme-toggle-btn {
+            background: none;
+            border: 1px dashed var(--ink-dim);
+            color: var(--ink-dim);
+            padding: 5px 15px;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+        .theme-toggle-btn:hover {
+            opacity: 1;
+            border-color: var(--accent);
+            color: var(--accent);
         }
 
         /* --- MODAL --- */
@@ -474,7 +529,7 @@
                 <img src="https://i.ibb.co/ymGmHBXm/balarun-logo.png" alt="Logo" class="logo-sketch">
                 <span class="digital-badge" id="label-digital">Digital Edition</span>
             </div>
-            <button class="lang-btn" onclick="toggleLanguage()" id="btn-lang">
+            <button class="lang-btn chalk-border-sm" onclick="toggleLanguage()" id="btn-lang">
                 हिन्दी
             </button>
         </header>
@@ -487,7 +542,7 @@
             <h1 id="main-title">E-Balarun</h1>
 
             <div class="cards-container">
-                <div class="sketch-card wobbly-box" onclick="openModal('principal')">
+                <div class="sketch-card chalk-border-1" onclick="openModal('principal')">
                     <div class="card-icon">
                         <svg width="40" height="40" viewBox="0 0 24 24">
                             <path d="M5 3l14 9-14 9V3z" />
@@ -496,7 +551,7 @@
                     <div class="card-title" id="btn-watch-text">Video Messages</div>
                 </div>
 
-                <div class="sketch-card wobbly-box" onclick="openModal('tour')">
+                <div class="sketch-card chalk-border-2" onclick="openModal('tour')">
                     <div class="card-icon">
                         <svg width="40" height="40" viewBox="0 0 24 24">
                             <circle cx="12" cy="12" r="3" />
@@ -512,6 +567,10 @@
             <div id="footer-dynamic">
                 Published with ❤️ in <span class="loc-text">Jabalpur</span>
             </div>
+            
+            <button class="theme-toggle-btn" id="btn-theme-toggle" onclick="toggleTheme()">
+                Switch to Whiteboard
+            </button>
         </footer>
     </div>
 
@@ -544,8 +603,11 @@
                 tourTitle: "Virtual Campus Tour",
                 // Labels for the toggle button (pointing to the OTHER language)
                 langBtn: "हिन्दी",      // Desktop: Switch to Hindi
-                langBtnMobile: "हिं",     // Mobile: Switch to Hindi (Short)
-                footerHtml: 'Published with ❤️ in <span class="loc-text">Jabalpur</span>'
+                langBtnMobile: "हिं",     // Mobile: Switch to Hindi (Very Short)
+                langBtnMobileEnglish: "En", // Mobile: English Label (if needed elsewhere)
+                footerHtml: 'Published with ❤️ in <span class="loc-text">Jabalpur</span>',
+                themeWhite: "Switch to Whiteboard",
+                themeBlack: "Switch to Blackboard"
             },
             hi: {
                 tabTitle: "ई-बालारुण २०२६ | डिजिटल संस्करण",
@@ -557,8 +619,10 @@
                 tourTitle: "कैंपस का भ्रमण",
                 // Labels for the toggle button (pointing to the OTHER language)
                 langBtn: "English",     // Desktop: Switch to English
-                langBtnMobile: "Eng",   // Mobile: Switch to English (Short)
-                footerHtml: '<span class="loc-text">जबलपुर</span> से ❤️ प्रकाशित'
+                langBtnMobile: "En",    // Mobile: Switch to English (Very Short)
+                footerHtml: '<span class="loc-text">जबलपुर</span> से ❤️ प्रकाशित',
+                themeWhite: "व्हाइटबोर्ड पर जाएं",
+                themeBlack: "ब्लैकबोर्ड पर जाएं"
             }
         };
 
@@ -577,6 +641,8 @@
             checkMobileNote();
             // Initial button text set (for responsive check)
             updateLangButton(); 
+            // Set initial theme button text
+            updateThemeButtonText();
         });
 
         // --- Responsive Lang Button Logic ---
@@ -603,6 +669,57 @@
             const note = document.getElementById('mobile-note');
             note.style.display = 'none';
             localStorage.setItem('mobileNoteDismissed', 'true');
+        }
+        
+        // --- Theme Toggle Logic ---
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('btn-theme-toggle');
+            
+            // Check if currently forcing whiteboard
+            if (body.classList.contains('theme-whiteboard')) {
+                body.classList.remove('theme-whiteboard');
+                body.classList.add('theme-blackboard');
+            } 
+            else if (body.classList.contains('theme-blackboard')) {
+                body.classList.remove('theme-blackboard');
+                body.classList.add('theme-whiteboard');
+            } 
+            else {
+                // No manual class set yet, check system pref
+                const isSystemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (isSystemDark) {
+                    body.classList.add('theme-whiteboard');
+                } else {
+                    body.classList.add('theme-blackboard');
+                }
+            }
+            updateThemeButtonText();
+        }
+
+        function updateThemeButtonText() {
+            const body = document.body;
+            const btn = document.getElementById('btn-theme-toggle');
+            const data = content[currentLang];
+            
+            // Determine current effective theme
+            let isDark = true; 
+            
+            if (body.classList.contains('theme-whiteboard')) {
+                isDark = false;
+            } else if (body.classList.contains('theme-blackboard')) {
+                isDark = true;
+            } else {
+                 // Fallback to system
+                 isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            }
+            
+            // If currently dark (Blackboard), button should offer "Switch to Whiteboard"
+            if (isDark) {
+                btn.textContent = data.themeWhite;
+            } else {
+                btn.textContent = data.themeBlack;
+            }
         }
 
         // --- Chalk Trail Logic ---
@@ -632,6 +749,8 @@
         function animateTrail() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
+            // Use ink color from CSS variable for trail? Or keep white chalk?
+            // Usually chalk is white regardless of theme, but let's stick to white for now
             const strokeColor = '#ffffff';
 
             ctx.beginPath();
@@ -679,8 +798,9 @@
             document.getElementById('btn-tour-text').textContent = data.tour;
             document.getElementById('footer-dynamic').innerHTML = data.footerHtml;
             
-            // Update button using responsive helper
+            // Update buttons using responsive helper
             updateLangButton();
+            updateThemeButtonText();
         }
 
         function openModal(videoKey) {
