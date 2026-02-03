@@ -377,7 +377,15 @@
             color: var(--ink-dim);
             margin-top: auto;
             text-align: center;
-            gap: 1rem;
+            gap: 1.5rem;
+        }
+
+        .footer-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
         }
 
         .loc-text {
@@ -575,13 +583,15 @@
                 Published with ❤️ in <span class="loc-text">Jabalpur</span>
             </div>
             
-            <a href="https://the-rebooted-coder.github.io/e-Balarun/archive" class="archive-btn" id="btn-archive">
-                📂 2021-22 Archive
-            </a>
+            <div class="footer-actions">
+                <a href="https://the-rebooted-coder.github.io/e-Balarun/archive" class="archive-btn" id="btn-archive">
+                    📂 2021-22 Archive
+                </a>
 
-            <button class="theme-toggle-btn" id="btn-theme-toggle" onclick="toggleTheme()">
-                Switch to Whiteboard
-            </button>
+                <button class="theme-toggle-btn" id="btn-theme-toggle" onclick="toggleTheme()">
+                    Switch to Whiteboard
+                </button>
+            </div>
         </footer>
     </div>
 
