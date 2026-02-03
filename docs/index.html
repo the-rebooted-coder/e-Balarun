@@ -31,6 +31,7 @@
             --ink-dim: #a1a1aa;
             --accent: #facc15; /* Yellow Chalk */
             --grid-color: #27272a;
+            --trail-color: #ffffff; /* White chalk for dark mode */
             
             --font-title: 'Amatic SC', cursive;
             --font-body: 'Patrick Hand', cursive;
@@ -46,6 +47,7 @@
             --ink-dim: #64748b;
             --accent: #d97706; /* Orange Highlighter */
             --grid-color: #e5e7eb;
+            --trail-color: #3f3f46; /* Dark Grey charcoal for light mode */
         }
 
         /* Check system preference if no manual override is set */
@@ -56,6 +58,7 @@
                 --ink-dim: #64748b;
                 --accent: #d97706; 
                 --grid-color: #e5e7eb;
+                --trail-color: #3f3f46; /* Dark Grey charcoal */
             }
         }
 
@@ -66,6 +69,7 @@
             --ink-dim: #a1a1aa;
             --accent: #facc15; 
             --grid-color: #27272a;
+            --trail-color: #ffffff;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
@@ -604,7 +608,6 @@
                 // Labels for the toggle button (pointing to the OTHER language)
                 langBtn: "हिन्दी",      // Desktop: Switch to Hindi
                 langBtnMobile: "हिं",     // Mobile: Switch to Hindi (Very Short)
-                langBtnMobileEnglish: "En", // Mobile: English Label (if needed elsewhere)
                 footerHtml: 'Published with ❤️ in <span class="loc-text">Jabalpur</span>',
                 themeWhite: "Switch to Whiteboard",
                 themeBlack: "Switch to Blackboard"
@@ -674,7 +677,6 @@
         // --- Theme Toggle Logic ---
         function toggleTheme() {
             const body = document.body;
-            const btn = document.getElementById('btn-theme-toggle');
             
             // Check if currently forcing whiteboard
             if (body.classList.contains('theme-whiteboard')) {
@@ -749,9 +751,8 @@
         function animateTrail() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Use ink color from CSS variable for trail? Or keep white chalk?
-            // Usually chalk is white regardless of theme, but let's stick to white for now
-            const strokeColor = '#ffffff';
+            // Fetch current trail color from CSS variable
+            const strokeColor = getComputedStyle(document.body).getPropertyValue('--trail-color') || '#ffffff';
 
             ctx.beginPath();
             ctx.lineCap = 'round';
