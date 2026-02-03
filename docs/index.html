@@ -314,6 +314,12 @@
             position: relative;
         }
 
+        /* Removed <a> styling, added general pointer cursor for div wrapper */
+        .book-wrapper {
+            cursor: pointer;
+            text-decoration: none;
+        }
+
         .book {
             position: relative;
             width: 220px;
@@ -324,7 +330,6 @@
             transition: transform 0.6s var(--ease);
             /* Ambient shadow on the floor */
             box-shadow: 20px 20px 50px rgba(0,0,0,0.4); 
-            cursor: pointer;
         }
 
         .book:hover {
@@ -536,6 +541,35 @@
             to { transform: translateY(0) rotate(-3deg); opacity: 1; }
         }
 
+        /* --- TOAST NOTIFICATION --- */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: var(--ink); /* Inverted for high visibility but within theme */
+            color: var(--paper);
+            text-align: center;
+            border-radius: 50px;
+            padding: 16px 25px;
+            position: fixed;
+            z-index: 10000;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%) translateY(20px);
+            font-family: var(--font-body);
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.4s;
+            border: 2px solid var(--accent); /* Subtle border matching accent */
+        }
+
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0px);
+        }
+
         /* --- FOOTER --- */
         footer {
             border-top: 2px dashed var(--ink-dim);
@@ -716,6 +750,8 @@
         ✨ <b>Tip:</b> Open this on a Laptop/PC for a better experience 🖱️
     </div>
 
+    <div id="toast">Coming Soon 🚧</div>
+
     <div class="container">
         <header>
             <div class="brand">
@@ -729,7 +765,7 @@
 
         <main class="hero">
             <div class="book-container">
-                <a href="https://the-rebooted-coder.github.io/balarun/" target="_blank" rel="noopener noreferrer">
+                <div class="book-wrapper" onclick="showToast()">
                     <div class="book">
                         <div class="book-face book-front">
                             <img src="150_Poster.jpg" alt="E-Balarun Poster Cover">
@@ -738,7 +774,7 @@
                         <div class="book-face book-pages"></div>
                         <div class="book-face book-back"></div>
                     </div>
-                </a>
+                </div>
                 <div class="read-tooltip" id="label-read">Click to Read 📖</div>
             </div>
             
@@ -816,7 +852,8 @@
                 themeWhite: "Switch to Whiteboard",
                 themeBlack: "Switch to Blackboard",
                 archiveBtn: "📂 2021-22 Archive",
-                readLabel: "Click to Read 📖"
+                readLabel: "Click to Read 📖",
+                comingSoon: "Coming Soon 🚧" // NEW
             },
             hi: {
                 tabTitle: "ई-बालारुण २०२६ | डिजिटल संस्करण",
@@ -832,7 +869,8 @@
                 themeWhite: "व्हाइटबोर्ड पर जाएं",
                 themeBlack: "ब्लैकबोर्ड पर जाएं",
                 archiveBtn: "📂 २०२१-२२ संग्रह",
-                readLabel: "पढ़ने के लिए क्लिक करें 📖"
+                readLabel: "पढ़ने के लिए क्लिक करें 📖",
+                comingSoon: "जल्द आ रहा है 🚧" // NEW
             }
         };
 
@@ -1024,6 +1062,22 @@
             
             updateLangButton();
             updateThemeButtonText();
+        }
+
+        // --- TOAST FUNCTION ---
+        function showToast() {
+            const toast = document.getElementById("toast");
+            
+            // Set text based on current language
+            toast.textContent = content[currentLang].comingSoon;
+            
+            // Add class to show
+            toast.className = "show";
+            
+            // Hide after 3 seconds
+            setTimeout(function(){ 
+                toast.className = toast.className.replace("show", ""); 
+            }, 3000);
         }
 
         function openModal(videoKey) {
