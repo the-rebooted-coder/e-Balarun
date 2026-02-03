@@ -144,7 +144,7 @@
             width: 0%; /* Starts invisible */
             z-index: 99990; /* High z-index but below loader */
             pointer-events: none;
-            background-size: 30px 30px; /* Size kept, image set in JS */
+            background-size: 30px 30px;
             overflow: visible;
         }
 
@@ -290,7 +290,7 @@
             transform: rotate(-2deg) scale(1.05);
         }
 
-        /* --- HERO --- */
+        /* --- HERO & TRUE 3D BOOK --- */
         .hero {
             flex: 1;
             display: flex;
@@ -301,20 +301,132 @@
             padding-bottom: 3rem;
         }
 
-        .year-circle {
-            width: 80px; height: 80px;
-            border: 2px solid var(--accent);
-            color: var(--accent);
-            border-radius: 50%;
+        /* 3D BOOK CONTAINER */
+        .book-container {
+            perspective: 1500px; /* High perspective for realistic depth */
+            width: 240px; 
+            height: 340px;
             display: flex;
-            align-items: center;
             justify-content: center;
-            font-family: var(--font-title);
-            font-size: 1.5rem;
-            font-weight: 700;
-            transform: rotate(-10deg);
-            margin-bottom: 1rem;
-            box-shadow: 4px 4px 0px var(--grid-color);
+            align-items: center;
+            margin-bottom: 2rem;
+            z-index: 50;
+            position: relative;
+        }
+
+        .book {
+            position: relative;
+            width: 220px;
+            height: 310px;
+            transform-style: preserve-3d;
+            /* Initial Angle: Tilted to show spine (Left) and Cover */
+            transform: rotateY(-35deg) rotateX(10deg); 
+            transition: transform 0.6s var(--ease);
+            /* Ambient shadow on the floor */
+            box-shadow: 20px 20px 50px rgba(0,0,0,0.4); 
+            cursor: pointer;
+        }
+
+        .book:hover {
+            /* On hover: Face forward, lift up */
+            transform: rotateY(0deg) rotateX(0deg) translateZ(30px) scale(1.05);
+            box-shadow: 0 40px 60px rgba(0,0,0,0.3);
+        }
+
+        /* Common face styles */
+        .book-face {
+            position: absolute;
+            background-color: #fff;
+            backface-visibility: hidden; /* Hide back of faces for performance */
+        }
+
+        /* FRONT COVER */
+        .book-front {
+            width: 220px;
+            height: 310px;
+            /* Move forward by half thickness (20px) */
+            transform: translateZ(20px);
+            background: #222;
+            border-radius: 2px 4px 4px 2px;
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        .book-front img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Gloss sheen overlay on cover */
+        .book-front::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0; width: 30px;
+            background: linear-gradient(to right, rgba(255,255,255,0.2) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        /* SPINE (Left Face) */
+        .book-spine {
+            width: 40px; /* Thickness */
+            height: 310px;
+            background: #8B4513; /* Warm Brown */
+            /* Position at left edge */
+            left: -20px; /* Center of spine element is at left edge of container */
+            /* Rotate -90deg to face Left. Translate Z to 0 (center of book) */
+            transform: rotateY(-90deg) translateZ(0); 
+            /* Inner shadow to make it look rounded */
+            box-shadow: inset 5px 0 15px rgba(0,0,0,0.3);
+        }
+
+        /* PAGES (Right Face) */
+        .book-pages {
+            width: 40px; /* Thickness */
+            height: 304px; /* Slightly shorter than cover */
+            top: 3px;
+            background: #fdf6e3;
+            /* Position at right edge */
+            right: -20px;
+            transform: rotateY(90deg) translateZ(0);
+            /* Paper lines pattern */
+            background-image: repeating-linear-gradient(
+                90deg, 
+                #fdf6e3 0px, 
+                #fdf6e3 2px, 
+                #dcdcdc 3px
+            );
+            box-shadow: inset -2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        /* BACK COVER (For completeness/rotation) */
+        .book-back {
+            width: 220px;
+            height: 310px;
+            transform: rotateY(180deg) translateZ(20px);
+            background: #2e2e2e;
+        }
+
+        /* "Click to Read" Tooltip */
+        .read-tooltip {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--font-body);
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 1.3rem;
+            opacity: 0;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            pointer-events: none;
+            white-space: nowrap;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .book-container:hover .read-tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-5px);
         }
 
         h1 {
@@ -616,8 +728,18 @@
         </header>
 
         <main class="hero">
-            <div class="year-circle">
-                <span id="label-edition">2026</span>
+            <div class="book-container">
+                <a href="https://the-rebooted-coder.github.io/balarun/" target="_blank" rel="noopener noreferrer">
+                    <div class="book">
+                        <div class="book-face book-front">
+                            <img src="150_Poster.jpg" alt="E-Balarun Poster Cover">
+                        </div>
+                        <div class="book-face book-spine"></div>
+                        <div class="book-face book-pages"></div>
+                        <div class="book-face book-back"></div>
+                    </div>
+                </a>
+                <div class="read-tooltip" id="label-read">Click to Read 📖</div>
             </div>
             
             <h1 id="main-title">E-Balarun</h1>
@@ -688,13 +810,13 @@
                 tour: "Campus Tour",
                 principalTitle: "Principal's Message",
                 tourTitle: "Virtual Campus Tour",
-                // Labels for the toggle button (pointing to the OTHER language)
-                langBtn: "हिन्दी",      // Desktop: Switch to Hindi
-                langBtnMobile: "हिं",     // Mobile: Switch to Hindi (Very Short)
+                langBtn: "हिन्दी",      
+                langBtnMobile: "हिं",    
                 footerHtml: 'Published with ❤️ in <span class="loc-text">Jabalpur</span>',
                 themeWhite: "Switch to Whiteboard",
                 themeBlack: "Switch to Blackboard",
-                archiveBtn: "📂 2021-22 Archive"
+                archiveBtn: "📂 2021-22 Archive",
+                readLabel: "Click to Read 📖"
             },
             hi: {
                 tabTitle: "ई-बालारुण २०२६ | डिजिटल संस्करण",
@@ -704,13 +826,13 @@
                 tour: "कैंपस दर्शन",
                 principalTitle: "प्राचार्य महोदय का संदेश",
                 tourTitle: "कैंपस का भ्रमण",
-                // Labels for the toggle button (pointing to the OTHER language)
-                langBtn: "English",     // Desktop: Switch to English
-                langBtnMobile: "En",    // Mobile: Switch to English (Very Short)
+                langBtn: "English",    
+                langBtnMobile: "En",   
                 footerHtml: '<span class="loc-text">जबलपुर</span> से ❤️ प्रकाशित',
                 themeWhite: "व्हाइटबोर्ड पर जाएं",
                 themeBlack: "ब्लैकबोर्ड पर जाएं",
-                archiveBtn: "📂 २०२१-२२ संग्रह"
+                archiveBtn: "📂 २०२१-२२ संग्रह",
+                readLabel: "पढ़ने के लिए क्लिक करें 📖"
             }
         };
 
@@ -721,16 +843,12 @@
         // --- Loader Logic ---
         window.addEventListener('load', () => {
             const loader = document.getElementById('loader');
-            // Allow animation to run for ~3s total
             setTimeout(() => {
                 loader.classList.add('hidden');
             }, 3000);
 
-            // Check if mobile note is already dismissed
             checkMobileNote();
-            // Initial button text set (for responsive check)
             updateLangButton(); 
-            // Set initial theme button text
             updateThemeButtonText();
         });
 
@@ -738,15 +856,13 @@
         function updateLangButton() {
             const btn = document.getElementById('btn-lang');
             const data = content[currentLang];
-            // Check viewport width (768px matches CSS break point)
             const isMobile = window.innerWidth <= 768;
             btn.textContent = isMobile ? data.langBtnMobile : data.langBtn;
         }
 
-        // Listen for resize to switch button text dynamically
         window.addEventListener('resize', updateLangButton);
 
-        // --- Mobile Note Logic (Local Storage) ---
+        // --- Mobile Note Logic ---
         function checkMobileNote() {
             const note = document.getElementById('mobile-note');
             if (localStorage.getItem('mobileNoteDismissed') === 'true') {
@@ -760,44 +876,39 @@
             localStorage.setItem('mobileNoteDismissed', 'true');
         }
         
-        // --- Theme Toggle Logic (With Animation) ---
+        // --- Theme Toggle Logic ---
         function toggleTheme() {
-            if (isAnimating) return; // Prevent double clicks
+            if (isAnimating) return; 
             isAnimating = true;
 
             const body = document.body;
             const wipeOverlay = document.getElementById('wipe-overlay');
             const duster = document.getElementById('duster');
             
-            // Determine Target State
             let targetClass = '';
             let targetPaperColor = '';
             let targetGridColor = '';
             
-            // Current State Check
             let isCurrentlyBlack = true;
             if (body.classList.contains('theme-whiteboard')) {
                 isCurrentlyBlack = false;
             } else if (body.classList.contains('theme-blackboard')) {
                 isCurrentlyBlack = true;
             } else {
-                 // Fallback to system
                  const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
                  isCurrentlyBlack = sysDark;
             }
 
-            // Set Target
             if (isCurrentlyBlack) {
                 targetClass = 'theme-whiteboard';
                 targetPaperColor = '#fffbeb'; 
-                targetGridColor = '#e5e7eb'; // Light Grey for light theme
+                targetGridColor = '#e5e7eb'; 
             } else {
                 targetClass = 'theme-blackboard';
                 targetPaperColor = '#18181b'; 
-                targetGridColor = '#27272a'; // Dark Grey for dark theme
+                targetGridColor = '#27272a'; 
             }
 
-            // 1. Prepare Overlay with CORRECT grid color so it blends
             wipeOverlay.style.backgroundColor = targetPaperColor;
             wipeOverlay.style.backgroundImage = `
                 linear-gradient(${targetGridColor} 1px, transparent 1px),
@@ -805,36 +916,27 @@
             `;
             duster.style.display = 'block';
 
-            // 2. Animate Wipe (using Web Animations API for JS control)
             const animation = wipeOverlay.animate(
                 [
                     { width: '0%' },
                     { width: '100%' }
                 ],
                 {
-                    duration: 1200, // 1.2s for full wipe
+                    duration: 1200, 
                     easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
                     fill: 'forwards' 
                 }
             );
 
-            // 3. Switch Theme "Halfway" or at End
-            // Doing it at the end feels cleanest as the overlay covers everything
             animation.onfinish = () => {
-                // Apply the new theme class
                 body.classList.remove('theme-whiteboard', 'theme-blackboard');
                 body.classList.add(targetClass);
                 
-                // Update Button Text
                 updateThemeButtonText();
-
-                // 4. CRITICAL FIX: Cancel animation so overlay resets to 0% width
                 animation.cancel();
                 
-                // Cleanup
                 wipeOverlay.style.width = '0%'; 
                 duster.style.display = 'none';
-                
                 isAnimating = false;
             };
         }
@@ -844,9 +946,7 @@
             const btn = document.getElementById('btn-theme-toggle');
             const data = content[currentLang];
             
-            // Determine current effective theme
             let isDark = true; 
-            
             if (body.classList.contains('theme-whiteboard')) {
                 isDark = false;
             } else if (body.classList.contains('theme-blackboard')) {
@@ -855,11 +955,7 @@
                  isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             }
             
-            if (isDark) {
-                btn.textContent = data.themeWhite;
-            } else {
-                btn.textContent = data.themeBlack;
-            }
+            btn.textContent = isDark ? data.themeWhite : data.themeBlack;
         }
 
         // --- Chalk Trail Logic ---
@@ -868,7 +964,6 @@
         let points = [];
         const maxPoints = 40; 
 
-        // Resize Canvas
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -876,20 +971,12 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // Track Mouse
         document.addEventListener('mousemove', (e) => {
-            points.push({ 
-                x: e.clientX, 
-                y: e.clientY, 
-                age: 0 
-            });
+            points.push({ x: e.clientX, y: e.clientY, age: 0 });
         });
 
-        // Animation Loop
         function animateTrail() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Fetch current trail color from CSS variable
             const strokeColor = getComputedStyle(document.body).getPropertyValue('--trail-color') || '#ffffff';
 
             ctx.beginPath();
@@ -901,7 +988,6 @@
                 const nextP = points[i + 1];
 
                 p.age++;
-
                 if (nextP) {
                     ctx.beginPath();
                     ctx.moveTo(p.x, p.y);
@@ -919,7 +1005,6 @@
         }
         animateTrail();
 
-
         // --- App Logic ---
         function toggleLanguage() {
             currentLang = currentLang === 'en' ? 'hi' : 'en';
@@ -928,17 +1013,15 @@
 
             body.classList.toggle('hindi-active', currentLang === 'hi');
 
-            // Update Tab Title
             document.title = data.tabTitle;
-
             document.getElementById('label-digital').textContent = data.digital;
             document.getElementById('main-title').textContent = data.title;
             document.getElementById('btn-watch-text').textContent = data.watch;
             document.getElementById('btn-tour-text').textContent = data.tour;
             document.getElementById('footer-dynamic').innerHTML = data.footerHtml;
             document.getElementById('btn-archive').textContent = data.archiveBtn;
+            document.getElementById('label-read').textContent = data.readLabel;
             
-            // Update buttons using responsive helper
             updateLangButton();
             updateThemeButtonText();
         }
