@@ -143,6 +143,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 3rem;
+            width: 100%;
         }
 
         .brand {
@@ -172,6 +173,7 @@
             font-weight: 700;
             border-bottom: 2px solid var(--accent);
             padding-bottom: 2px;
+            white-space: nowrap;
         }
 
         .lang-btn {
@@ -183,6 +185,7 @@
             padding: 5px 20px;
             border: 2px solid var(--ink);
             border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+            white-space: nowrap;
         }
 
         .lang-btn:hover {
@@ -415,8 +418,34 @@
             stroke: currentColor;
         }
 
+        /* --- RESPONSIVE ADJUSTMENTS --- */
         @media (max-width: 768px) {
-            header { flex-direction: column; gap: 20px; }
+            header { 
+                /* Keep row direction for mobile header */
+                flex-direction: row; 
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 2rem;
+            }
+            
+            .brand {
+                gap: 8px; /* Tighter spacing */
+            }
+
+            .logo-sketch {
+                height: 35px; /* Smaller logo */
+            }
+
+            .digital-badge {
+                font-size: 0.9rem; /* Smaller text */
+            }
+
+            .lang-btn {
+                padding: 4px 10px;
+                font-size: 1rem;
+            }
+
             h1 { margin-bottom: 2rem; }
             .cards-container { flex-direction: column; }
             .sketch-card { max-width: 100%; }
@@ -513,7 +542,8 @@
                 tour: "Campus Tour",
                 principalTitle: "Principal's Message",
                 tourTitle: "Virtual Campus Tour",
-                langBtn: "हिन्दी",
+                langBtn: "हिन्दी", // Desktop text
+                langBtnMobile: "हिन्दी", // Mobile text (already short)
                 footerHtml: 'Published with ❤️ in <span class="loc-text">Jabalpur</span>'
             },
             hi: {
@@ -524,7 +554,8 @@
                 tour: "कैंपस दर्शन",
                 principalTitle: "प्राचार्य महोदय का संदेश",
                 tourTitle: "कैंपस का भ्रमण",
-                langBtn: "English",
+                langBtn: "English", // Desktop text
+                langBtnMobile: "Eng", // Mobile text (abbreviated)
                 footerHtml: '<span class="loc-text">जबलपुर</span> से ❤️ प्रकाशित'
             }
         };
@@ -542,14 +573,27 @@
 
             // Check if mobile note is already dismissed
             checkMobileNote();
+            // Initial button text set (for responsive check)
+            updateLangButton(); 
         });
+
+        // --- Responsive Lang Button Logic ---
+        function updateLangButton() {
+            const btn = document.getElementById('btn-lang');
+            const data = content[currentLang];
+            // Check viewport width (768px matches CSS break point)
+            const isMobile = window.innerWidth <= 768;
+            btn.textContent = isMobile ? data.langBtnMobile : data.langBtn;
+        }
+
+        // Listen for resize to switch button text dynamically
+        window.addEventListener('resize', updateLangButton);
 
         // --- Mobile Note Logic (Local Storage) ---
         function checkMobileNote() {
             const note = document.getElementById('mobile-note');
             if (localStorage.getItem('mobileNoteDismissed') === 'true') {
-                note.style.display = 'none'; // Ensure it stays hidden
-                // Important: Override CSS !important if needed, but display:none on inline style works high specificity
+                note.style.display = 'none'; 
             }
         }
 
@@ -632,7 +676,9 @@
             document.getElementById('btn-watch-text').textContent = data.watch;
             document.getElementById('btn-tour-text').textContent = data.tour;
             document.getElementById('footer-dynamic').innerHTML = data.footerHtml;
-            document.getElementById('btn-lang').textContent = data.langBtn;
+            
+            // Update button using responsive helper
+            updateLangButton();
         }
 
         function openModal(videoKey) {
