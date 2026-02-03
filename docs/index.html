@@ -388,8 +388,8 @@
             text-decoration-color: var(--accent);
         }
         
-        /* --- THEME TOGGLE BUTTON --- */
-        .theme-toggle-btn {
+        /* --- THEME TOGGLE & ARCHIVE BUTTONS --- */
+        .theme-toggle-btn, .archive-btn {
             background: none;
             border: 1px dashed var(--ink-dim);
             color: var(--ink-dim);
@@ -400,8 +400,11 @@
             cursor: pointer;
             transition: all 0.3s ease;
             opacity: 0.7;
+            text-decoration: none; /* Ensure link doesn't look like default link */
+            display: inline-block;
         }
-        .theme-toggle-btn:hover {
+        
+        .theme-toggle-btn:hover, .archive-btn:hover {
             opacity: 1;
             border-color: var(--accent);
             color: var(--accent);
@@ -572,6 +575,10 @@
                 Published with ❤️ in <span class="loc-text">Jabalpur</span>
             </div>
             
+            <a href="file:///C:/Users/SpandanSaxena/Documents/GitHub/e-Balarun/docs/archive.html" class="archive-btn" id="btn-archive">
+                📂 2021-22 Archive
+            </a>
+
             <button class="theme-toggle-btn" id="btn-theme-toggle" onclick="toggleTheme()">
                 Switch to Whiteboard
             </button>
@@ -610,7 +617,8 @@
                 langBtnMobile: "हिं",     // Mobile: Switch to Hindi (Very Short)
                 footerHtml: 'Published with ❤️ in <span class="loc-text">Jabalpur</span>',
                 themeWhite: "Switch to Whiteboard",
-                themeBlack: "Switch to Blackboard"
+                themeBlack: "Switch to Blackboard",
+                archiveBtn: "📂 2021-22 Archive"
             },
             hi: {
                 tabTitle: "ई-बालारुण २०२६ | डिजिटल संस्करण",
@@ -625,7 +633,8 @@
                 langBtnMobile: "En",    // Mobile: Switch to English (Very Short)
                 footerHtml: '<span class="loc-text">जबलपुर</span> से ❤️ प्रकाशित',
                 themeWhite: "व्हाइटबोर्ड पर जाएं",
-                themeBlack: "ब्लैकबोर्ड पर जाएं"
+                themeBlack: "ब्लैकबोर्ड पर जाएं",
+                archiveBtn: "📂 २०२१-२२ आर्काइव"
             }
         };
 
@@ -798,6 +807,7 @@
             document.getElementById('btn-watch-text').textContent = data.watch;
             document.getElementById('btn-tour-text').textContent = data.tour;
             document.getElementById('footer-dynamic').innerHTML = data.footerHtml;
+            document.getElementById('btn-archive').textContent = data.archiveBtn;
             
             // Update buttons using responsive helper
             updateLangButton();
