@@ -118,6 +118,7 @@
             height: auto;
             filter: grayscale(100%); 
             animation: popZoom 2.8s forwards cubic-bezier(0.65, 0, 0.35, 1);
+            will-change: transform, opacity, filter; /* Optimization hint */
         }
 
         @keyframes popZoom {
@@ -512,8 +513,28 @@
             animation: slideUp 1s ease-out 4s backwards; /* Appears after loader */
         }
         
+        /* --- GALLERY STICKY NOTE --- */
+        #gallery-note {
+            display: none; 
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            width: 200px;
+            background: #fef3c7; /* Sticky note yellow */
+            color: #1e1e1e;
+            padding: 12px;
+            transform: rotate(4deg);
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.4);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            line-height: 1.2;
+            z-index: 150; /* Above images */
+            text-align: center;
+            border: 1px solid #eab308;
+        }
+
         /* Tape effect on note */
-        #mobile-note::before {
+        #mobile-note::before, #gallery-note::before {
             content: '';
             position: absolute;
             top: -10px;
@@ -653,6 +674,7 @@
             display: flex;
             flex-direction: column;
             max-height: 90vh; /* Don't exceed screen height */
+            position: relative; /* Context for sticky note */
         }
 
         .modal-header {
@@ -697,6 +719,8 @@
             padding: 1rem;
             overflow-y: auto; /* Scrollable inside modal */
             border-top: 2px dashed var(--ink-dim);
+            /* Content-visibility optimization */
+            content-visibility: auto;
         }
 
         /* Scrollbar styling for Gallery */
@@ -713,6 +737,9 @@
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
             text-align: center;
             position: relative;
+            cursor: zoom-in; /* Indicate clickable */
+            /* GPU layer for smooth hover */
+            will-change: transform;
         }
 
         /* Alternate tilts for natural look */
@@ -747,6 +774,40 @@
             height: 100%;
             object-fit: cover;
             display: block;
+        }
+
+        /* --- FULLSCREEN IMAGE MODAL --- */
+        #fullscreenModal {
+            z-index: 200; /* Higher than gallery modal (100) */
+            background: rgba(0, 0, 0, 0.95); /* Darker background */
+        }
+        
+        #fullscreenModal img {
+            max-width: 90%;
+            max-height: 90vh;
+            border: 4px solid #fff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            animation: popZoom 0.4s ease-out;
+        }
+
+        .fullscreen-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #fff;
+            font-size: 2rem;
+            background: rgba(255,255,255,0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .fullscreen-close:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
         }
 
         svg path, svg circle {
@@ -791,6 +852,14 @@
             
             /* Show the sticky note only on mobile */
             #mobile-note { display: block; }
+
+            /* Adjust gallery note position for mobile */
+            #gallery-note {
+                right: 10px;
+                bottom: 10px;
+                width: 150px;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -921,7 +990,17 @@
             </div>
             <div class="gallery-grid" id="gallery-grid-content">
                 </div>
+            
+            <div id="gallery-note">
+                <span class="note-close" onclick="dismissGalleryNote()">×</span>
+                🔍 <b>Tip:</b> Click an image to view fullscreen! 📸
+            </div>
         </div>
+    </div>
+
+    <div class="modal-overlay" id="fullscreenModal">
+        <button class="close-btn fullscreen-close" onclick="closeFullscreen()">×</button>
+        <img id="fullscreen-img" src="" alt="Fullscreen view">
     </div>
 
     <script>
@@ -970,35 +1049,39 @@
         const videoLinks = { principal: "CzQg5KaU26g", tour: "2Zbh6GzVhmo" };
         let currentLang = 'en';
         let isAnimating = false;
+        let galleryLoaded = false; // Flag for optimization
 
-        // --- Loader Logic & Init ---
+        // --- Initialization ---
+        // Optimization: Use DOMContentLoaded for faster script execution
+        document.addEventListener('DOMContentLoaded', () => {
+            checkMobileNote();
+            updateLangButton(); 
+            updateThemeButtonText();
+        });
+
+        // Loader still waits for window.load to ensure assets are ready (User Experience)
         window.addEventListener('load', () => {
             const loader = document.getElementById('loader');
             setTimeout(() => {
                 loader.classList.add('hidden');
             }, 3000);
-
-            checkMobileNote();
-            updateLangButton(); 
-            updateThemeButtonText();
-            
-            // Generate Gallery Images dynamically
-            generateGalleryImages();
         });
 
-        // --- Gallery Generation Logic ---
+        // --- Gallery Generation Logic (OPTIMIZED: Lazy Load) ---
         function generateGalleryImages() {
+            if (galleryLoaded) return; // Optimization: Don't regenerate if already loaded
+
             const galleryContainer = document.getElementById('gallery-grid-content');
             const totalImages = 23;
-            const fileExtension = '.webp';             
+            const fileExtension = '.webp'; 
+            
             let htmlContent = '';
             
             for (let i = 1; i <= totalImages; i++) {
-                // Constructs path: gallery/e-balarun-gallery (1).jpg
                 const imagePath = `gallery/e-balarun-gallery (${i})${fileExtension}`;
-                
+                // Uses loading="lazy" for network optimization
                 htmlContent += `
-                <div class="photo-frame">
+                <div class="photo-frame" onclick="openFullscreen('${imagePath}')">
                     <div class="photo-placeholder">
                         <img src="${imagePath}" loading="lazy" alt="Gallery Image ${i}">
                     </div>
@@ -1006,6 +1089,7 @@
             }
             
             galleryContainer.innerHTML = htmlContent;
+            galleryLoaded = true;
         }
 
         // --- Responsive Lang Button Logic ---
@@ -1030,6 +1114,22 @@
             const note = document.getElementById('mobile-note');
             note.style.display = 'none';
             localStorage.setItem('mobileNoteDismissed', 'true');
+        }
+
+        // --- Gallery Sticky Note Logic ---
+        function checkGalleryNote() {
+            const note = document.getElementById('gallery-note');
+            if (localStorage.getItem('galleryNoteDismissed') !== 'true') {
+                note.style.display = 'block'; 
+            } else {
+                note.style.display = 'none';
+            }
+        }
+
+        function dismissGalleryNote() {
+            const note = document.getElementById('gallery-note');
+            note.style.display = 'none';
+            localStorage.setItem('galleryNoteDismissed', 'true');
         }
         
         // --- Theme Toggle Logic ---
@@ -1114,11 +1214,12 @@
             btn.textContent = isDark ? data.themeWhite : data.themeBlack;
         }
 
-        // --- Chalk Trail Logic ---
+        // --- Chalk Trail Logic (OPTIMIZED) ---
         const canvas = document.getElementById('trail-canvas');
         const ctx = canvas.getContext('2d');
         let points = [];
         const maxPoints = 40; 
+        let isTrailAnimating = false; // Optimization flag
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -1129,9 +1230,23 @@
 
         document.addEventListener('mousemove', (e) => {
             points.push({ x: e.clientX, y: e.clientY, age: 0 });
+            // Optimization: Only start animation loop if it's not running
+            if (!isTrailAnimating) {
+                isTrailAnimating = true;
+                animateTrail();
+            }
         });
 
         function animateTrail() {
+            if (!isTrailAnimating) return;
+
+            // Optimization: If no points left, stop the loop to save battery
+            if (points.length === 0) {
+                isTrailAnimating = false;
+                ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear one last time
+                return;
+            }
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const strokeColor = getComputedStyle(document.body).getPropertyValue('--trail-color') || '#ffffff';
 
@@ -1159,7 +1274,7 @@
             points = points.filter(p => p.age < maxPoints);
             requestAnimationFrame(animateTrail);
         }
-        animateTrail();
+        // No initial call to animateTrail() needed, it starts on mousemove.
 
         // --- App Logic ---
         function toggleLanguage() {
@@ -1173,7 +1288,6 @@
             document.getElementById('label-digital').textContent = data.digital;
             document.getElementById('main-title').textContent = data.title;
             
-            // Text updates for cards
             document.getElementById('btn-watch-text').textContent = data.watch;
             document.getElementById('btn-tour-text').textContent = data.tour;
             document.getElementById('btn-gallery-text').textContent = data.gallery; 
@@ -1182,7 +1296,6 @@
             document.getElementById('btn-archive').textContent = data.archiveBtn;
             document.getElementById('label-read').textContent = data.readLabel;
             
-            // Text updates for modals if open
             document.getElementById('gallery-title-text').textContent = data.galleryTitle;
             
             updateLangButton();
@@ -1192,14 +1305,8 @@
         // --- TOAST FUNCTION ---
         function showToast() {
             const toast = document.getElementById("toast");
-            
-            // Set text based on current language
             toast.textContent = content[currentLang].comingSoon;
-            
-            // Add class to show
             toast.className = "show";
-            
-            // Hide after 3 seconds
             setTimeout(function(){ 
                 toast.className = toast.className.replace("show", ""); 
             }, 3000);
@@ -1228,6 +1335,11 @@
             const modal = document.getElementById('galleryModal');
             document.getElementById('gallery-title-text').textContent = content[currentLang].galleryTitle;
             modal.classList.add('active');
+            
+            // Optimization: Generate images NOW, not on page load
+            generateGalleryImages();
+            
+            checkGalleryNote();
         }
 
         function closeGallery() {
@@ -1235,21 +1347,38 @@
             modal.classList.remove('active');
         }
 
+        // --- FULLSCREEN IMAGE FUNCTIONS ---
+        function openFullscreen(imageSrc) {
+            const modal = document.getElementById('fullscreenModal');
+            const img = document.getElementById('fullscreen-img');
+            img.src = imageSrc;
+            modal.classList.add('active');
+        }
+
+        function closeFullscreen() {
+            const modal = document.getElementById('fullscreenModal');
+            modal.classList.remove('active');
+            setTimeout(() => { document.getElementById('fullscreen-img').src = ""; }, 300);
+        }
+
         // --- MODAL EVENT LISTENERS ---
-        // Video Modal Close
         document.getElementById('videoModal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('videoModal')) closeModal();
         });
         
-        // Gallery Modal Close
         document.getElementById('galleryModal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('galleryModal')) closeGallery();
+        });
+
+        document.getElementById('fullscreenModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('fullscreenModal')) closeFullscreen();
         });
         
         document.addEventListener('keydown', (e) => {
             if (e.key === "Escape") {
                 closeModal();
                 closeGallery();
+                closeFullscreen();
             }
         });
     </script>
