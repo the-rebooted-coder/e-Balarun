@@ -919,32 +919,8 @@
                     </svg>
                 </button>
             </div>
-            <div class="gallery-grid">
-                <div class="photo-frame">
-                    <div class="photo-placeholder">Image 1</div>
+            <div class="gallery-grid" id="gallery-grid-content">
                 </div>
-
-                <div class="photo-frame">
-                    <div class="photo-placeholder">Image 2</div>
-                </div>
-
-                <div class="photo-frame">
-                    <div class="photo-placeholder">Image 3</div>
-                </div>
-
-                <div class="photo-frame">
-                    <div class="photo-placeholder">Image 4</div>
-                </div>
-
-                <div class="photo-frame">
-                    <div class="photo-placeholder">Image 5</div>
-                </div>
-
-                <div class="photo-frame">
-                    <div class="photo-placeholder">Image 6</div>
-                </div>
-
-            </div>
         </div>
     </div>
 
@@ -980,7 +956,7 @@
                 principalTitle: "प्राचार्य महोदय का संदेश",
                 tourTitle: "कैंपस का भ्रमण",
                 galleryTitle: "फ़ोटो एल्बम", 
-                langBtn: "English",    
+                langBtn: "English",     
                 langBtnMobile: "En",   
                 footerHtml: '<span class="loc-text">जबलपुर</span> से ❤️ प्रकाशित',
                 themeWhite: "व्हाइटबोर्ड पर जाएं",
@@ -995,7 +971,7 @@
         let currentLang = 'en';
         let isAnimating = false;
 
-        // --- Loader Logic ---
+        // --- Loader Logic & Init ---
         window.addEventListener('load', () => {
             const loader = document.getElementById('loader');
             setTimeout(() => {
@@ -1005,7 +981,32 @@
             checkMobileNote();
             updateLangButton(); 
             updateThemeButtonText();
+            
+            // Generate Gallery Images dynamically
+            generateGalleryImages();
         });
+
+        // --- Gallery Generation Logic ---
+        function generateGalleryImages() {
+            const galleryContainer = document.getElementById('gallery-grid-content');
+            const totalImages = 23;
+            const fileExtension = '.webp';             
+            let htmlContent = '';
+            
+            for (let i = 1; i <= totalImages; i++) {
+                // Constructs path: gallery/e-balarun-gallery (1).jpg
+                const imagePath = `gallery/e-balarun-gallery (${i})${fileExtension}`;
+                
+                htmlContent += `
+                <div class="photo-frame">
+                    <div class="photo-placeholder">
+                        <img src="${imagePath}" loading="lazy" alt="Gallery Image ${i}">
+                    </div>
+                </div>`;
+            }
+            
+            galleryContainer.innerHTML = htmlContent;
+        }
 
         // --- Responsive Lang Button Logic ---
         function updateLangButton() {
