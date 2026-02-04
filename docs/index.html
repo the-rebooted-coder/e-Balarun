@@ -463,7 +463,7 @@
             background: var(--paper);
             padding: 2rem;
             width: 100%;
-            max-width: 350px;
+            max-width: 300px; /* Reduced slightly to fit 3 cards better */
             position: relative;
             text-align: left;
             display: flex;
@@ -488,7 +488,7 @@
 
         .card-title {
             font-family: var(--font-title);
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 700;
             line-height: 1;
         }
@@ -650,6 +650,9 @@
             border: 2px solid var(--ink);
             box-shadow: 15px 15px 0px var(--accent); 
             /* Straight modal - no rotation */
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh; /* Don't exceed screen height */
         }
 
         .modal-header {
@@ -670,6 +673,7 @@
             border: none;
             color: var(--ink);
             transition: transform 0.2s;
+            cursor: pointer;
         }
         .close-btn:hover { transform: scale(1.2) rotate(90deg); }
 
@@ -685,7 +689,67 @@
             top: 0; left: 0; width: 100%; height: 100%;
         }
 
-        svg path {
+        /* --- GALLERY GRID & PHOTO STYLES --- */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+            overflow-y: auto; /* Scrollable inside modal */
+            border-top: 2px dashed var(--ink-dim);
+        }
+
+        /* Scrollbar styling for Gallery */
+        .gallery-grid::-webkit-scrollbar { width: 8px; }
+        .gallery-grid::-webkit-scrollbar-track { background: transparent; }
+        .gallery-grid::-webkit-scrollbar-thumb { background-color: var(--ink-dim); border-radius: 4px; }
+
+        /* Polaroid / Scrapbook Frame */
+        .photo-frame {
+            background: #fff;
+            padding: 10px 10px 40px 10px; /* Polaroid bottom heavy padding */
+            box-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            transform: rotate(2deg); /* Tilted look */
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Alternate tilts for natural look */
+        .photo-frame:nth-child(even) { transform: rotate(-2deg); }
+        .photo-frame:nth-child(3n) { transform: rotate(1.5deg); }
+
+        /* Hover effect: Straighten up and pop */
+        .photo-frame:hover {
+            transform: scale(1.05) rotate(0deg);
+            z-index: 10;
+            box-shadow: 10px 10px 15px rgba(0,0,0,0.4);
+        }
+
+        /* Placeholder styles */
+        .photo-placeholder {
+            width: 100%;
+            aspect-ratio: 1/1; /* Square photos */
+            background-color: #e5e5e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-family: var(--font-body);
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 1px solid #ccc;
+            overflow: hidden;
+        }
+        
+        .photo-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        svg path, svg circle {
             stroke-width: 2;
             stroke-linecap: round;
             stroke-linejoin: round;
@@ -799,6 +863,16 @@
                     </div>
                     <div class="card-title" id="btn-tour-text">Campus Tour</div>
                 </div>
+
+                <div class="sketch-card chalk-border-1" onclick="openGallery()">
+                    <div class="card-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="card-title" id="btn-gallery-text">Image Gallery</div>
+                </div>
             </div>
         </main>
 
@@ -835,6 +909,45 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="galleryModal">
+        <div class="modal-paper" style="max-width: 900px;">
+            <div class="modal-header">
+                <span class="modal-title" id="gallery-title-text">Photo Scrapbook</span>
+                <button class="close-btn" onclick="closeGallery()">
+                    <svg width="24" height="24" viewBox="0 0 24 24">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="gallery-grid">
+                <div class="photo-frame">
+                    <div class="photo-placeholder">Image 1</div>
+                </div>
+
+                <div class="photo-frame">
+                    <div class="photo-placeholder">Image 2</div>
+                </div>
+
+                <div class="photo-frame">
+                    <div class="photo-placeholder">Image 3</div>
+                </div>
+
+                <div class="photo-frame">
+                    <div class="photo-placeholder">Image 4</div>
+                </div>
+
+                <div class="photo-frame">
+                    <div class="photo-placeholder">Image 5</div>
+                </div>
+
+                <div class="photo-frame">
+                    <div class="photo-placeholder">Image 6</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- Content Data ---
         const content = {
@@ -844,8 +957,10 @@
                 title: "E-Balarun",
                 watch: "Video Messages",
                 tour: "Campus Tour",
+                gallery: "Image Gallery", 
                 principalTitle: "Principal's Message",
                 tourTitle: "Virtual Campus Tour",
+                galleryTitle: "Photo Scrapbook", 
                 langBtn: "हिन्दी",      
                 langBtnMobile: "हिं",    
                 footerHtml: 'Published with ❤️ in <span class="loc-text">Jabalpur</span>',
@@ -853,7 +968,7 @@
                 themeBlack: "Switch to Blackboard",
                 archiveBtn: "📂 2021-22 Archive",
                 readLabel: "Click to Read 📖",
-                comingSoon: "Coming Soon 🚧" // NEW
+                comingSoon: "Coming Soon 🚧" 
             },
             hi: {
                 tabTitle: "ई-बालारुण २०२६ | डिजिटल संस्करण",
@@ -861,8 +976,10 @@
                 title: "ई-बालारुण",
                 watch: "वीडियो संदेश",
                 tour: "कैंपस दर्शन",
+                gallery: "पिक्चर गैलरी", 
                 principalTitle: "प्राचार्य महोदय का संदेश",
                 tourTitle: "कैंपस का भ्रमण",
+                galleryTitle: "फ़ोटो एल्बम", 
                 langBtn: "English",    
                 langBtnMobile: "En",   
                 footerHtml: '<span class="loc-text">जबलपुर</span> से ❤️ प्रकाशित',
@@ -870,7 +987,7 @@
                 themeBlack: "ब्लैकबोर्ड पर जाएं",
                 archiveBtn: "📂 २०२१-२२ संग्रह",
                 readLabel: "पढ़ने के लिए क्लिक करें 📖",
-                comingSoon: "जल्द आ रहा है 🚧" // NEW
+                comingSoon: "जल्द आ रहा है 🚧"
             }
         };
 
@@ -1054,11 +1171,18 @@
             document.title = data.tabTitle;
             document.getElementById('label-digital').textContent = data.digital;
             document.getElementById('main-title').textContent = data.title;
+            
+            // Text updates for cards
             document.getElementById('btn-watch-text').textContent = data.watch;
             document.getElementById('btn-tour-text').textContent = data.tour;
+            document.getElementById('btn-gallery-text').textContent = data.gallery; 
+            
             document.getElementById('footer-dynamic').innerHTML = data.footerHtml;
             document.getElementById('btn-archive').textContent = data.archiveBtn;
             document.getElementById('label-read').textContent = data.readLabel;
+            
+            // Text updates for modals if open
+            document.getElementById('gallery-title-text').textContent = data.galleryTitle;
             
             updateLangButton();
             updateThemeButtonText();
@@ -1080,6 +1204,7 @@
             }, 3000);
         }
 
+        // --- VIDEO MODAL FUNCTIONS ---
         function openModal(videoKey) {
             const modal = document.getElementById('videoModal');
             const iframe = document.getElementById('youtube-frame');
@@ -1097,12 +1222,34 @@
             modal.classList.remove('active');
         }
 
+        // --- GALLERY MODAL FUNCTIONS ---
+        function openGallery() {
+            const modal = document.getElementById('galleryModal');
+            document.getElementById('gallery-title-text').textContent = content[currentLang].galleryTitle;
+            modal.classList.add('active');
+        }
+
+        function closeGallery() {
+            const modal = document.getElementById('galleryModal');
+            modal.classList.remove('active');
+        }
+
+        // --- MODAL EVENT LISTENERS ---
+        // Video Modal Close
         document.getElementById('videoModal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('videoModal')) closeModal();
         });
         
+        // Gallery Modal Close
+        document.getElementById('galleryModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('galleryModal')) closeGallery();
+        });
+        
         document.addEventListener('keydown', (e) => {
-            if (e.key === "Escape") closeModal();
+            if (e.key === "Escape") {
+                closeModal();
+                closeGallery();
+            }
         });
     </script>
 </body>
