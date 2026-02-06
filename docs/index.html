@@ -287,6 +287,51 @@
         }
         #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0px); }
 
+        /* --- CUSTOM CONTEXT MENU --- */
+        #custom-context-menu {
+            display: none;
+            position: fixed;
+            z-index: 999999;
+            background-color: var(--paper);
+            border: 2px solid var(--ink);
+            box-shadow: 4px 4px 0px var(--accent);
+            padding: 5px 0;
+            border-radius: 5px 20px 5px 20px;
+            min-width: 150px;
+            font-family: var(--font-body);
+            animation: fadeInMenu 0.1s ease-out;
+        }
+
+        @keyframes fadeInMenu {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .context-menu-item {
+            padding: 8px 15px;
+            cursor: pointer;
+            color: var(--ink);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .context-menu-item:hover {
+            background-color: var(--ink);
+            color: var(--paper);
+        }
+        
+        .context-menu-item.disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+        .context-menu-item.disabled:hover {
+            background-color: transparent;
+            color: var(--ink);
+        }
+
         /* --- FOOTER --- */
         footer {
             border-top: 2px dashed var(--ink-dim); padding-top: 1.5rem;
@@ -429,6 +474,21 @@
 
     <div id="toast">Coming Soon 🚧</div>
 
+    <div id="custom-context-menu">
+        <div class="context-menu-item" id="ctx-open">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14L21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+            Open / View
+        </div>
+        <div class="context-menu-item disabled">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
+            Share (N/A)
+        </div>
+        <div class="context-menu-item" onclick="hideContextMenu()">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            Close Menu
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <div class="brand">
@@ -441,7 +501,7 @@
         </header>
 
         <main class="hero">
-            <div class="book-container">
+            <div class="book-container ctx-target" data-action="toast">
                 <div class="book-wrapper" onclick="showToast()">
                     <div class="book">
                         <div class="book-face book-front">
@@ -458,14 +518,14 @@
             <h1 id="main-title">E-Balarun</h1>
 
             <div class="cards-container">
-                <div class="sketch-card chalk-border-1" onclick="openModal('messages')">
+                <div class="sketch-card chalk-border-1 ctx-target" data-action="messages" onclick="openModal('messages')">
                     <div class="card-icon">
                         <svg width="40" height="40" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z" /></svg>
                     </div>
                     <div class="card-title" id="btn-watch-text">Video Messages</div>
                 </div>
 
-                <div class="sketch-card chalk-border-2" onclick="openModal('tour')">
+                <div class="sketch-card chalk-border-2 ctx-target" data-action="tour" onclick="openModal('tour')">
                     <div class="card-icon">
                         <svg width="40" height="40" viewBox="0 0 24 24">
                             <circle cx="12" cy="12" r="3" />
@@ -475,7 +535,7 @@
                     <div class="card-title" id="btn-tour-text">Campus Tour</div>
                 </div>
 
-                <div class="sketch-card chalk-border-1" onclick="openGallery()">
+                <div class="sketch-card chalk-border-1 ctx-target" data-action="gallery" onclick="openGallery()">
                     <div class="card-icon">
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
@@ -618,6 +678,7 @@
             checkMobileNote();
             updateLangButton(); 
             updateThemeButtonText();
+            initCustomContextMenu(); // Initialize Context Menu
         });
 
         window.addEventListener('load', () => {
@@ -735,6 +796,62 @@
             let isDark = body.classList.contains('theme-blackboard') || (!body.classList.contains('theme-whiteboard') && sysDark);
             
             document.getElementById('btn-theme-toggle').textContent = isDark ? content[currentLang].themeWhite : content[currentLang].themeBlack;
+        }
+
+        // --- Custom Context Menu Logic ---
+        let currentContextAction = null;
+
+        function initCustomContextMenu() {
+            const contextMenu = document.getElementById('custom-context-menu');
+            const targets = document.querySelectorAll('.ctx-target');
+            const openBtn = document.getElementById('ctx-open');
+
+            targets.forEach(target => {
+                target.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    
+                    // Store the action associated with the right-clicked element
+                    currentContextAction = target.getAttribute('data-action');
+                    
+                    // Calculate position
+                    let x = e.clientX;
+                    let y = e.clientY;
+                    
+                    // Boundary checks
+                    const menuWidth = 150; // min-width
+                    const menuHeight = 100; // estimated height
+                    
+                    if (x + menuWidth > window.innerWidth) x -= menuWidth;
+                    if (y + menuHeight > window.innerHeight) y -= menuHeight;
+                    
+                    contextMenu.style.left = `${x}px`;
+                    contextMenu.style.top = `${y}px`;
+                    contextMenu.style.display = 'block';
+                });
+            });
+
+            // Handle "Open" click
+            openBtn.addEventListener('click', () => {
+                hideContextMenu();
+                if (currentContextAction) {
+                    if (currentContextAction === 'toast') showToast();
+                    else if (currentContextAction === 'messages') openModal('messages');
+                    else if (currentContextAction === 'tour') openModal('tour');
+                    else if (currentContextAction === 'gallery') openGallery();
+                }
+            });
+
+            // Hide menu on any click outside
+            document.addEventListener('click', (e) => {
+                if (!contextMenu.contains(e.target)) hideContextMenu();
+            });
+
+            // Hide menu on scroll
+            window.addEventListener('scroll', hideContextMenu, { passive: true });
+        }
+
+        function hideContextMenu() {
+            document.getElementById('custom-context-menu').style.display = 'none';
         }
 
         // --- App Logic ---
