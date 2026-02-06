@@ -430,20 +430,46 @@
 
         /* --- GALLERY & FILTERS --- */
         .gallery-filter-bar {
-            display: flex; gap: 12px; overflow-x: auto; padding: 5px 5px 15px 5px;
-            border-bottom: 2px dashed var(--ink-dim); margin-bottom: 15px;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; /* Firefox */
-        }
+    	display: flex; 
+   	gap: 12px; 
+    
+    	/* SCROLL FIXES */
+    	overflow-x: auto; 
+    	overflow-y: hidden;  /* PREVENTS the "little up and down" scroll */
+    
+    	/* Layout */
+    	padding: 10px 5px 35px 5px; /* Increased bottom padding so chips + shadows don't get cut off */
+    	border-bottom: 2px dashed var(--ink-dim); 
+    	margin-bottom: 15px;
+    
+    	/* Smoothness */
+    	-webkit-overflow-scrolling: touch;
+    	scrollbar-width: none; 
+}
         .gallery-filter-bar::-webkit-scrollbar { display: none; } /* Safari and Chrome */
 
         .filter-btn {
-            background: transparent; border: 2px solid var(--ink-dim); color: var(--ink-dim);
-            padding: 8px 24px; border-radius: 25px; font-family: var(--font-body); font-weight: bold;
-            font-size: 1.1rem;
-            cursor: pointer; white-space: nowrap; transition: all 0.2s ease;
-            flex: 0 0 auto; /* PREVENTS SHRINKING/WRAPPING */
-        }
+    	/* Layout & Alignment Fixes */
+    	display: inline-flex;       /* Makes the box behave like a flex container */
+    	align-items: center;        /* Forces text to center vertically */
+    	justify-content: center;    /* Forces text to center horizontally */
+    	line-height: 1;            /* Resets line height to prevent gaps */
+    	min-height: 45px;          /* Enforces a good minimum height */
+    
+    /* Visuals */
+    background: transparent; 
+    border: 2px solid var(--ink-dim); 
+    color: var(--ink-dim);
+    padding: 0 25px;           /* Horizontal padding only, height is handled by min-height */
+    border-radius: 50px; 
+    font-family: var(--font-body); 
+    font-weight: bold;
+    font-size: 1.2rem;         /* Slightly larger text for readability */
+    cursor: pointer; 
+    white-space: nowrap; 
+    transition: all 0.2s ease;
+    flex: 0 0 auto;
+}
         .filter-btn:hover { border-color: var(--ink); color: var(--ink); }
         
         .filter-btn.active {
