@@ -415,9 +415,17 @@
 
         /* Gallery */
         .gallery-filter-bar {
-            display: flex; flex-wrap: nowrap; gap: 12px; overflow-x: auto; overflow-y: hidden; 
-            padding: 15px 5px 25px 5px; border-bottom: 2px dashed var(--ink-dim); margin-bottom: 15px;
+            display: flex; flex-wrap: nowrap; gap: 12px; overflow-x: auto; overflow-y: hidden;
+            /* REMOVED border-bottom from here */
+            padding: 15px 5px 15px 5px; 
+            margin-bottom: 0; 
             align-items: center; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+        }
+	.gallery-divider {
+            width: 100%;
+            border-bottom: 2px dashed var(--ink-dim);
+            margin-top: 15px;    /* Force space ABOVE the line */
+            margin-bottom: 25px; /* Force space BELOW the line */
         }
         .gallery-filter-bar::-webkit-scrollbar { display: none; }
         .filter-btn {
@@ -609,7 +617,7 @@
                 <button class="filter-btn" data-filter="portraits" onclick="applyFilter('portraits')">Portraits</button>
                 <button class="filter-btn" data-filter="events" onclick="applyFilter('events')">Group Photos</button>
             </div>
-
+	    <div class="gallery-divider"></div>
             <div class="gallery-grid" id="gallery-grid-content"></div>
             
             <div class="load-more-container">
