@@ -91,14 +91,16 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* --- LOADER (OPTIMIZED & FASTER) --- */
+        /* --- LOADER (RESTORED SEQUENCE) --- */
         #loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: var(--paper); z-index: 99999;
             display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.5s ease-out, visibility 0.5s;
+            /* No transition on the loader container itself, we handle it via animation */
         }
-        #loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        
+        /* This class is added via JS after animation ends to hide it */
+        #loader.hidden { display: none; }
 
         .loader-content {
             position: relative;
@@ -117,30 +119,40 @@
             object-fit: contain;
         }
 
-        /* FIX: Animation Timeline Compressed (~3s total instead of ~6s) */
-        /* 0s - 1.2s: Show Balarun Logo */
-        /* 1.2s - 1.7s: Fade Balarun Out, Fade Vande In */
-        /* 1.7s - 3.2s: Zoom Vande Out */
+        /* ANIMATION SEQUENCE RESTORED:
+           1. Balarun Logo starts visible.
+           2. At 1.5s, it fades out.
+           3. Vande Mataram starts invisible.
+           4. At 1.5s, Vande Mataram fades in.
+           5. At 2.0s, Vande Mataram does the "Pop Zoom" to clear the screen.
+        */
 
         .loader-logo {
-            /* Fade out starts at 1.2s */
-            animation: fadeOutBalarun 0.5s forwards 1.2s; 
+            opacity: 1;
+            animation: fadeOutBalarun 0.5s forwards 1.5s; 
         }
 
         .loader-vande {
             opacity: 0;
-            /* Fade in starts at 1.2s, Pop starts at 1.7s */
-            animation: fadeInVande 0.5s forwards 1.2s, popZoom 1.5s forwards 1.7s var(--ease-out);
+            /* Fade In at 1.5s, Pop Zoom at 2.0s */
+            animation: fadeInVande 0.5s forwards 1.5s, popZoom 1.2s forwards 2.0s cubic-bezier(0.22, 1, 0.36, 1);
             will-change: transform, opacity; 
         }
 
-        @keyframes fadeOutBalarun { to { opacity: 0; transform: scale(0.9); } }
-        @keyframes fadeInVande { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeOutBalarun { 
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.9); } 
+        }
+        
+        @keyframes fadeInVande { 
+            0% { opacity: 0; transform: scale(0.9); } 
+            100% { opacity: 1; transform: scale(1); } 
+        }
+        
         @keyframes popZoom {
             0% { transform: scale(1); opacity: 1; }
-            40% { transform: scale(1.1); opacity: 1; }
-            70% { transform: scale(0.95); opacity: 1; }
-            100% { transform: scale(30); opacity: 0; }
+            40% { transform: scale(1.1); opacity: 1; } /* Mild anticipatory bounce */
+            100% { transform: scale(30); opacity: 0; }  /* The Pop */
         }
 
         /* --- ANIMATIONS --- */
@@ -999,14 +1011,15 @@
             const loader = document.getElementById('loader');
             
             // --- FIX: NO MORE 5500ms DELAY ---
-            // Remove the timeout wrapper. The loader hides as soon as the load event fires 
-            // (meaning preload assets are done) OR slightly after if animation is still running.
-            // Since we sped up animation to ~3s, and load might happen fast, we do a minimal check.
+            // Let the animation finish on its own CSS timeline.
+            // The keyframes handle the opacity and scale. 
+            // We just need to remove the element from the DOM after animation completes.
             
-            // Allow a small buffer for the final 'popZoom' to be visible if load was instant
+            // The popZoom animation ends at 3.5s total time (1.5s delay + 2s duration approx)
+            // We set a failsafe timeout slightly longer than the CSS animation total duration
             setTimeout(() => {
                  loader.classList.add('hidden');
-            }, 100); 
+            }, 3500); 
 
             // --- OPTIMIZATION: IDLE PRELOADER ---
             setTimeout(() => {
