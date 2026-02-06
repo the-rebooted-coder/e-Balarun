@@ -187,32 +187,23 @@
         }
 
         /* --- HEADER & STICKY LOGIC --- */
+        /* Wrapper for the entire header area (Logo + Lang Button) */
         header { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
             margin-bottom: 3rem; 
             width: 100%; 
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        /* Sticky State */
-        header.sticky-active {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 1000px;
-            margin-bottom: 0;
-            padding: 0 10px; /* Slight padding in sticky mode */
+            position: relative; /* Context for children */
         }
         
-        /* Spacer to prevent content jump when header goes fixed */
-        #header-spacer { display: none; height: 100px; }
+        /* Placeholder to prevent layout jump when logo floats */
+        #brand-placeholder {
+            display: none;
+            /* Dimensions are set via JS match */
+        }
 
-        /* UPDATED BRAND CARD */
+        /* BRAND CARD (The Floating Pill) */
         .brand { 
             display: flex; 
             align-items: center; 
@@ -226,20 +217,33 @@
             border: 2px solid #333;
             color: #333;
             transform: rotate(-1deg);
-            transition: all 0.4s var(--ease-out); /* Smooth transition for background/opacity */
+            transition: all 0.4s var(--ease-out); 
+            z-index: 2000; /* High z-index for floating */
         }
         
-        /* State when sticky */
-        header.sticky-active .brand {
-            background-color: rgba(255, 255, 255, 0.85); /* Less opaque (more transparent) */
-            backdrop-filter: blur(5px); /* Nice glass effect */
+        /* Sticky State for Brand Card */
+        .brand.sticky-active {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            /* Translate to center, but also clear any rotation */
+            transform: translateX(-50%) rotate(0deg) scale(0.95); 
+            
+            /* Visual tweaks */
+            background-color: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(5px);
             box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
-            transform: rotate(0deg) scale(0.95); /* Straighten up and shrink slightly */
             border-color: rgba(51, 51, 51, 0.5);
+            cursor: pointer; /* Click to top */
         }
 
         .brand:hover {
             transform: scale(1.02) rotate(0deg);
+        }
+        
+        /* Ensure hover state in sticky mode doesn't break centering */
+        .brand.sticky-active:hover {
+            transform: translateX(-50%) rotate(0deg) scale(1); 
         }
 
         .logo-sketch, .logo-vande {
@@ -275,7 +279,7 @@
         }
 
         /* Hide text in sticky mode */
-        header.sticky-active .digital-badge {
+        .brand.sticky-active .digital-badge {
             opacity: 0;
             max-width: 0;
             margin-left: 0;
@@ -287,6 +291,7 @@
             background: transparent; font-family: var(--font-hindi); 
             font-weight: 700; font-size: 1.1rem; color: var(--ink);
             padding: 5px 20px; white-space: nowrap;
+            z-index: 10; /* Lower than sticky brand */
         }
         .lang-btn:hover { background: var(--ink); color: var(--paper); transform: rotate(-2deg) scale(1.05); }
 
@@ -577,9 +582,6 @@
             .sketch-card { max-width: 100%; }
             #mobile-note { display: block; }
             #gallery-note { right: 10px; bottom: 10px; width: 150px; font-size: 0.9rem; }
-            
-            /* Sticky mobile tweaks */
-            header.sticky-active { width: 95%; top: 10px; }
         }
     </style>
 </head>
@@ -626,10 +628,11 @@
     </div>
 
     <div class="container">
-        <div id="header-spacer"></div>
-
+        
         <header id="main-header">
-            <div class="brand">
+            <div id="brand-placeholder"></div>
+
+            <div class="brand" id="floating-pill">
                 <img src="https://i.ibb.co/ymGmHBXm/balarun-logo.png" alt="Logo" class="logo-sketch">
                 <span class="brand-separator">|</span>
                 <img src="vande_mataram.png" alt="Vande Mataram" class="logo-vande">
@@ -833,20 +836,40 @@
 
         // --- STICKY HEADER LOGIC ---
         function initStickyHeader() {
-            const header = document.getElementById('main-header');
-            const spacer = document.getElementById('header-spacer');
+            const pill = document.getElementById('floating-pill');
+            const placeholder = document.getElementById('brand-placeholder');
             const threshold = 50; // Scroll amount before sticking
 
+            // Scroll to Top Logic
+            pill.addEventListener('click', () => {
+                if (pill.classList.contains('sticky-active')) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+
             window.addEventListener('scroll', () => {
+                // Requirement: Header should not detach if page is very little scrollable
+                // We check if the total scrollable height is significantly larger than viewport
+                const docHeight = document.documentElement.scrollHeight;
+                const winHeight = window.innerHeight;
+                
+                // If content is barely larger than screen (buffer 200px), don't stick
+                if (docHeight <= winHeight + 200) return;
+
                 if (window.scrollY > threshold) {
-                    if (!header.classList.contains('sticky-active')) {
-                        header.classList.add('sticky-active');
-                        spacer.style.display = 'block'; // Fill gap
+                    if (!pill.classList.contains('sticky-active')) {
+                        // Capture dimensions before fixing
+                        const rect = pill.getBoundingClientRect();
+                        placeholder.style.width = rect.width + 'px';
+                        placeholder.style.height = rect.height + 'px';
+                        placeholder.style.display = 'block';
+                        
+                        pill.classList.add('sticky-active');
                     }
                 } else {
-                    if (header.classList.contains('sticky-active')) {
-                        header.classList.remove('sticky-active');
-                        spacer.style.display = 'none'; // Remove gap
+                    if (pill.classList.contains('sticky-active')) {
+                        pill.classList.remove('sticky-active');
+                        placeholder.style.display = 'none';
                     }
                 }
             }, { passive: true });
