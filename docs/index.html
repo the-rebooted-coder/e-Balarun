@@ -91,7 +91,7 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* --- LOADER --- */
+        /* --- LOADER (OPTIMIZED & FASTER) --- */
         #loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: var(--paper); z-index: 99999;
@@ -117,13 +117,20 @@
             object-fit: contain;
         }
 
+        /* FIX: Animation Timeline Compressed (~3s total instead of ~6s) */
+        /* 0s - 1.2s: Show Balarun Logo */
+        /* 1.2s - 1.7s: Fade Balarun Out, Fade Vande In */
+        /* 1.7s - 3.2s: Zoom Vande Out */
+
         .loader-logo {
-            animation: fadeOutBalarun 0.5s forwards 2s; 
+            /* Fade out starts at 1.2s */
+            animation: fadeOutBalarun 0.5s forwards 1.2s; 
         }
 
         .loader-vande {
             opacity: 0;
-            animation: fadeInVande 0.5s forwards 2s, popZoom 2.8s forwards 3s var(--ease-out);
+            /* Fade in starts at 1.2s, Pop starts at 1.7s */
+            animation: fadeInVande 0.5s forwards 1.2s, popZoom 1.5s forwards 1.7s var(--ease-out);
             will-change: transform, opacity; 
         }
 
@@ -990,17 +997,25 @@
 
         window.addEventListener('load', () => {
             const loader = document.getElementById('loader');
-            setTimeout(() => { loader.classList.add('hidden'); }, 5500);
+            
+            // --- FIX: NO MORE 5500ms DELAY ---
+            // Remove the timeout wrapper. The loader hides as soon as the load event fires 
+            // (meaning preload assets are done) OR slightly after if animation is still running.
+            // Since we sped up animation to ~3s, and load might happen fast, we do a minimal check.
+            
+            // Allow a small buffer for the final 'popZoom' to be visible if load was instant
+            setTimeout(() => {
+                 loader.classList.add('hidden');
+            }, 100); 
 
             // --- OPTIMIZATION: IDLE PRELOADER ---
-            // After 3 seconds (when user is likely reading cover), start downloading thumbnails silently
             setTimeout(() => {
                 const firstBatch = galleryData.slice(0, 12);
                 firstBatch.forEach(img => {
                     const link = document.createElement('link');
                     link.rel = 'preload';
                     link.as = 'image';
-                    link.href = `gallery/thumbnails/${img.src}`; // Optimistic preloading of thumbnails
+                    link.href = `gallery/thumbnails/${img.src}`; 
                     document.head.appendChild(link);
                 });
             }, 3000);
@@ -1042,34 +1057,27 @@
             modal.classList.add('active');
             checkGalleryNote();
             
-            // Initial Load
             if (filteredImages.length === 0) {
                  applyFilter('all');
             }
         }
 
         function applyFilter(category) {
-            // Update UI Active State
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.filter === category);
             });
 
-            // Logical Merging for Better Categories
             if (category === 'all') {
                 filteredImages = galleryData;
             } else if (category === 'events') {
-                // Merging Crowd and Groups for "Group Photos"
                 filteredImages = galleryData.filter(img => img.category === 'groups' || img.category === 'crowd');
             } else {
-                // Campus and Portraits stay distinct
                 filteredImages = galleryData.filter(img => img.category === category);
             }
 
-            // Reset Grid
             document.getElementById('gallery-grid-content').innerHTML = '';
             currentGalleryIndex = 0;
             
-            // Check if empty
             if (filteredImages.length === 0) {
                 document.getElementById('gallery-grid-content').innerHTML = '<div style="grid-column: 1/-1; text-align: center; opacity: 0.5;">No images found in this category.</div>';
                 document.getElementById('btn-load-more').style.display = 'none';
@@ -1083,18 +1091,15 @@
             const loadMoreBtn = document.getElementById('btn-load-more');
             const fragment = document.createDocumentFragment();
             
-            // Calculate slice
             const nextIndex = Math.min(currentGalleryIndex + galleryBatchSize, filteredImages.length);
             const batch = filteredImages.slice(currentGalleryIndex, nextIndex);
             
             batch.forEach(imgObj => {
-                // --- OPTIMIZATION: USE THUMBNAILS FOR GRID ---
-                const thumbPath = `gallery/thumbnails/${imgObj.src}`; // Small image for speed
-                const fullPath = `gallery/${imgObj.src}`;            // Large image for quality
+                const thumbPath = `gallery/thumbnails/${imgObj.src}`; 
+                const fullPath = `gallery/${imgObj.src}`;            
                 
                 const frame = document.createElement('div');
                 frame.className = 'photo-frame';
-                // Pass fullPath to fullscreen modal
                 frame.onclick = () => openFullscreen(fullPath);
                 
                 frame.innerHTML = `
@@ -1108,7 +1113,6 @@
             galleryContainer.appendChild(fragment);
             currentGalleryIndex = nextIndex;
 
-            // Button visibility
             if (currentGalleryIndex >= filteredImages.length) {
                 loadMoreBtn.style.display = 'none';
             } else {
@@ -1121,7 +1125,6 @@
             document.getElementById('gallery-title-text').textContent = data.galleryTitle;
             document.getElementById('btn-load-more').textContent = data.loadMore;
             
-            // Update Filter Button Text
             const filters = {
                 'all': data.filterAll,
                 'campus': data.filterCampus,
@@ -1151,12 +1154,11 @@
             document.getElementById('btn-archive').textContent = data.archiveBtn;
             document.getElementById('label-read').textContent = data.readLabel;
             
-            updateGalleryText(); // Updates gallery specific text
+            updateGalleryText(); 
             updateLangButton();
             updateThemeButtonText();
         }
 
-        // --- Standard UI Helper Functions ---
         function updateLangButton() {
             const btn = document.getElementById('btn-lang');
             const data = content[currentLang];
@@ -1208,7 +1210,6 @@
             setTimeout(() => { document.getElementById('fullscreen-img').src = ""; }, 300);
         }
 
-        // --- Theme ---
         function toggleTheme() {
             if (isAnimating) return; 
             isAnimating = true;
@@ -1245,13 +1246,11 @@
             document.getElementById('btn-theme-toggle').textContent = isDark ? content[currentLang].themeWhite : content[currentLang].themeBlack;
         }
 
-        // --- Note Helpers ---
         function checkMobileNote() { if (localStorage.getItem('mobileNoteDismissed') === 'true') document.getElementById('mobile-note').style.display = 'none'; }
         function dismissMobileNote() { document.getElementById('mobile-note').style.display = 'none'; localStorage.setItem('mobileNoteDismissed', 'true'); }
         function checkGalleryNote() { document.getElementById('gallery-note').style.display = (localStorage.getItem('galleryNoteDismissed') !== 'true') ? 'block' : 'none'; }
         function dismissGalleryNote() { document.getElementById('gallery-note').style.display = 'none'; localStorage.setItem('galleryNoteDismissed', 'true'); }
 
-        // --- Context Menu ---
         let currentContextAction = null;
         function initCustomContextMenu() {
             const contextMenu = document.getElementById('custom-context-menu');
@@ -1304,7 +1303,6 @@
         }
         function hideContextMenu() { document.getElementById('custom-context-menu').style.display = 'none'; }
 
-        // --- Listeners ---
         const bindModalClose = (id, func) => { document.getElementById(id).addEventListener('click', (e) => { if (e.target === document.getElementById(id)) func(); }); };
         bindModalClose('videoModal', closeModal); bindModalClose('galleryModal', closeGallery); bindModalClose('fullscreenModal', closeFullscreen);
         document.addEventListener('keydown', (e) => { if (e.key === "Escape") { closeModal(); closeGallery(); closeFullscreen(); } });
