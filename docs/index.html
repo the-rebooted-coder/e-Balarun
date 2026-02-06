@@ -638,7 +638,7 @@
 
         // --- ANIMATION SEQUENCE LOGIC ---
         // We use flags to coordinate:
-        // 1. Min animation time (1.2s Balarun, 1.2s Vande Mataram)
+        // 1. Min animation time (2.0s Balarun, 1.0s Vande Mataram)
         // 2. Page fully loaded state
         
         let phase1Done = false; // Balarun -> Vande Swap happened
@@ -648,11 +648,12 @@
         
         // Step 1: Trigger the Logo Swap (Balarun fades out, Vande fades in)
         // Background remains SOLID OPAQUE here.
+        // **UPDATED: 2000ms (2 seconds)**
         setTimeout(() => {
             loader.classList.add('swap-logos');
             phase1Done = true;
             checkFinish(); // Check if page is already loaded
-        }, 1200);
+        }, 2000);
 
         // Step 2: Listen for page load
         window.addEventListener('load', () => {
