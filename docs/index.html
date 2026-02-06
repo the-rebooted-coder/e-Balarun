@@ -36,6 +36,7 @@
             --font-body: 'Patrick Hand', cursive;
             --font-hindi: 'Noto Serif Devanagari', serif;
             
+            /* Optimized Easing for smooth UI */
             --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
             --ease-in-out: cubic-bezier(0.645, 0.045, 0.355, 1);
         }
@@ -73,11 +74,17 @@
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
+            
+            /* Custom Cursor */
             cursor: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="2.5" width="10" height="20" rx="1" transform="rotate(-30 8 12)" fill="white" stroke="gray" stroke-width="1"/></svg>') 0 20, auto;
+
+            /* Performance Pattern */
             background-image: 
                 linear-gradient(var(--grid-color) 1px, transparent 1px),
                 linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
             background-size: 30px 30px;
+            
+            /* Font smoothing */
             -webkit-font-smoothing: antialiased;
         }
 
@@ -91,17 +98,31 @@
         #loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
         .loader-content {
-            position: relative; width: 150px; height: 150px;
-            display: flex; align-items: center; justify-content: center;
+            position: relative;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .loader-logo, .loader-vande {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            margin: auto; width: 100%; height: auto; object-fit: contain;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            margin: auto;
+            width: 100%; height: auto;
+            object-fit: contain;
         }
 
-        .loader-logo { animation: fadeOutBalarun 0.5s forwards 2s; }
-        .loader-vande { opacity: 0; animation: fadeInVande 0.5s forwards 2s, popZoom 2.8s forwards 3s var(--ease-out); will-change: transform, opacity; }
+        .loader-logo {
+            animation: fadeOutBalarun 0.5s forwards 2s; 
+        }
+
+        .loader-vande {
+            opacity: 0;
+            animation: fadeInVande 0.5s forwards 2s, popZoom 2.8s forwards 3s var(--ease-out);
+            will-change: transform, opacity; 
+        }
 
         @keyframes fadeOutBalarun { to { opacity: 0; transform: scale(0.9); } }
         @keyframes fadeInVande { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
@@ -112,18 +133,23 @@
             100% { transform: scale(30); opacity: 0; }
         }
 
-        /* --- UI ELEMENTS --- */
+        /* --- ANIMATIONS --- */
         #wipe-overlay {
             position: fixed; top: 0; left: 0; bottom: 0; width: 0%;
-            z-index: 99990; pointer-events: none; background-size: 30px 30px; will-change: width;
+            z-index: 99990; pointer-events: none;
+            background-size: 30px 30px; will-change: width;
         }
+
         #duster {
-            position: absolute; right: -25px; top: 50%; transform: translateY(-50%) rotate(5deg);
+            position: absolute; right: -25px; top: 50%;
+            transform: translateY(-50%) rotate(5deg);
             width: 60px; height: 140px; display: none;
         }
+
         .duster-handle {
-            width: 100%; height: 100%; background: #854d0e; border-radius: 10px;
-            box-shadow: 4px 4px 10px rgba(0,0,0,0.3); border: 2px solid #503106; position: relative; z-index: 2;
+            width: 100%; height: 100%; background: #854d0e;
+            border-radius: 10px; box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
+            border: 2px solid #503106; position: relative; z-index: 2;
         }
         .duster-felt {
             position: absolute; left: -10px; top: 5px; width: 20px; height: 130px;
@@ -131,158 +157,284 @@
             border-radius: 5px 0 0 5px; z-index: 1; box-shadow: -2px 0 5px rgba(0,0,0,0.2);
         }
 
+        /* --- CHALK BORDERS --- */
         .chalk-border-1, .chalk-border-2, .chalk-border-sm {
-            border: 2px solid var(--ink); box-shadow: 2px 2px 0px rgba(0,0,0,0.1); transition: all 0.3s var(--ease-out);
+            border: 2px solid var(--ink);
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+            transition: all 0.3s var(--ease-out);
         }
         .chalk-border-1 { border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px; }
         .chalk-border-2 { border-radius: 25px 225px 25px 225px / 225px 25px 225px 25px; }
         .chalk-border-sm { border-radius: 255px 25px 225px 25px / 25px 225px 25px 255px; }
 
         a, button, .sketch-card { cursor: pointer; }
-        .container { width: 90%; max-width: 1000px; margin: 0 auto; flex: 1; display: flex; flex-direction: column; padding: 2rem 0; position: relative; z-index: 10; }
 
-        /* --- HEADER --- */
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; width: 100%; position: relative; }
-        #brand-placeholder { display: none; }
-        
-        .brand { 
-            display: flex; align-items: center; gap: 15px; background-color: #ffffff; padding: 10px 20px;
-            border-radius: 50px; box-shadow: 4px 4px 0px rgba(0,0,0,0.2); border: 2px solid #333; color: #333;
-            transform: rotate(-1deg); transition: all 0.4s var(--ease-out); z-index: 2000;
+        /* --- LAYOUT --- */
+        .container {
+            width: 90%; max-width: 1000px; margin: 0 auto;
+            flex: 1; display: flex; flex-direction: column;
+            padding: 2rem 0; position: relative; z-index: 10;
         }
+
+        /* --- HEADER & STICKY LOGIC --- */
+        header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 3rem; width: 100%; position: relative;
+        }
+        
+        #brand-placeholder { display: none; }
+
+        .brand { 
+            display: flex; align-items: center; gap: 15px; 
+            background-color: #ffffff; padding: 10px 20px;
+            border-radius: 50px; box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+            border: 2px solid #333; color: #333;
+            transform: rotate(-1deg); transition: all 0.4s var(--ease-out); 
+            z-index: 2000;
+        }
+        
         .brand.sticky-active {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) rotate(0deg) scale(0.95); 
-            background-color: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px);
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.1); border-color: rgba(51, 51, 51, 0.5); cursor: pointer;
+            position: fixed; top: 20px; left: 50%;
+            transform: translateX(-50%) rotate(0deg) scale(0.95); 
+            background-color: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(5px); box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            border-color: rgba(51, 51, 51, 0.5); cursor: pointer;
         }
         .brand:hover { transform: scale(1.02) rotate(0deg); }
         .brand.sticky-active:hover { transform: translateX(-50%) rotate(0deg) scale(1); }
 
-        .logo-sketch, .logo-vande { height: 50px; transition: transform 0.4s var(--ease-out); transform-origin: center; will-change: transform; }
+        .logo-sketch, .logo-vande {
+            height: 50px; transition: transform 0.4s var(--ease-out);
+            transform-origin: center; will-change: transform;
+        }
         .logo-vande { height: 55px; }
         .logo-sketch:hover { transform: scale(1.1) rotate(-2deg); }
         .logo-vande:hover { transform: scale(1.1) rotate(2deg); }
         
-        .brand-separator { font-size: 2rem; color: #ccc; font-weight: 300; margin: 0 5px; font-family: var(--font-body); opacity: 0.8; transform: rotate(5deg); }
+        .brand-separator {
+            font-size: 2rem; color: #ccc; font-weight: 300; margin: 0 5px;
+            font-family: var(--font-body); opacity: 0.8; transform: rotate(5deg);
+        }
+
         .digital-badge {
-            font-family: var(--font-title); font-size: 1.5rem; font-weight: 700; border-bottom: 2px solid #facc15;
-            padding-bottom: 2px; white-space: nowrap; color: #333; opacity: 1; max-width: 200px; margin-left: 10px;
+            font-family: var(--font-title); font-size: 1.5rem; font-weight: 700;
+            border-bottom: 2px solid #facc15; padding-bottom: 2px; white-space: nowrap;
+            color: #333; opacity: 1; max-width: 200px; margin-left: 10px;
             transition: all 0.4s ease; overflow: hidden;
         }
-        .brand.sticky-active .digital-badge { opacity: 0; max-width: 0; margin-left: 0; padding: 0; border: none; }
+
+        .brand.sticky-active .digital-badge {
+            opacity: 0; max-width: 0; margin-left: 0; padding: 0; border: none;
+        }
 
         .lang-btn {
-            background: transparent; font-family: var(--font-hindi); font-weight: 700; font-size: 1.1rem;
-            color: var(--ink); padding: 5px 20px; white-space: nowrap; z-index: 10;
+            background: transparent; font-family: var(--font-hindi); 
+            font-weight: 700; font-size: 1.1rem; color: var(--ink);
+            padding: 5px 20px; white-space: nowrap; z-index: 10;
         }
         .lang-btn:hover { background: var(--ink); color: var(--paper); transform: rotate(-2deg) scale(1.05); }
 
-        /* --- HERO --- */
+        /* --- HERO & BOOK --- */
         .hero { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; padding-bottom: 3rem; }
-        .book-container { perspective: 1500px; width: 240px; height: 340px; display: flex; justify-content: center; align-items: center; margin-bottom: 2rem; z-index: 50; position: relative; }
-        .book-wrapper { cursor: pointer; text-decoration: none; }
-        .book {
-            position: relative; width: 220px; height: 310px; transform-style: preserve-3d;
-            transform: rotateY(-35deg) rotateX(10deg); transition: transform 0.6s var(--ease-out), box-shadow 0.6s;
-            box-shadow: 20px 20px 50px rgba(0,0,0,0.4); will-change: transform;
+
+        .book-container {
+            perspective: 1500px; width: 240px; height: 340px;
+            display: flex; justify-content: center; align-items: center;
+            margin-bottom: 2rem; z-index: 50; position: relative;
         }
-        .book:hover { transform: rotateY(0deg) rotateX(0deg) translateZ(30px) scale(1.05); box-shadow: 0 40px 60px rgba(0,0,0,0.3); }
+        .book-wrapper { cursor: pointer; text-decoration: none; }
+
+        .book {
+            position: relative; width: 220px; height: 310px;
+            transform-style: preserve-3d;
+            transform: rotateY(-35deg) rotateX(10deg); 
+            transition: transform 0.6s var(--ease-out), box-shadow 0.6s;
+            box-shadow: 20px 20px 50px rgba(0,0,0,0.4); 
+            will-change: transform;
+        }
+        .book:hover {
+            transform: rotateY(0deg) rotateX(0deg) translateZ(30px) scale(1.05);
+            box-shadow: 0 40px 60px rgba(0,0,0,0.3);
+        }
+
         .book-face { position: absolute; background-color: #fff; backface-visibility: hidden; }
-        .book-front { width: 220px; height: 310px; transform: translateZ(20px); background: #222; border-radius: 2px 4px 4px 2px; overflow: hidden; z-index: 2; }
+        .book-front {
+            width: 220px; height: 310px; transform: translateZ(20px);
+            background: #222; border-radius: 2px 4px 4px 2px; overflow: hidden; z-index: 2;
+        }
         .book-front img { width: 100%; height: 100%; object-fit: cover; }
-        .book-front::after { content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 30px; background: linear-gradient(to right, rgba(255,255,255,0.2) 0%, transparent 100%); pointer-events: none; }
-        .book-spine { width: 40px; height: 310px; background: #8B4513; left: -20px; transform: rotateY(-90deg) translateZ(0); box-shadow: inset 5px 0 15px rgba(0,0,0,0.3); }
-        .book-pages { width: 40px; height: 304px; top: 3px; background: #fdf6e3; right: -20px; transform: rotateY(90deg) translateZ(0); background-image: repeating-linear-gradient(90deg, #fdf6e3 0px, #fdf6e3 2px, #dcdcdc 3px); }
+        .book-front::after {
+            content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 30px;
+            background: linear-gradient(to right, rgba(255,255,255,0.2) 0%, transparent 100%); pointer-events: none;
+        }
+        .book-spine {
+            width: 40px; height: 310px; background: #8B4513; left: -20px;
+            transform: rotateY(-90deg) translateZ(0); box-shadow: inset 5px 0 15px rgba(0,0,0,0.3);
+        }
+        .book-pages {
+            width: 40px; height: 304px; top: 3px; background: #fdf6e3; right: -20px;
+            transform: rotateY(90deg) translateZ(0);
+            background-image: repeating-linear-gradient(90deg, #fdf6e3 0px, #fdf6e3 2px, #dcdcdc 3px);
+        }
         .book-back { width: 220px; height: 310px; transform: rotateY(180deg) translateZ(20px); background: #2e2e2e; }
+
         .read-tooltip {
-            position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); font-family: var(--font-body);
-            color: var(--accent); font-weight: bold; font-size: 1.3rem; opacity: 0; transition: opacity 0.4s, transform 0.4s;
-            pointer-events: none; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%);
+            font-family: var(--font-body); color: var(--accent); font-weight: bold;
+            font-size: 1.3rem; opacity: 0; transition: opacity 0.4s, transform 0.4s; pointer-events: none;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
         .book-container:hover .read-tooltip { opacity: 1; transform: translateX(-50%) translateY(-5px); }
 
-        h1 { font-family: var(--font-title); font-size: clamp(4rem, 10vw, 7rem); font-weight: 700; line-height: 0.9; margin-bottom: 3rem; text-transform: uppercase; letter-spacing: 2px; }
+        h1 {
+            font-family: var(--font-title); font-size: clamp(4rem, 10vw, 7rem);
+            font-weight: 700; line-height: 0.9; margin-bottom: 3rem;
+            text-transform: uppercase; letter-spacing: 2px;
+        }
         body.hindi-active h1 { font-family: var(--font-hindi); font-size: clamp(3rem, 8vw, 5rem); line-height: 1.2; }
 
+        /* --- CARDS --- */
         .cards-container { display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; width: 100%; }
+
         .sketch-card {
-            background: var(--paper); padding: 2rem; width: 100%; max-width: 300px; position: relative;
-            text-align: left; display: flex; flex-direction: column; justify-content: center;
+            background: var(--paper); padding: 2rem; width: 100%; max-width: 300px;
+            position: relative; text-align: left; display: flex; flex-direction: column; justify-content: center;
             will-change: transform; transition: transform 0.2s, box-shadow 0.2s;
         }
         .sketch-card:hover { transform: translateY(-5px) rotate(1deg); box-shadow: 8px 8px 0px var(--ink); }
         .sketch-card:active { transform: translateY(0px); box-shadow: 2px 2px 0px var(--ink); }
+
         .card-icon { margin-bottom: 1rem; color: var(--accent); }
         .card-title { font-family: var(--font-title); font-size: 2.2rem; font-weight: 700; line-height: 1; }
 
-        /* --- STICKY NOTES & TOAST --- */
-        #mobile-note, #gallery-note { background: #fef3c7; color: #1e1e1e; font-family: var(--font-body); box-shadow: 3px 3px 10px rgba(0,0,0,0.3); z-index: 500; }
-        #mobile-note { display: none; position: fixed; bottom: 20px; right: 20px; width: 250px; padding: 15px; transform: rotate(-3deg); animation: slideUp 1s ease-out 4s backwards; }
-        #gallery-note { display: none; position: absolute; bottom: -20px; right: -20px; width: 200px; padding: 12px; transform: rotate(4deg); text-align: center; border: 1px solid #eab308; z-index: 150; }
-        #mobile-note::before, #gallery-note::before { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 40px; height: 15px; background: rgba(255, 255, 255, 0.4); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        /* --- STICKY NOTES --- */
+        #mobile-note, #gallery-note {
+            background: #fef3c7; color: #1e1e1e; font-family: var(--font-body);
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.3); z-index: 500;
+        }
+        #mobile-note {
+            display: none; position: fixed; bottom: 20px; right: 20px; width: 250px;
+            padding: 15px; transform: rotate(-3deg); animation: slideUp 1s ease-out 4s backwards;
+        }
+        #gallery-note {
+            display: none; position: absolute; bottom: -20px; right: -20px; width: 200px;
+            padding: 12px; transform: rotate(4deg); text-align: center; border: 1px solid #eab308; z-index: 150;
+        }
+        #mobile-note::before, #gallery-note::before {
+            content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 40px; height: 15px; background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
         .note-close { position: absolute; top: 2px; right: 5px; font-weight: bold; cursor: pointer; opacity: 0.5; }
+
         @keyframes slideUp { from { transform: translateY(100%) rotate(-3deg); opacity: 0; } to { transform: translateY(0) rotate(-3deg); opacity: 1; } }
 
+        /* --- TOAST --- */
         #toast {
-            visibility: hidden; min-width: 250px; background-color: var(--ink); color: var(--paper); text-align: center;
-            border-radius: 50px; padding: 16px 25px; position: fixed; z-index: 10000; left: 50%; bottom: 30px;
-            transform: translateX(-50%) translateY(20px); font-family: var(--font-body); font-weight: bold;
-            box-shadow: 0px 4px 15px rgba(0,0,0,0.3); opacity: 0; transition: all 0.4s var(--ease-out); border: 2px solid var(--accent);
+            visibility: hidden; min-width: 250px; background-color: var(--ink); color: var(--paper);
+            text-align: center; border-radius: 50px; padding: 16px 25px; position: fixed; z-index: 10000;
+            left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px);
+            font-family: var(--font-body); font-weight: bold; box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+            opacity: 0; transition: all 0.4s var(--ease-out); border: 2px solid var(--accent);
         }
         #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0px); }
 
-        /* --- CONTEXT MENU --- */
+        /* --- CUSTOM CONTEXT MENU --- */
         #custom-context-menu {
-            display: none; position: fixed; z-index: 999999; background-color: var(--paper); border: 2px solid var(--ink);
-            box-shadow: 4px 4px 0px var(--accent); padding-bottom: 5px; border-radius: 5px 20px 5px 20px; min-width: 180px;
+            display: none; position: fixed; z-index: 999999;
+            background-color: var(--paper); border: 2px solid var(--ink);
+            box-shadow: 4px 4px 0px var(--accent); padding-bottom: 5px;
+            border-radius: 5px 20px 5px 20px; min-width: 180px;
             font-family: var(--font-body); animation: fadeInMenu 0.1s ease-out; overflow: hidden;
         }
+
         @keyframes fadeInMenu { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        .context-menu-header { background-color: var(--ink); color: var(--paper); padding: 8px 15px; font-family: var(--font-title); font-size: 1.4rem; font-weight: bold; border-bottom: 2px solid var(--accent); text-align: center; letter-spacing: 1px; }
-        .context-menu-item { padding: 10px 15px; cursor: pointer; color: var(--ink); font-weight: bold; display: flex; align-items: center; gap: 10px; transition: background 0.2s, color 0.2s; font-size: 1.1rem; }
+
+        .context-menu-header {
+            background-color: var(--ink); color: var(--paper); padding: 8px 15px;
+            font-family: var(--font-title); font-size: 1.4rem; font-weight: bold;
+            border-bottom: 2px solid var(--accent); text-align: center; letter-spacing: 1px;
+        }
+
+        .context-menu-item {
+            padding: 10px 15px; cursor: pointer; color: var(--ink); font-weight: bold;
+            display: flex; align-items: center; gap: 10px; transition: background 0.2s, color 0.2s;
+            font-size: 1.1rem;
+        }
         .context-menu-item:hover { background-color: var(--ink); color: var(--paper); }
         .context-menu-item.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 
         /* --- FOOTER --- */
-        footer { border-top: 2px dashed var(--ink-dim); padding-top: 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--ink-dim); margin-top: auto; text-align: center; gap: 1.5rem; content-visibility: auto; }
+        footer {
+            border-top: 2px dashed var(--ink-dim); padding-top: 1.5rem;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 1.1rem; color: var(--ink-dim); margin-top: auto; text-align: center; gap: 1.5rem;
+            content-visibility: auto; 
+        }
         .footer-actions { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; align-items: center; }
         .loc-text { color: var(--ink); font-weight: 700; text-decoration: underline; text-decoration-style: wavy; text-decoration-color: var(--accent); }
-        .theme-toggle-btn, .archive-btn { background: none; border: 1px dashed var(--ink-dim); color: var(--ink-dim); padding: 5px 15px; font-family: var(--font-body); font-size: 0.9rem; border-radius: 20px; cursor: pointer; transition: all 0.3s ease; opacity: 0.7; text-decoration: none; display: inline-block; }
+        
+        .theme-toggle-btn, .archive-btn {
+            background: none; border: 1px dashed var(--ink-dim); color: var(--ink-dim);
+            padding: 5px 15px; font-family: var(--font-body); font-size: 0.9rem;
+            border-radius: 20px; cursor: pointer; transition: all 0.3s ease; opacity: 0.7; text-decoration: none; display: inline-block;
+        }
         .theme-toggle-btn:hover, .archive-btn:hover { opacity: 1; border-color: var(--accent); color: var(--accent); }
 
         /* --- MODALS --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(5px); }
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9);
+            z-index: 100; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(5px);
+        }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
-        .modal-paper { background: var(--paper); color: var(--ink); width: 90%; max-width: 800px; padding: 10px; border: 2px solid var(--ink); box-shadow: 15px 15px 0px var(--accent); display: flex; flex-direction: column; max-height: 90vh; position: relative; }
+
+        .modal-paper {
+            background: var(--paper); color: var(--ink); width: 90%; max-width: 800px;
+            padding: 10px; border: 2px solid var(--ink); box-shadow: 15px 15px 0px var(--accent);
+            display: flex; flex-direction: column; max-height: 90vh; position: relative;
+        }
+
         .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 10px 20px 10px; flex-shrink: 0; }
         .modal-title { font-family: var(--font-title); font-size: 2rem; font-weight: 700; }
         .close-btn { background: none; border: none; color: var(--ink); transition: transform 0.2s; cursor: pointer; }
         .close-btn:hover { transform: scale(1.2) rotate(90deg); }
+
         .modal-scroll-content { overflow-y: auto; flex: 1; padding-right: 5px; overscroll-behavior: contain; }
         .modal-scroll-content::-webkit-scrollbar { width: 8px; }
         .modal-scroll-content::-webkit-scrollbar-track { background: transparent; }
         .modal-scroll-content::-webkit-scrollbar-thumb { background-color: var(--ink-dim); border-radius: 4px; }
 
+        /* Video Facade */
         .video-wrapper { margin-bottom: 2rem; }
         .video-label { font-family: var(--font-title); font-size: 1.5rem; color: var(--accent); margin-bottom: 0.5rem; display: block; }
-        .video-facade { position: relative; padding-bottom: 56.25%; height: 0; background: #000; border: 2px solid var(--ink); cursor: pointer; overflow: hidden; }
-        .video-facade img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.3s; }
+        .video-facade {
+            position: relative; padding-bottom: 56.25%; height: 0; background: #000;
+            border: 2px solid var(--ink); cursor: pointer; overflow: hidden;
+        }
+        .video-facade img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.3s;
+        }
         .video-facade:hover img { opacity: 0.5; }
-        .play-btn-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 40px; background: rgba(255,0,0,0.9); border-radius: 10px; display: flex; align-items: center; justify-content: center; pointer-events: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .play-btn-overlay::after { content: ''; border-style: solid; border-width: 10px 0 10px 18px; border-color: transparent transparent transparent white; }
+        .play-btn-overlay {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 60px; height: 40px; background: rgba(255,0,0,0.9); border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; pointer-events: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .play-btn-overlay::after {
+            content: ''; border-style: solid; border-width: 10px 0 10px 18px;
+            border-color: transparent transparent transparent white;
+        }
         .video-active iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-        /* --- GALLERY & FILTERS (Fixed UI) --- */
+        /* --- GALLERY & FILTERS --- */
         .gallery-filter-bar {
-            display: flex; gap: 12px; overflow-x: auto; padding: 5px 5px 15px 5px;
-            margin-bottom: 0; -webkit-overflow-scrolling: touch;
+            display: flex; gap: 10px; overflow-x: auto; padding: 0 5px 15px 5px;
+            border-bottom: 2px dashed var(--ink-dim); margin-bottom: 15px;
+            -webkit-overflow-scrolling: touch;
         }
-        .gallery-filter-bar::-webkit-scrollbar { display: none; }
-        
-        /* New Divider Element to avoid Pill overlap */
-        .gallery-filter-separator {
-            border-bottom: 2px dashed var(--ink-dim); margin-bottom: 20px;
-        }
+        .gallery-filter-bar::-webkit-scrollbar { display: none; } /* Hide scrollbar for cleaner look */
 
         .filter-btn {
             background: transparent; border: 2px solid var(--ink-dim); color: var(--ink-dim);
@@ -290,9 +442,17 @@
             cursor: pointer; white-space: nowrap; transition: all 0.2s ease;
         }
         .filter-btn:hover { border-color: var(--ink); color: var(--ink); }
-        .filter-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); box-shadow: 2px 2px 0 var(--accent); transform: translateY(-2px); }
+        
+        .filter-btn.active {
+            background: var(--ink); color: var(--paper); border-color: var(--ink);
+            box-shadow: 2px 2px 0 var(--accent); transform: translateY(-2px);
+        }
 
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; padding: 1rem; overflow-y: auto; content-visibility: auto; overscroll-behavior: contain; }
+        .gallery-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem; padding: 1rem; overflow-y: auto; 
+            content-visibility: auto; overscroll-behavior: contain;
+        }
         .gallery-grid::-webkit-scrollbar { width: 8px; }
         .gallery-grid::-webkit-scrollbar-track { background: transparent; }
         .gallery-grid::-webkit-scrollbar-thumb { background-color: var(--ink-dim); border-radius: 4px; }
@@ -306,36 +466,57 @@
         .photo-frame:nth-child(3n) { transform: rotate(1.5deg); }
         .photo-frame:hover { transform: scale(1.05) rotate(0deg); z-index: 10; box-shadow: 10px 10px 15px rgba(0,0,0,0.4); }
 
-        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-        .photo-placeholder {
-            width: 100%; aspect-ratio: 1/1; background: #e5e5e5;
-            background-image: linear-gradient(90deg, #e5e5e5 25%, #f0f0f0 50%, #e5e5e5 75%);
-            background-size: 200% 100%; animation: shimmer 1.5s infinite;
-            display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; overflow: hidden; position: relative;
+        /* Shimmer Animation */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
         }
-        /* Faster transition for "Instant" feel */
-        .photo-placeholder img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: opacity 0.2s ease-in; }
+
+        .photo-placeholder {
+            width: 100%; aspect-ratio: 1/1; 
+            background: #e5e5e5;
+            background-image: linear-gradient(90deg, #e5e5e5 25%, #f0f0f0 50%, #e5e5e5 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid #ccc; overflow: hidden;
+            position: relative;
+        }
+
+        .photo-placeholder img { 
+            width: 100%; height: 100%; object-fit: cover; display: block;
+            opacity: 0; transition: opacity 0.5s ease-in;
+        }
         .photo-placeholder img.loaded { opacity: 1; }
 
-        .load-more-container { width: 100%; display: flex; justify-content: center; padding: 20px 0; margin-top: 10px; }
+        .load-more-container {
+            width: 100%; display: flex; justify-content: center; padding: 20px 0; margin-top: 10px;
+        }
         .btn-load-more {
             background: var(--paper); border: 2px solid var(--ink); color: var(--ink);
-            font-family: var(--font-title); font-size: 1.8rem; padding: 8px 30px; border-radius: 5px; cursor: pointer;
-            transition: all 0.3s; box-shadow: 4px 4px 0px var(--accent);
+            font-family: var(--font-title); font-size: 1.8rem; padding: 8px 30px;
+            border-radius: 5px; cursor: pointer; transition: all 0.3s;
+            box-shadow: 4px 4px 0px var(--accent);
         }
         .btn-load-more:hover { transform: scale(1.05) rotate(-1deg); box-shadow: 6px 6px 0px var(--accent); }
         .btn-load-more:active { transform: scale(0.98); box-shadow: 2px 2px 0px var(--accent); }
+        .btn-load-more.hidden { display: none; }
 
         #fullscreenModal { z-index: 200; background: rgba(0, 0, 0, 0.95); }
-        #fullscreenModal img { max-width: 90%; max-height: 90vh; border: 4px solid #fff; box-shadow: 0 0 20px rgba(0,0,0,0.5); animation: popZoom 0.4s ease-out; }
+        #fullscreenModal img {
+            max-width: 90%; max-height: 90vh; border: 4px solid #fff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5); animation: popZoom 0.4s ease-out;
+        }
         .fullscreen-close {
-            position: absolute; top: 20px; right: 20px; color: #fff; font-size: 2rem; background: rgba(255,255,255,0.1);
-            width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: transform 0.2s;
+            position: absolute; top: 20px; right: 20px; color: #fff; font-size: 2rem;
+            background: rgba(255,255,255,0.1); width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s;
         }
         .fullscreen-close:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
+
         svg path, svg circle { stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; stroke: currentColor; }
 
+        /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
             header { flex-direction: row; gap: 10px; margin-bottom: 2rem; }
             .brand { gap: 8px; padding: 8px 15px; } 
@@ -367,14 +548,27 @@
         </div>
     </div>
 
-    <div id="mobile-note"><span class="note-close" onclick="dismissMobileNote()">×</span>✨ <b>Tip:</b> Open this on a Laptop/PC for a better experience 🖱️</div>
+    <div id="mobile-note">
+        <span class="note-close" onclick="dismissMobileNote()">×</span>
+        ✨ <b>Tip:</b> Open this on a Laptop/PC for a better experience 🖱️
+    </div>
+
     <div id="toast">Coming Soon 🚧</div>
 
     <div id="custom-context-menu">
         <div class="context-menu-header">E-Balarun</div>
-        <div class="context-menu-item" id="ctx-open"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14L21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg><span id="ctx-open-text">Open / View</span></div>
-        <div class="context-menu-item" id="ctx-share"><svg width="18" height="18" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>Share</div>
-        <div class="context-menu-item" onclick="hideContextMenu()"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>Close Menu</div>
+        <div class="context-menu-item" id="ctx-open">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14L21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+            <span id="ctx-open-text">Open / View</span>
+        </div>
+        <div class="context-menu-item" id="ctx-share">
+            <svg width="18" height="18" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            Share
+        </div>
+        <div class="context-menu-item" onclick="hideContextMenu()">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            Close Menu
+        </div>
     </div>
 
     <div class="container">
@@ -448,11 +642,11 @@
             
             <div class="gallery-filter-bar">
                 <button class="filter-btn active" data-filter="all" onclick="applyFilter('all')">All</button>
-                <button class="filter-btn" data-filter="buildings" onclick="applyFilter('buildings')">Buildings</button>
-                <button class="filter-btn" data-filter="groups" onclick="applyFilter('groups')">Group Photos</button>
-                <button class="filter-btn" data-filter="class" onclick="applyFilter('class')">Class Photos</button>
+                <button class="filter-btn" data-filter="campus" onclick="applyFilter('campus')">Campus & Art</button>
+                <button class="filter-btn" data-filter="portraits" onclick="applyFilter('portraits')">Solos</button>
+                <button class="filter-btn" data-filter="groups" onclick="applyFilter('groups')">Buddies</button>
+                <button class="filter-btn" data-filter="crowd" onclick="applyFilter('crowd')">Class Photos</button>
             </div>
-            <div class="gallery-filter-separator"></div>
 
             <div class="gallery-grid" id="gallery-grid-content"></div>
             
@@ -460,7 +654,10 @@
                 <button id="btn-load-more" class="btn-load-more" onclick="loadNextGalleryBatch()">Load More 📸</button>
             </div>
 
-            <div id="gallery-note"><span class="note-close" onclick="dismissGalleryNote()">×</span>🔍 <b>Tip:</b> Click an image to view fullscreen! 📸</div>
+            <div id="gallery-note">
+                <span class="note-close" onclick="dismissGalleryNote()">×</span>
+                🔍 <b>Tip:</b> Click an image to view fullscreen! 📸
+            </div>
         </div>
     </div>
 
@@ -470,92 +667,66 @@
     </div>
 
     <script>
-        // --- EMBEDDED JSON DATA (Instant Load) ---
-        // Cleaned and merged from your input
-        const rawGalleryData = [
-            { src: "e-balarun-gallery (1).webp", faces: 12 }, { src: "e-balarun-gallery (10).webp", faces: 12 }, { src: "e-balarun-gallery (100).webp", faces: 3 }, { src: "e-balarun-gallery (101).webp", faces: 3 },
-            { src: "e-balarun-gallery (102).webp", faces: 13 }, { src: "e-balarun-gallery (103).webp", faces: 14 }, { src: "e-balarun-gallery (104).webp", faces: 7 }, { src: "e-balarun-gallery (105).webp", faces: 12 },
-            { src: "e-balarun-gallery (106).webp", faces: 15 }, { src: "e-balarun-gallery (107).webp", faces: 1 }, { src: "e-balarun-gallery (108).webp", faces: 4 }, { src: "e-balarun-gallery (109).webp", faces: 7 },
-            { src: "e-balarun-gallery (11).webp", faces: 18 }, { src: "e-balarun-gallery (110).webp", faces: 2 }, { src: "e-balarun-gallery (111).webp", faces: 0 }, { src: "e-balarun-gallery (112).webp", faces: 2 },
-            { src: "e-balarun-gallery (113).webp", faces: 12 }, { src: "e-balarun-gallery (114).webp", faces: 18 }, { src: "e-balarun-gallery (115).webp", faces: 7 }, { src: "e-balarun-gallery (116).webp", faces: 0 },
-            { src: "e-balarun-gallery (117).webp", faces: 0 }, { src: "e-balarun-gallery (118).webp", faces: 4 }, { src: "e-balarun-gallery (119).webp", faces: 7 }, { src: "e-balarun-gallery (12).webp", faces: 0 },
-            { src: "e-balarun-gallery (120).webp", faces: 1 }, { src: "e-balarun-gallery (121).webp", faces: 8 }, { src: "e-balarun-gallery (122).webp", faces: 12 }, { src: "e-balarun-gallery (123).webp", faces: 3 },
-            { src: "e-balarun-gallery (124).webp", faces: 7 }, { src: "e-balarun-gallery (125).webp", faces: 12 }, { src: "e-balarun-gallery (126).webp", faces: 41 }, { src: "e-balarun-gallery (127).webp", faces: 3 },
-            { src: "e-balarun-gallery (128).webp", faces: 8 }, { src: "e-balarun-gallery (129).webp", faces: 33 }, { src: "e-balarun-gallery (13).webp", faces: 2 }, { src: "e-balarun-gallery (130).webp", faces: 17 },
-            { src: "e-balarun-gallery (131).webp", faces: 30 }, { src: "e-balarun-gallery (132).webp", faces: 62 }, { src: "e-balarun-gallery (133).webp", faces: 0 }, { src: "e-balarun-gallery (134).webp", faces: 5 },
-            { src: "e-balarun-gallery (135).webp", faces: 4 }, { src: "e-balarun-gallery (136).webp", faces: 7 }, { src: "e-balarun-gallery (137).webp", faces: 7 }, { src: "e-balarun-gallery (138).webp", faces: 6 },
-            { src: "e-balarun-gallery (139).webp", faces: 30 }, { src: "e-balarun-gallery (14).webp", faces: 8 }, { src: "e-balarun-gallery (140).webp", faces: 19 }, { src: "e-balarun-gallery (141).webp", faces: 0 },
-            { src: "e-balarun-gallery (142).webp", faces: 29 }, { src: "e-balarun-gallery (143).webp", faces: 1 }, { src: "e-balarun-gallery (144).webp", faces: 3 }, { src: "e-balarun-gallery (145).webp", faces: 6 },
-            { src: "e-balarun-gallery (146).webp", faces: 0 }, { src: "e-balarun-gallery (147).webp", faces: 3 }, { src: "e-balarun-gallery (148).webp", faces: 16 }, { src: "e-balarun-gallery (149).webp", faces: 6 },
-            { src: "e-balarun-gallery (15).webp", faces: 1 }, { src: "e-balarun-gallery (150).webp", faces: 6 }, { src: "e-balarun-gallery (151).webp", faces: 1 }, { src: "e-balarun-gallery (152).webp", faces: 9 },
-            { src: "e-balarun-gallery (153).webp", faces: 0 }, { src: "e-balarun-gallery (154).webp", faces: 10 }, { src: "e-balarun-gallery (155).webp", faces: 0 }, { src: "e-balarun-gallery (156).webp", faces: 0 },
-            { src: "e-balarun-gallery (157).webp", faces: 8 }, { src: "e-balarun-gallery (158).webp", faces: 10 }, { src: "e-balarun-gallery (159).webp", faces: 1 }, { src: "e-balarun-gallery (16).webp", faces: 0 },
-            { src: "e-balarun-gallery (160).webp", faces: 4 }, { src: "e-balarun-gallery (161).webp", faces: 1 }, { src: "e-balarun-gallery (162).webp", faces: 0 }, { src: "e-balarun-gallery (163).webp", faces: 0 },
-            { src: "e-balarun-gallery (164).webp", faces: 18 }, { src: "e-balarun-gallery (165).webp", faces: 4 }, { src: "e-balarun-gallery (166).webp", faces: 2 }, { src: "e-balarun-gallery (167).webp", faces: 25 },
-            { src: "e-balarun-gallery (168).webp", faces: 1 }, { src: "e-balarun-gallery (169).webp", faces: 16 }, { src: "e-balarun-gallery (17).webp", faces: 4 }, { src: "e-balarun-gallery (170).webp", faces: 15 },
-            { src: "e-balarun-gallery (171).webp", faces: 6 }, { src: "e-balarun-gallery (172).webp", faces: 0 }, { src: "e-balarun-gallery (173).webp", faces: 7 }, { src: "e-balarun-gallery (174).webp", faces: 0 },
-            { src: "e-balarun-gallery (175).webp", faces: 9 }, { src: "e-balarun-gallery (176).webp", faces: 9 }, { src: "e-balarun-gallery (177).webp", faces: 9 }, { src: "e-balarun-gallery (178).webp", faces: 6 },
-            { src: "e-balarun-gallery (179).webp", faces: 13 }, { src: "e-balarun-gallery (18).webp", faces: 1 }, { src: "e-balarun-gallery (180).webp", faces: 0 }, { src: "e-balarun-gallery (181).webp", faces: 1 },
-            { src: "e-balarun-gallery (182).webp", faces: 7 }, { src: "e-balarun-gallery (183).webp", faces: 0 }, { src: "e-balarun-gallery (184).webp", faces: 1 }, { src: "e-balarun-gallery (185).webp", faces: 2 },
-            { src: "e-balarun-gallery (186).webp", faces: 2 }, { src: "e-balarun-gallery (187).webp", faces: 8 }, { src: "e-balarun-gallery (188).webp", faces: 5 }, { src: "e-balarun-gallery (189).webp", faces: 5 },
-            { src: "e-balarun-gallery (19).webp", faces: 5 }, { src: "e-balarun-gallery (2).webp", faces: 4 }, { src: "e-balarun-gallery (20).webp", faces: 1 }, { src: "e-balarun-gallery (21).webp", faces: 16 },
-            { src: "e-balarun-gallery (22).webp", faces: 3 }, { src: "e-balarun-gallery (23).webp", faces: 16 }, { src: "e-balarun-gallery (24).webp", faces: 4 }, { src: "e-balarun-gallery (25).webp", faces: 12 },
-            { src: "e-balarun-gallery (26).webp", faces: 1 }, { src: "e-balarun-gallery (27).webp", faces: 2 }, { src: "e-balarun-gallery (28).webp", faces: 12 }, { src: "e-balarun-gallery (29).webp", faces: 4 },
-            { src: "e-balarun-gallery (3).webp", faces: 3 }, { src: "e-balarun-gallery (30).webp", faces: 5 }, { src: "e-balarun-gallery (31).webp", faces: 0 }, { src: "e-balarun-gallery (32).webp", faces: 4 },
-            { src: "e-balarun-gallery (33).webp", faces: 20 }, { src: "e-balarun-gallery (34).webp", faces: 11 }, { src: "e-balarun-gallery (35).webp", faces: 0 }, { src: "e-balarun-gallery (36).webp", faces: 0 },
-            { src: "e-balarun-gallery (37).webp", faces: 2 }, { src: "e-balarun-gallery (38).webp", faces: 3 }, { src: "e-balarun-gallery (39).webp", faces: 2 }, { src: "e-balarun-gallery (4).webp", faces: 2 },
-            { src: "e-balarun-gallery (40).webp", faces: 4 }, { src: "e-balarun-gallery (41).webp", faces: 3 }, { src: "e-balarun-gallery (42).webp", faces: 14 }, { src: "e-balarun-gallery (43).webp", faces: 3 },
-            { src: "e-balarun-gallery (44).webp", faces: 24 }, { src: "e-balarun-gallery (45).webp", faces: 22 }, { src: "e-balarun-gallery (46).webp", faces: 17 }, { src: "e-balarun-gallery (47).webp", faces: 30 },
-            { src: "e-balarun-gallery (48).webp", faces: 4 }, { src: "e-balarun-gallery (49).webp", faces: 2 }, { src: "e-balarun-gallery (5).webp", faces: 5 }, { src: "e-balarun-gallery (50).webp", faces: 2 },
-            { src: "e-balarun-gallery (51).webp", faces: 9 }, { src: "e-balarun-gallery (52).webp", faces: 6 }, { src: "e-balarun-gallery (53).webp", faces: 0 }, { src: "e-balarun-gallery (54).webp", faces: 2 },
-            { src: "e-balarun-gallery (55).webp", faces: 3 }, { src: "e-balarun-gallery (56).webp", faces: 1 }, { src: "e-balarun-gallery (57).webp", faces: 2 }, { src: "e-balarun-gallery (58).webp", faces: 10 },
-            { src: "e-balarun-gallery (59).webp", faces: 0 }, { src: "e-balarun-gallery (6).webp", faces: 5 }, { src: "e-balarun-gallery (60).webp", faces: 1 }, { src: "e-balarun-gallery (61).webp", faces: 8 },
-            { src: "e-balarun-gallery (62).webp", faces: 9 }, { src: "e-balarun-gallery (63).webp", faces: 1 }, { src: "e-balarun-gallery (64).webp", faces: 10 }, { src: "e-balarun-gallery (65).webp", faces: 7 },
-            { src: "e-balarun-gallery (66).webp", faces: 10 }, { src: "e-balarun-gallery (67).webp", faces: 36 }, { src: "e-balarun-gallery (68).webp", faces: 7 }, { src: "e-balarun-gallery (69).webp", faces: 3 },
-            { src: "e-balarun-gallery (7).webp", faces: 4 }, { src: "e-balarun-gallery (70).webp", faces: 3 }, { src: "e-balarun-gallery (71).webp", faces: 3 }, { src: "e-balarun-gallery (72).webp", faces: 15 },
-            { src: "e-balarun-gallery (73).webp", faces: 3 }, { src: "e-balarun-gallery (74).webp", faces: 2 }, { src: "e-balarun-gallery (75).webp", faces: 2 }, { src: "e-balarun-gallery (76).webp", faces: 1 },
-            { src: "e-balarun-gallery (77).webp", faces: 5 }, { src: "e-balarun-gallery (78).webp", faces: 1 }, { src: "e-balarun-gallery (79).webp", faces: 3 }, { src: "e-balarun-gallery (8).webp", faces: 3 },
-            { src: "e-balarun-gallery (80).webp", faces: 4 }, { src: "e-balarun-gallery (81).webp", faces: 0 }, { src: "e-balarun-gallery (82).webp", faces: 1 }, { src: "e-balarun-gallery (83).webp", faces: 1 },
-            { src: "e-balarun-gallery (84).webp", faces: 4 }, { src: "e-balarun-gallery (85).webp", faces: 12 }, { src: "e-balarun-gallery (86).webp", faces: 7 }, { src: "e-balarun-gallery (87).webp", faces: 1 },
-            { src: "e-balarun-gallery (88).webp", faces: 10 }, { src: "e-balarun-gallery (89).webp", faces: 10 }, { src: "e-balarun-gallery (9).webp", faces: 10 }, { src: "e-balarun-gallery (90).webp", faces: 6 },
-            { src: "e-balarun-gallery (91).webp", faces: 7 }, { src: "e-balarun-gallery (92).webp", faces: 7 }, { src: "e-balarun-gallery (93).webp", faces: 12 }, { src: "e-balarun-gallery (94).webp", faces: 2 },
-            { src: "e-balarun-gallery (95).webp", faces: 20 }, { src: "e-balarun-gallery (96).webp", faces: 6 }, { src: "e-balarun-gallery (97).webp", faces: 16 }, { src: "e-balarun-gallery (98).webp", faces: 3 },
-            { src: "e-balarun-gallery (99).webp", faces: 4 }
-        ];
-
-        // Fill missing gaps if any logic (not needed as I scraped all 189)
-        // But to be safe, I will ensure 1-189 logic if something is missing
-        
         // --- Content Configuration ---
         const content = {
             en: {
-                tabTitle: "E-Balarun 2026 | Digital Edition", digital: "Digital Edition", title: "E-Balarun",
-                watch: "Video Messages", tour: "Campus Tour", gallery: "Image Gallery", 
-                messagesTitle: "Video Messages", tourTitle: "Virtual Campus Tour", galleryTitle: "Photo Scrapbook", 
-                langBtn: "हिन्दी", langBtnMobile: "हिं", footerHtml: 'Published with ❤️ in <span class="loc-text">Jabalpur</span>',
-                themeWhite: "Switch to Whiteboard", themeBlack: "Switch to Blackboard", archiveBtn: "📂 2021-22 Archive",
-                readLabel: "Click to Read 📖", comingSoon: "Coming Soon 🚧", loadMore: "Load More 📸",
-                vid_principal: "Principal's Message", vid_editor: "Editor's Message", vid_teacher: "Teacher's Message",
-                vid_ex_teacher: "Ex-Teacher's Message", vid_ex_trainee: "Ex-Trainee Teacher's Message",
+                tabTitle: "E-Balarun 2026 | Digital Edition",
+                digital: "Digital Edition",
+                title: "E-Balarun",
+                watch: "Video Messages",
+                tour: "Campus Tour",
+                gallery: "Image Gallery", 
+                messagesTitle: "Video Messages",
+                tourTitle: "Virtual Campus Tour",
+                galleryTitle: "Photo Scrapbook", 
+                langBtn: "हिन्दी", langBtnMobile: "हिं",       
+                footerHtml: 'Published with ❤️ in <span class="loc-text">Jabalpur</span>',
+                themeWhite: "Switch to Whiteboard", themeBlack: "Switch to Blackboard",
+                archiveBtn: "📂 2021-22 Archive", readLabel: "Click to Read 📖",
+                comingSoon: "Coming Soon 🚧", loadMore: "Load More 📸",
+                
+                // Video Labels
+                vid_principal: "Principal's Message", vid_editor: "Editor's Message",
+                vid_teacher: "Teacher's Message", vid_ex_teacher: "Ex-Teacher's Message",
+                vid_ex_trainee: "Ex-Trainee Teacher's Message",
+
                 // Filters
-                filterAll: "All", filterBuildings: "Buildings", filterGroups: "Group Photos", filterClass: "Class Photos"
+                filterAll: "All", filterCampus: "Campus & Art",
+                filterSolos: "Solos", filterGroups: "Buddies", filterCrowd: "Class Photos"
             },
             hi: {
-                tabTitle: "ई-बालारुण २०२६ | डिजिटल संस्करण", digital: "डिजिटल संस्करण", title: "ई-बालारुण",
-                watch: "वीडियो संदेश", tour: "कैंपस दर्शन", gallery: "पिक्चर गैलरी", 
-                messagesTitle: "वीडियो संदेश", tourTitle: "कैंपस का भ्रमण", galleryTitle: "फ़ोटो एल्बम", 
-                langBtn: "English", langBtnMobile: "En", footerHtml: '<span class="loc-text">जबलपुर</span> से ❤️ प्रकाशित',
-                themeWhite: "व्हाइटबोर्ड पर जाएं", themeBlack: "ब्लैकबोर्ड पर जाएं", archiveBtn: "📂 २०२१-२२ संग्रह",
-                readLabel: "पढ़ने के लिए क्लिक करें 📖", comingSoon: "जल्द आ रहा है 🚧", loadMore: "और देखें 📸",
-                vid_principal: "प्राचार्य महोदय का संदेश", vid_editor: "संपादक का संदेश", vid_teacher: "दीदी का संदेश",
-                vid_ex_teacher: "पूर्व दीदी का संदेश", vid_ex_trainee: "पूर्व प्रशिक्षु दीदी का संदेश",
+                tabTitle: "ई-बालारुण २०२६ | डिजिटल संस्करण",
+                digital: "डिजिटल संस्करण",
+                title: "ई-बालारुण",
+                watch: "वीडियो संदेश",
+                tour: "कैंपस दर्शन",
+                gallery: "पिक्चर गैलरी", 
+                messagesTitle: "वीडियो संदेश",
+                tourTitle: "कैंपस का भ्रमण",
+                galleryTitle: "फ़ोटो एल्बम", 
+                langBtn: "English", langBtnMobile: "En",    
+                footerHtml: '<span class="loc-text">जबलपुर</span> से ❤️ प्रकाशित',
+                themeWhite: "व्हाइटबोर्ड पर जाएं", themeBlack: "ब्लैकबोर्ड पर जाएं",
+                archiveBtn: "📂 २०२१-२२ संग्रह", readLabel: "पढ़ने के लिए क्लिक करें 📖",
+                comingSoon: "जल्द आ रहा है 🚧", loadMore: "और देखें 📸",
+
+                // Video Labels
+                vid_principal: "प्राचार्य महोदय का संदेश", vid_editor: "संपादक का संदेश",
+                vid_teacher: "दीदी का संदेश", vid_ex_teacher: "पूर्व दीदी का संदेश",
+                vid_ex_trainee: "पूर्व प्रशिक्षु दीदी का संदेश",
+
                 // Filters
-                filterAll: "सभी", filterBuildings: "इमारतें", filterGroups: "ग्रुप फोटो", filterClass: "कक्षा फोटो"
+                filterAll: "सभी", filterCampus: "परिसर और कला",
+                filterSolos: "एकल", filterGroups: "मित्र", filterCrowd: "कक्षा फोटो"
             }
         };
 
         const videoData = {
-            messages: [{ key: 'vid_principal', id: 'CzQg5KaU26g' }, { key: 'vid_editor', id: 'y6bLJ6j2EBg' }, { key: 'vid_teacher', id: 'p4AuVkiJIzg' }, { key: 'vid_ex_teacher', id: 'ZkiOgR5EH1c' }, { key: 'vid_ex_trainee', id: 'aHu-F3yuaKE' }],
+            messages: [
+                { key: 'vid_principal', id: 'CzQg5KaU26g' }, { key: 'vid_editor', id: 'y6bLJ6j2EBg' },
+                { key: 'vid_teacher', id: 'p4AuVkiJIzg' }, { key: 'vid_ex_teacher', id: 'ZkiOgR5EH1c' },
+                { key: 'vid_ex_trainee', id: 'aHu-F3yuaKE' }
+            ],
             tour: [{ key: 'tourTitle', id: '2Zbh6GzVhmo' }]
         };
 
@@ -563,25 +734,33 @@
         let isAnimating = false;
         
         // --- SMART GALLERY VARIABLES ---
-        let filteredImages = []; 
-        let currentGalleryIndex = 0;
+        let galleryData = [];          // Holds the full JSON
+        let filteredImages = [];       // Holds the currently active list
+        let currentGalleryIndex = 0;   // Where are we in the filtered list?
         const galleryBatchSize = 12;
+        let galleryInitialized = false;
 
         document.addEventListener('DOMContentLoaded', () => {
-            checkMobileNote(); updateLangButton(); updateThemeButtonText();
-            initCustomContextMenu(); initStickyHeader();
+            checkMobileNote();
+            updateLangButton(); 
+            updateThemeButtonText();
+            initCustomContextMenu();
+            initStickyHeader();
         });
 
         window.addEventListener('load', () => {
             const loader = document.getElementById('loader');
-            setTimeout(() => { loader.classList.add('hidden'); }, 4000); // Reduced loader time slightly
+            setTimeout(() => { loader.classList.add('hidden'); }, 5500);
         });
 
+        // --- Sticky Header Logic ---
         function initStickyHeader() {
             const pill = document.getElementById('floating-pill');
             const placeholder = document.getElementById('brand-placeholder');
             const threshold = 50; 
-            pill.addEventListener('click', () => { if (pill.classList.contains('sticky-active')) window.scrollTo({ top: 0, behavior: 'smooth' }); });
+            pill.addEventListener('click', () => {
+                if (pill.classList.contains('sticky-active')) window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
             window.addEventListener('scroll', () => {
                 const docHeight = document.documentElement.scrollHeight;
                 const winHeight = window.innerHeight;
@@ -589,25 +768,48 @@
                 if (window.scrollY > threshold) {
                     if (!pill.classList.contains('sticky-active')) {
                         const rect = pill.getBoundingClientRect();
-                        placeholder.style.width = rect.width + 'px'; placeholder.style.height = rect.height + 'px'; placeholder.style.display = 'block';
+                        placeholder.style.width = rect.width + 'px';
+                        placeholder.style.height = rect.height + 'px';
+                        placeholder.style.display = 'block';
                         pill.classList.add('sticky-active');
                     }
                 } else {
-                    if (pill.classList.contains('sticky-active')) { pill.classList.remove('sticky-active'); placeholder.style.display = 'none'; }
+                    if (pill.classList.contains('sticky-active')) {
+                        pill.classList.remove('sticky-active');
+                        placeholder.style.display = 'none';
+                    }
                 }
             }, { passive: true });
         }
 
         // --- SMART GALLERY LOGIC ---
-        function openGallery() {
+        async function openGallery() {
             const modal = document.getElementById('galleryModal');
             updateGalleryText();
             modal.classList.add('active');
             checkGalleryNote();
-            
-            // Initial Load (Category: All)
-            if (filteredImages.length === 0) {
-               applyFilter('all');
+
+            // Load JSON only once
+            if (!galleryInitialized) {
+                try {
+                    const response = await fetch('gallery-map.json');
+                    if (!response.ok) throw new Error("JSON not found");
+                    galleryData = await response.json();
+                    
+                    // Initial State: All images
+                    filteredImages = galleryData;
+                    galleryInitialized = true;
+                    loadNextGalleryBatch(); 
+                } catch (e) {
+                    console.error("Could not load smart gallery, falling back to basic...", e);
+                    // Fallback if JSON missing: create dummy data for 1-189
+                    galleryData = [];
+                    for(let i=1; i<=189; i++) {
+                        galleryData.append({ src: `e-balarun-gallery (${i}).webp`, category: 'all' });
+                    }
+                    filteredImages = galleryData;
+                    loadNextGalleryBatch();
+                }
             }
         }
 
@@ -617,25 +819,20 @@
                 btn.classList.toggle('active', btn.dataset.filter === category);
             });
 
-            // Filter Data Logic based on FACES
+            // Filter Data
             if (category === 'all') {
-                filteredImages = rawGalleryData;
-            } else if (category === 'buildings') {
-                filteredImages = rawGalleryData.filter(img => img.faces === 0);
-            } else if (category === 'groups') {
-                // Group Photos: 1 to 9 faces
-                filteredImages = rawGalleryData.filter(img => img.faces >= 1 && img.faces <= 9);
-            } else if (category === 'class') {
-                // Class Photos: 10+ faces
-                filteredImages = rawGalleryData.filter(img => img.faces >= 10);
+                filteredImages = galleryData;
+            } else {
+                filteredImages = galleryData.filter(img => img.category === category);
             }
 
             // Reset Grid
             document.getElementById('gallery-grid-content').innerHTML = '';
             currentGalleryIndex = 0;
             
+            // Check if empty
             if (filteredImages.length === 0) {
-                document.getElementById('gallery-grid-content').innerHTML = '<div style="grid-column: 1/-1; text-align: center; opacity: 0.5;">No images found.</div>';
+                document.getElementById('gallery-grid-content').innerHTML = '<div style="grid-column: 1/-1; text-align: center; opacity: 0.5;">No images found in this category.</div>';
                 document.getElementById('btn-load-more').style.display = 'none';
             } else {
                 loadNextGalleryBatch();
@@ -647,29 +844,50 @@
             const loadMoreBtn = document.getElementById('btn-load-more');
             const fragment = document.createDocumentFragment();
             
+            // Calculate slice
             const nextIndex = Math.min(currentGalleryIndex + galleryBatchSize, filteredImages.length);
             const batch = filteredImages.slice(currentGalleryIndex, nextIndex);
             
             batch.forEach(imgObj => {
                 const imagePath = `gallery/${imgObj.src}`;
+                
                 const frame = document.createElement('div');
                 frame.className = 'photo-frame';
                 frame.onclick = () => openFullscreen(imagePath);
-                // Added decoding="async" for perf
-                frame.innerHTML = `<div class="photo-placeholder"><img src="${imagePath}" decoding="async" loading="lazy" alt="Gallery Image" onload="this.classList.add('loaded')"></div>`;
+                
+                frame.innerHTML = `
+                    <div class="photo-placeholder">
+                        <img src="${imagePath}" loading="lazy" alt="Gallery Image" onload="this.classList.add('loaded')">
+                    </div>
+                `;
                 fragment.appendChild(frame);
             });
             
             galleryContainer.appendChild(fragment);
             currentGalleryIndex = nextIndex;
-            loadMoreBtn.style.display = (currentGalleryIndex >= filteredImages.length) ? 'none' : 'block';
+
+            // Button visibility
+            if (currentGalleryIndex >= filteredImages.length) {
+                loadMoreBtn.style.display = 'none';
+            } else {
+                loadMoreBtn.style.display = 'block';
+            }
         }
 
         function updateGalleryText() {
             const data = content[currentLang];
             document.getElementById('gallery-title-text').textContent = data.galleryTitle;
             document.getElementById('btn-load-more').textContent = data.loadMore;
-            const filters = { 'all': data.filterAll, 'buildings': data.filterBuildings, 'groups': data.filterGroups, 'class': data.filterClass };
+            
+            // Update Filter Button Text
+            const filters = {
+                'all': data.filterAll,
+                'campus': data.filterCampus,
+                'portraits': data.filterSolos,
+                'groups': data.filterGroups,
+                'crowd': data.filterCrowd
+            };
+            
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 const key = btn.dataset.filter;
                 if (filters[key]) btn.textContent = filters[key];
@@ -680,6 +898,7 @@
             currentLang = currentLang === 'en' ? 'hi' : 'en';
             const data = content[currentLang];
             const body = document.getElementById('body');
+
             body.classList.toggle('hindi-active', currentLang === 'hi');
             document.title = data.tabTitle;
             document.getElementById('label-digital').textContent = data.digital;
@@ -690,11 +909,13 @@
             document.getElementById('footer-dynamic').innerHTML = data.footerHtml;
             document.getElementById('btn-archive').textContent = data.archiveBtn;
             document.getElementById('label-read').textContent = data.readLabel;
-            updateGalleryText();
+            
+            updateGalleryText(); // Updates gallery specific text
             updateLangButton();
             updateThemeButtonText();
         }
 
+        // --- Standard UI Helper Functions ---
         function updateLangButton() {
             const btn = document.getElementById('btn-lang');
             const data = content[currentLang];
@@ -729,30 +950,53 @@
             modal.classList.add('active');
         }
 
-        function closeModal() { document.getElementById('videoModal').classList.remove('active'); document.getElementById('modal-content-body').innerHTML = ""; }
-        function closeGallery() { document.getElementById('galleryModal').classList.remove('active'); }
-        function openFullscreen(imageSrc) { document.getElementById('fullscreenModal').classList.add('active'); document.getElementById('fullscreen-img').src = imageSrc; }
-        function closeFullscreen() {
-            const modal = document.getElementById('fullscreenModal');
-            modal.classList.remove('active'); setTimeout(() => { document.getElementById('fullscreen-img').src = ""; }, 300);
+        function closeModal() {
+            document.getElementById('videoModal').classList.remove('active');
+            document.getElementById('modal-content-body').innerHTML = ""; 
         }
 
+        function closeGallery() { document.getElementById('galleryModal').classList.remove('active'); }
+        function openFullscreen(imageSrc) {
+            const modal = document.getElementById('fullscreenModal');
+            document.getElementById('fullscreen-img').src = imageSrc;
+            modal.classList.add('active');
+        }
+        function closeFullscreen() {
+            const modal = document.getElementById('fullscreenModal');
+            modal.classList.remove('active');
+            setTimeout(() => { document.getElementById('fullscreen-img').src = ""; }, 300);
+        }
+
+        // --- Theme ---
         function toggleTheme() {
-            if (isAnimating) return; isAnimating = true;
-            const body = document.body; const wipeOverlay = document.getElementById('wipe-overlay'); const duster = document.getElementById('duster');
+            if (isAnimating) return; 
+            isAnimating = true;
+            const body = document.body;
+            const wipeOverlay = document.getElementById('wipe-overlay');
+            const duster = document.getElementById('duster');
+            
             const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             let isCurrentlyBlack = body.classList.contains('theme-blackboard') || (!body.classList.contains('theme-whiteboard') && sysDark);
             const targetClass = isCurrentlyBlack ? 'theme-whiteboard' : 'theme-blackboard';
-            const targetPaperColor = isCurrentlyBlack ? '#fffbeb' : '#18181b'; const targetGridColor = isCurrentlyBlack ? '#e5e7eb' : '#27272a'; 
+            const targetPaperColor = isCurrentlyBlack ? '#fffbeb' : '#18181b'; 
+            const targetGridColor = isCurrentlyBlack ? '#e5e7eb' : '#27272a'; 
+
             wipeOverlay.style.backgroundColor = targetPaperColor;
             wipeOverlay.style.backgroundImage = `linear-gradient(${targetGridColor} 1px, transparent 1px), linear-gradient(90deg, ${targetGridColor} 1px, transparent 1px)`;
             duster.style.display = 'block';
+
             const animation = wipeOverlay.animate([{ width: '0%' }, { width: '100%' }], { duration: 1000, easing: 'cubic-bezier(0.25, 1, 0.5, 1)', fill: 'forwards' });
             animation.onfinish = () => {
-                body.classList.remove('theme-whiteboard', 'theme-blackboard'); body.classList.add(targetClass);
-                updateThemeButtonText(); animation.cancel(); wipeOverlay.style.width = '0%'; duster.style.display = 'none'; isAnimating = false;
+                body.classList.remove('theme-whiteboard', 'theme-blackboard');
+                body.classList.add(targetClass);
+                updateThemeButtonText();
+                animation.cancel();
+                wipeOverlay.style.width = '0%'; 
+                duster.style.display = 'none';
+                isAnimating = false;
             };
         }
+        
         function updateThemeButtonText() {
             const body = document.body;
             const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -760,46 +1004,70 @@
             document.getElementById('btn-theme-toggle').textContent = isDark ? content[currentLang].themeWhite : content[currentLang].themeBlack;
         }
 
+        // --- Note Helpers ---
         function checkMobileNote() { if (localStorage.getItem('mobileNoteDismissed') === 'true') document.getElementById('mobile-note').style.display = 'none'; }
         function dismissMobileNote() { document.getElementById('mobile-note').style.display = 'none'; localStorage.setItem('mobileNoteDismissed', 'true'); }
         function checkGalleryNote() { document.getElementById('gallery-note').style.display = (localStorage.getItem('galleryNoteDismissed') !== 'true') ? 'block' : 'none'; }
         function dismissGalleryNote() { document.getElementById('gallery-note').style.display = 'none'; localStorage.setItem('galleryNoteDismissed', 'true'); }
 
+        // --- Context Menu ---
         let currentContextAction = null;
         function initCustomContextMenu() {
             const contextMenu = document.getElementById('custom-context-menu');
             const openBtn = document.getElementById('ctx-open');
             const openBtnText = document.getElementById('ctx-open-text');
             const shareBtn = document.getElementById('ctx-share');
+
             document.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 const targetElement = e.target.closest('[data-action]');
-                if (targetElement) { currentContextAction = targetElement.getAttribute('data-action'); openBtn.classList.remove('disabled'); openBtnText.textContent = "Open / View"; }
-                else { currentContextAction = null; openBtn.classList.add('disabled'); openBtnText.textContent = "Open (Select Item)"; }
-                let x = e.clientX, y = e.clientY; if (x + 180 > window.innerWidth) x -= 180; if (y + 150 > window.innerHeight) y -= 150;
+                if (targetElement) {
+                    currentContextAction = targetElement.getAttribute('data-action');
+                    openBtn.classList.remove('disabled');
+                    openBtnText.textContent = "Open / View"; 
+                } else {
+                    currentContextAction = null;
+                    openBtn.classList.add('disabled');
+                    openBtnText.textContent = "Open (Select Item)";
+                }
+                let x = e.clientX, y = e.clientY;
+                if (x + 180 > window.innerWidth) x -= 180;
+                if (y + 150 > window.innerHeight) y -= 150;
                 contextMenu.style.left = `${x}px`; contextMenu.style.top = `${y}px`; contextMenu.style.display = 'block';
             });
+
             openBtn.addEventListener('click', () => {
-                if (openBtn.classList.contains('disabled')) return; hideContextMenu();
-                if (currentContextAction === 'toast') showToast(); else if (currentContextAction === 'messages') openModal('messages');
-                else if (currentContextAction === 'tour') openModal('tour'); else if (currentContextAction === 'gallery') openGallery();
+                if (openBtn.classList.contains('disabled')) return;
+                hideContextMenu();
+                if (currentContextAction === 'toast') showToast();
+                else if (currentContextAction === 'messages') openModal('messages');
+                else if (currentContextAction === 'tour') openModal('tour');
+                else if (currentContextAction === 'gallery') openGallery();
             });
+
             shareBtn.addEventListener('click', async () => {
                 hideContextMenu();
-                if (navigator.share) { try { await navigator.share({ title: 'E-Balarun 2026', text: 'Check out the Digital Edition!', url: window.location.href }); } catch (err) {} }
-                else {
+                if (navigator.share) {
+                    try { await navigator.share({ title: 'E-Balarun 2026', text: 'Check out the Digital Edition!', url: window.location.href }); } catch (err) {}
+                } else {
                     navigator.clipboard.writeText(window.location.href);
-                    const toast = document.getElementById("toast"); const oldText = toast.textContent;
-                    toast.textContent = "Link Copied! 📋"; toast.className = "show"; setTimeout(() => { toast.className = ""; setTimeout(() => { toast.textContent = oldText; }, 500); }, 2000);
+                    const toast = document.getElementById("toast");
+                    const oldText = toast.textContent;
+                    toast.textContent = "Link Copied! 📋"; toast.className = "show";
+                    setTimeout(() => { toast.className = ""; setTimeout(() => { toast.textContent = oldText; }, 500); }, 2000);
                 }
             });
+
             document.addEventListener('click', (e) => { if (!contextMenu.contains(e.target)) hideContextMenu(); });
             window.addEventListener('scroll', hideContextMenu, { passive: true });
         }
         function hideContextMenu() { document.getElementById('custom-context-menu').style.display = 'none'; }
+
+        // --- Listeners ---
         const bindModalClose = (id, func) => { document.getElementById(id).addEventListener('click', (e) => { if (e.target === document.getElementById(id)) func(); }); };
         bindModalClose('videoModal', closeModal); bindModalClose('galleryModal', closeGallery); bindModalClose('fullscreenModal', closeFullscreen);
         document.addEventListener('keydown', (e) => { if (e.key === "Escape") { closeModal(); closeGallery(); closeFullscreen(); } });
+        
         let resizeTimer;
         window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(updateLangButton, 100); }, { passive: true });
     </script>
