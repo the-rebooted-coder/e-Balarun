@@ -431,16 +431,21 @@
         /* --- GALLERY & FILTERS --- */
         .gallery-filter-bar {
             display: flex; 
-            gap: 12px; 
+            gap: 15px; 
             
             /* SCROLL FIXES */
             overflow-x: auto; 
-            overflow-y: hidden;  /* PREVENTS the "little up and down" scroll */
+            /* REMOVED overflow-y: hidden; to stop clipping */
             
-            /* Layout */
-            padding: 10px 5px 35px 5px; /* Increased bottom padding so chips + shadows don't get cut off */
+            /* Layout - Optimized padding */
+            /* Top: 10px, Right: 5px, Bottom: 25px (Space for shadow + spacing), Left: 5px */
+            padding: 10px 5px 25px 5px; 
+            
             border-bottom: 2px dashed var(--ink-dim); 
             margin-bottom: 15px;
+            
+            /* Alignment Fixes */
+            align-items: center; 
             
             /* Smoothness */
             -webkit-overflow-scrolling: touch;
@@ -450,21 +455,22 @@
 
         .filter-btn {
             /* Layout & Alignment Fixes */
-            display: inline-flex;       /* Makes the box behave like a flex container */
-            align-items: center;        /* Forces text to center vertically */
-            justify-content: center;    /* Forces text to center horizontally */
-            line-height: 1;            /* Resets line height to prevent gaps */
-            min-height: 45px;          /* Enforces a good minimum height */
+            display: inline-flex;       
+            align-items: center;        
+            justify-content: center;    
+            
+            line-height: 1.2;          /* Increased from 1 to 1.2 to fix text clipping */
+            min-height: 45px;          
             
             /* Visuals */
             background: transparent; 
             border: 2px solid var(--ink-dim); 
             color: var(--ink-dim);
-            padding: 0 25px;           /* Horizontal padding only, height is handled by min-height */
+            padding: 0 25px;           
             border-radius: 50px; 
             font-family: var(--font-body); 
             font-weight: bold;
-            font-size: 1.2rem;         /* Slightly larger text for readability */
+            font-size: 1.2rem;         
             cursor: pointer; 
             white-space: nowrap; 
             transition: all 0.2s ease;
