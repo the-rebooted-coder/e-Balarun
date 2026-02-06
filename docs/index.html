@@ -39,9 +39,7 @@
             --font-body: 'Patrick Hand', cursive;
             --font-hindi: 'Noto Serif Devanagari', serif;
             
-            /* Optimized Easing for smooth UI */
             --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
-            --ease-in-out: cubic-bezier(0.645, 0.045, 0.355, 1);
         }
 
         /* --- THEMES --- */
@@ -65,7 +63,7 @@
             --accent: #facc15; --grid-color: #27272a;
         }
 
-        /* --- GLOBAL RESET & BASE --- */
+        /* --- GLOBAL RESET --- */
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
         
         body {
@@ -77,83 +75,91 @@
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
-            
-            /* Custom Cursor */
             cursor: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="2.5" width="10" height="20" rx="1" transform="rotate(-30 8 12)" fill="white" stroke="gray" stroke-width="1"/></svg>') 0 20, auto;
-
-            /* Performance Pattern */
             background-image: 
                 linear-gradient(var(--grid-color) 1px, transparent 1px),
                 linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
             background-size: 30px 30px;
-            
-            /* Font smoothing */
             -webkit-font-smoothing: antialiased;
         }
 
-        /* --- REDESIGNED LOADER --- */
+        /* =========================================
+           REFINED LOADER STYLES
+           ========================================= */
         #loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--paper); z-index: 99999;
-            display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.5s ease-out, visibility 0.5s;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--paper); /* Matches theme background */
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Ensure smooth fade of background color at end */
+            transition: background-color 0.8s ease-out, visibility 0.8s linear;
         }
 
-        .loader-content {
+        .loader-wrapper {
             position: relative;
-            width: 180px; /* Slightly larger for impact */
-            height: 180px;
+            width: 200px;
+            height: 200px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .loader-logo, .loader-vande {
+        .loader-img {
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            margin: auto;
-            width: 100%; height: auto;
+            max-width: 100%;
+            max-height: 100%;
             object-fit: contain;
-            transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), transform 1s cubic-bezier(0.4, 0, 0.2, 1);
-            will-change: transform, opacity;
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: opacity, transform;
         }
 
-        /* Initial State */
-        .loader-logo { opacity: 1; transform: scale(1); }
-        .loader-vande { opacity: 0; transform: scale(0.8); }
+        /* STATE 1: Initial Load */
+        /* Balarun visible, Vande hidden */
+        #img-balarun { opacity: 1; transform: scale(1); }
+        #img-vande { opacity: 0; transform: scale(0.9); }
 
-        /* Step 2: Swap Logos */
-        #loader.step-swap .loader-logo { opacity: 0; transform: scale(1.1); }
-        #loader.step-swap .loader-vande { 
-            opacity: 1; 
-            transform: scale(1); 
-            animation: pulse-wait 2s infinite ease-in-out; /* Breathing while waiting for load */
-        }
+        /* STATE 2: Crossfade (.swap-logos) */
+        /* Triggered via JS after delay */
+        #loader.swap-logos #img-balarun { opacity: 0; transform: scale(1.1); }
+        #loader.swap-logos #img-vande { opacity: 1; transform: scale(1); }
 
-        /* Step 3: Pop and Open */
-        #loader.step-finish {
+        /* STATE 3: Explosion (.explode-out) */
+        /* Triggered when page load is complete */
+        #loader.explode-out {
             background-color: transparent; /* Fade out background */
-            pointer-events: none;
+            pointer-events: none; /* Let clicks pass through */
         }
+
+        #loader.explode-out #img-vande {
+            /* The Pop Zoom Effect */
+            animation: zoomThrough 0.8s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+        }
+
+        /* The Zoom Animation */
+        @keyframes zoomThrough {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            20% {
+                /* Anticipation: slight shrink before explode */
+                opacity: 1;
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(40); /* Massive scale to simulate going 'through' */
+            }
+        }
+
+        /* =========================================
+           REST OF CSS
+           ========================================= */
         
-        #loader.step-finish .loader-logo { display: none; }
-
-        #loader.step-finish .loader-vande {
-            animation: popZoomExplosion 0.8s cubic-bezier(0.6, 0.05, 0.01, 0.99) forwards;
-        }
-
-        @keyframes pulse-wait {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.9; }
-        }
-
-        @keyframes popZoomExplosion {
-            0% { transform: scale(1); opacity: 1; }
-            30% { transform: scale(0.9); opacity: 1; } /* Anticipation shrink */
-            100% { transform: scale(30); opacity: 0; } /* Massive expansion */
-        }
-
-        /* --- ANIMATIONS --- */
+        /* Wipe Animation */
         #wipe-overlay {
             position: fixed; top: 0; left: 0; bottom: 0; width: 0%;
             z-index: 99990; pointer-events: none;
@@ -165,7 +171,6 @@
             transform: translateY(-50%) rotate(5deg);
             width: 60px; height: 140px; display: none;
         }
-
         .duster-handle {
             width: 100%; height: 100%; background: #854d0e;
             border-radius: 10px; box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
@@ -177,7 +182,7 @@
             border-radius: 5px 0 0 5px; z-index: 1; box-shadow: -2px 0 5px rgba(0,0,0,0.2);
         }
 
-        /* --- CHALK BORDERS --- */
+        /* Borders */
         .chalk-border-1, .chalk-border-2, .chalk-border-sm {
             border: 2px solid var(--ink);
             box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
@@ -189,14 +194,13 @@
 
         a, button, .sketch-card { cursor: pointer; }
 
-        /* --- LAYOUT --- */
+        /* Layout */
         .container {
             width: 90%; max-width: 1000px; margin: 0 auto;
             flex: 1; display: flex; flex-direction: column;
             padding: 2rem 0; position: relative; z-index: 10;
         }
 
-        /* --- HEADER & STICKY LOGIC --- */
         header { 
             display: flex; justify-content: space-between; align-items: center; 
             margin-bottom: 3rem; width: 100%; position: relative;
@@ -228,8 +232,6 @@
             transform-origin: center; will-change: transform;
         }
         .logo-vande { height: 55px; }
-        .logo-sketch:hover { transform: scale(1.1) rotate(-2deg); }
-        .logo-vande:hover { transform: scale(1.1) rotate(2deg); }
         
         .brand-separator {
             font-size: 2rem; color: #ccc; font-weight: 300; margin: 0 5px;
@@ -242,10 +244,7 @@
             color: #333; opacity: 1; max-width: 200px; margin-left: 10px;
             transition: all 0.4s ease; overflow: hidden;
         }
-
-        .brand.sticky-active .digital-badge {
-            opacity: 0; max-width: 0; margin-left: 0; padding: 0; border: none;
-        }
+        .brand.sticky-active .digital-badge { opacity: 0; max-width: 0; margin-left: 0; padding: 0; border: none; }
 
         .lang-btn {
             background: transparent; font-family: var(--font-hindi); 
@@ -254,7 +253,7 @@
         }
         .lang-btn:hover { background: var(--ink); color: var(--paper); transform: rotate(-2deg) scale(1.05); }
 
-        /* --- HERO & BOOK --- */
+        /* Hero */
         .hero { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; padding-bottom: 3rem; }
 
         .book-container {
@@ -272,10 +271,7 @@
             box-shadow: 20px 20px 50px rgba(0,0,0,0.4); 
             will-change: transform;
         }
-        .book:hover {
-            transform: rotateY(0deg) rotateX(0deg) translateZ(30px) scale(1.05);
-            box-shadow: 0 40px 60px rgba(0,0,0,0.3);
-        }
+        .book:hover { transform: rotateY(0deg) rotateX(0deg) translateZ(30px) scale(1.05); box-shadow: 0 40px 60px rgba(0,0,0,0.3); }
 
         .book-face { position: absolute; background-color: #fff; backface-visibility: hidden; }
         .book-front {
@@ -313,9 +309,8 @@
         }
         body.hindi-active h1 { font-family: var(--font-hindi); font-size: clamp(3rem, 8vw, 5rem); line-height: 1.2; }
 
-        /* --- CARDS --- */
+        /* Cards */
         .cards-container { display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; width: 100%; }
-
         .sketch-card {
             background: var(--paper); padding: 2rem; width: 100%; max-width: 300px;
             position: relative; text-align: left; display: flex; flex-direction: column; justify-content: center;
@@ -323,11 +318,10 @@
         }
         .sketch-card:hover { transform: translateY(-5px) rotate(1deg); box-shadow: 8px 8px 0px var(--ink); }
         .sketch-card:active { transform: translateY(0px); box-shadow: 2px 2px 0px var(--ink); }
-
         .card-icon { margin-bottom: 1rem; color: var(--accent); }
         .card-title { font-family: var(--font-title); font-size: 2.2rem; font-weight: 700; line-height: 1; }
 
-        /* --- STICKY NOTES --- */
+        /* Notes */
         #mobile-note, #gallery-note {
             background: #fef3c7; color: #1e1e1e; font-family: var(--font-body);
             box-shadow: 3px 3px 10px rgba(0,0,0,0.3); z-index: 500;
@@ -346,10 +340,9 @@
             border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .note-close { position: absolute; top: 2px; right: 5px; font-weight: bold; cursor: pointer; opacity: 0.5; }
-
         @keyframes slideUp { from { transform: translateY(100%) rotate(-3deg); opacity: 0; } to { transform: translateY(0) rotate(-3deg); opacity: 1; } }
 
-        /* --- TOAST --- */
+        /* Toast */
         #toast {
             visibility: hidden; min-width: 250px; background-color: var(--ink); color: var(--paper);
             text-align: center; border-radius: 50px; padding: 16px 25px; position: fixed; z-index: 10000;
@@ -359,7 +352,7 @@
         }
         #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0px); }
 
-        /* --- CUSTOM CONTEXT MENU --- */
+        /* Context Menu */
         #custom-context-menu {
             display: none; position: fixed; z-index: 999999;
             background-color: var(--paper); border: 2px solid var(--ink);
@@ -367,15 +360,12 @@
             border-radius: 5px 20px 5px 20px; min-width: 180px;
             font-family: var(--font-body); animation: fadeInMenu 0.1s ease-out; overflow: hidden;
         }
-
         @keyframes fadeInMenu { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-
         .context-menu-header {
             background-color: var(--ink); color: var(--paper); padding: 8px 15px;
             font-family: var(--font-title); font-size: 1.4rem; font-weight: bold;
             border-bottom: 2px solid var(--accent); text-align: center; letter-spacing: 1px;
         }
-
         .context-menu-item {
             padding: 10px 15px; cursor: pointer; color: var(--ink); font-weight: bold;
             display: flex; align-items: center; gap: 10px; transition: background 0.2s, color 0.2s;
@@ -384,7 +374,7 @@
         .context-menu-item:hover { background-color: var(--ink); color: var(--paper); }
         .context-menu-item.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 
-        /* --- FOOTER --- */
+        /* Footer */
         footer {
             border-top: 2px dashed var(--ink-dim); padding-top: 1.5rem;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -393,7 +383,6 @@
         }
         .footer-actions { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; align-items: center; }
         .loc-text { color: var(--ink); font-weight: 700; text-decoration: underline; text-decoration-style: wavy; text-decoration-color: var(--accent); }
-        
         .theme-toggle-btn, .archive-btn {
             background: none; border: 1px dashed var(--ink-dim); color: var(--ink-dim);
             padding: 5px 15px; font-family: var(--font-body); font-size: 0.9rem;
@@ -401,40 +390,35 @@
         }
         .theme-toggle-btn:hover, .archive-btn:hover { opacity: 1; border-color: var(--accent); color: var(--accent); }
 
-        /* --- MODALS --- */
+        /* Modals */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9);
             z-index: 100; display: flex; align-items: center; justify-content: center;
             opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(5px);
         }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
-
         .modal-paper {
             background: var(--paper); color: var(--ink); width: 90%; max-width: 800px;
             padding: 10px; border: 2px solid var(--ink); box-shadow: 15px 15px 0px var(--accent);
             display: flex; flex-direction: column; max-height: 90vh; position: relative;
         }
-
         .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 10px 20px 10px; flex-shrink: 0; }
         .modal-title { font-family: var(--font-title); font-size: 2rem; font-weight: 700; }
         .close-btn { background: none; border: none; color: var(--ink); transition: transform 0.2s; cursor: pointer; }
         .close-btn:hover { transform: scale(1.2) rotate(90deg); }
-
         .modal-scroll-content { overflow-y: auto; flex: 1; padding-right: 5px; overscroll-behavior: contain; }
         .modal-scroll-content::-webkit-scrollbar { width: 8px; }
         .modal-scroll-content::-webkit-scrollbar-track { background: transparent; }
         .modal-scroll-content::-webkit-scrollbar-thumb { background-color: var(--ink-dim); border-radius: 4px; }
 
-        /* Video Facade */
+        /* Video */
         .video-wrapper { margin-bottom: 2rem; }
         .video-label { font-family: var(--font-title); font-size: 1.5rem; color: var(--accent); margin-bottom: 0.5rem; display: block; }
         .video-facade {
             position: relative; padding-bottom: 56.25%; height: 0; background: #000;
             border: 2px solid var(--ink); cursor: pointer; overflow: hidden;
         }
-        .video-facade img {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.3s;
-        }
+        .video-facade img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.3s; }
         .video-facade:hover img { opacity: 0.5; }
         .play-btn-overlay {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -442,79 +426,34 @@
             display: flex; align-items: center; justify-content: center; pointer-events: none;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
-        .play-btn-overlay::after {
-            content: ''; border-style: solid; border-width: 10px 0 10px 18px;
-            border-color: transparent transparent transparent white;
-        }
+        .play-btn-overlay::after { content: ''; border-style: solid; border-width: 10px 0 10px 18px; border-color: transparent transparent transparent white; }
         .video-active iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-        /* --- FIXED GALLERY FILTER BAR --- */
+        /* Gallery */
         .gallery-filter-bar {
-            display: flex;
-            flex-wrap: nowrap; /* Forces horizontal layout */
-            gap: 12px;
-            
-            /* SCROLL CONFIG */
-            overflow-x: auto;
-            overflow-y: hidden; 
-            
-            /* PADDING FIX: Enough space for shadows and hover effects */
-            padding: 15px 5px; 
-            
-            border-bottom: 2px dashed var(--ink-dim);
-            margin-bottom: 15px;
-            
-            /* ALIGNMENT */
-            align-items: center; 
-            
-            /* HIDE SCROLLBARS */
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; /* Firefox */
+            display: flex; flex-wrap: nowrap; gap: 12px; overflow-x: auto; overflow-y: hidden; 
+            padding: 15px 5px; border-bottom: 2px dashed var(--ink-dim); margin-bottom: 15px;
+            align-items: center; -webkit-overflow-scrolling: touch; scrollbar-width: none;
         }
-        .gallery-filter-bar::-webkit-scrollbar { display: none; } /* Chrome/Safari */
-
+        .gallery-filter-bar::-webkit-scrollbar { display: none; }
         .filter-btn {
-            /* NO SHRINKING */
-            flex: 0 0 auto; 
-            
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            
-            /* VISUALS */
-            background: transparent;
-            border: 2px solid var(--ink-dim);
-            color: var(--ink-dim);
-            
-            /* SIZING */
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-family: var(--font-body);
-            font-weight: bold;
-            font-size: 1.1rem;
-            line-height: 1;
-            
-            cursor: pointer;
-            transition: all 0.2s ease;
+            flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+            background: transparent; border: 2px solid var(--ink-dim); color: var(--ink-dim);
+            padding: 8px 20px; border-radius: 50px; font-family: var(--font-body);
+            font-weight: bold; font-size: 1.1rem; line-height: 1; cursor: pointer; transition: all 0.2s ease;
         }
-
         .filter-btn:hover { border-color: var(--ink); color: var(--ink); }
-        
         .filter-btn.active {
             background: var(--ink); color: var(--paper); border-color: var(--ink);
-            box-shadow: 0px 4px 0px var(--accent); /* Shadow moves down */
-            transform: translateY(-4px); /* Chip moves up */
+            box-shadow: 0px 4px 0px var(--accent); transform: translateY(-4px);
         }
-
         .gallery-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem; padding: 1rem; overflow-y: auto; 
-            content-visibility: auto; overscroll-behavior: contain;
+            gap: 2rem; padding: 1rem; overflow-y: auto; content-visibility: auto; overscroll-behavior: contain;
         }
         .gallery-grid::-webkit-scrollbar { width: 8px; }
         .gallery-grid::-webkit-scrollbar-track { background: transparent; }
         .gallery-grid::-webkit-scrollbar-thumb { background-color: var(--ink-dim); border-radius: 4px; }
-
         .photo-frame {
             background: #fff; padding: 10px 10px 40px 10px; box-shadow: 3px 3px 6px rgba(0,0,0,0.3);
             transform: rotate(2deg); transition: transform 0.3s var(--ease-out), box-shadow 0.3s;
@@ -523,33 +462,17 @@
         .photo-frame:nth-child(even) { transform: rotate(-2deg); }
         .photo-frame:nth-child(3n) { transform: rotate(1.5deg); }
         .photo-frame:hover { transform: scale(1.05) rotate(0deg); z-index: 10; box-shadow: 10px 10px 15px rgba(0,0,0,0.4); }
-
-        /* Shimmer Animation */
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
         .photo-placeholder {
-            width: 100%; aspect-ratio: 1/1; 
-            background: #e5e5e5;
+            width: 100%; aspect-ratio: 1/1; background: #e5e5e5;
             background-image: linear-gradient(90deg, #e5e5e5 25%, #f0f0f0 50%, #e5e5e5 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
+            background-size: 200% 100%; animation: shimmer 1.5s infinite;
             display: flex; align-items: center; justify-content: center;
-            border: 1px solid #ccc; overflow: hidden;
-            position: relative;
+            border: 1px solid #ccc; overflow: hidden; position: relative;
         }
-
-        .photo-placeholder img { 
-            width: 100%; height: 100%; object-fit: cover; display: block;
-            opacity: 0; transition: opacity 0.5s ease-in;
-        }
+        .photo-placeholder img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: opacity 0.5s ease-in; }
         .photo-placeholder img.loaded { opacity: 1; }
-
-        .load-more-container {
-            width: 100%; display: flex; justify-content: center; padding: 20px 0; margin-top: 10px;
-        }
+        .load-more-container { width: 100%; display: flex; justify-content: center; padding: 20px 0; margin-top: 10px; }
         .btn-load-more {
             background: var(--paper); border: 2px solid var(--ink); color: var(--ink);
             font-family: var(--font-title); font-size: 1.8rem; padding: 8px 30px;
@@ -559,7 +482,6 @@
         .btn-load-more:hover { transform: scale(1.05) rotate(-1deg); box-shadow: 6px 6px 0px var(--accent); }
         .btn-load-more:active { transform: scale(0.98); box-shadow: 2px 2px 0px var(--accent); }
         .btn-load-more.hidden { display: none; }
-
         #fullscreenModal { z-index: 200; background: rgba(0, 0, 0, 0.95); }
         #fullscreenModal img {
             max-width: 90%; max-height: 90vh; border: 4px solid #fff;
@@ -572,9 +494,8 @@
         }
         .fullscreen-close:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
 
+        /* Responsive */
         svg path, svg circle { stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; stroke: currentColor; }
-
-        /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
             header { flex-direction: row; gap: 10px; margin-bottom: 2rem; }
             .brand { gap: 8px; padding: 8px 15px; } 
@@ -593,9 +514,9 @@
 <body id="body">
     
     <div id="loader">
-        <div class="loader-content">
-            <img src="https://i.ibb.co/ymGmHBXm/balarun-logo.png" alt="Logo" class="loader-logo" loading="eager">
-            <img src="vande_mataram.png" alt="Vande Mataram" class="loader-vande" loading="eager">
+        <div class="loader-wrapper">
+            <img src="https://i.ibb.co/ymGmHBXm/balarun-logo.png" alt="Balarun Logo" id="img-balarun" class="loader-img">
+            <img src="vande_mataram.png" alt="Vande Mataram" id="img-vande" class="loader-img">
         </div>
     </div>
 
@@ -724,6 +645,63 @@
     </div>
 
     <script>
+        // --- PRELOAD CRITICAL LOADER ASSETS ---
+        // This runs immediately to ensure the animation is smooth.
+        (function preloadLoaderAssets() {
+            const img1 = new Image(); img1.src = "https://i.ibb.co/ymGmHBXm/balarun-logo.png";
+            const img2 = new Image(); img2.src = "vande_mataram.png";
+        })();
+
+        // --- ANIMATION SEQUENCE LOGIC ---
+        // 1. Minimum display time for Balarun Logo (1.2s)
+        // 2. Minimum display time for Vande Mataram Logo (1.5s)
+        // 3. Page load check
+        
+        let phase1Done = false; // Balarun shown
+        let pageLoaded = false; // Page content ready
+
+        const loader = document.getElementById('loader');
+        
+        // Timer 1: Swap Logo
+        setTimeout(() => {
+            loader.classList.add('swap-logos'); // Fades Balarun out, Vande in
+            phase1Done = true;
+            checkFinish();
+        }, 1200);
+
+        // Window Load Event
+        window.addEventListener('load', () => {
+            pageLoaded = true;
+            checkFinish();
+            
+            // Background preload for gallery
+            setTimeout(() => {
+                const firstBatch = galleryData.slice(0, 12);
+                firstBatch.forEach(img => {
+                    const link = document.createElement('link');
+                    link.rel = 'preload'; link.as = 'image';
+                    link.href = `gallery/thumbnails/${img.src}`; 
+                    document.head.appendChild(link);
+                });
+            }, 3000);
+        });
+
+        function checkFinish() {
+            // We wait until:
+            // 1. The first logo swap has happened (at 1.2s)
+            // 2. The page is actually loaded
+            // 3. We ensure the Vande Mataram logo has been visible for at least 1s
+            
+            if (phase1Done && pageLoaded) {
+                // Add a small buffer to ensure the Vande logo is fully visible before exploding
+                setTimeout(() => {
+                    loader.classList.add('explode-out');
+                    // Remove loader from DOM after animation completes to free resources
+                    setTimeout(() => { loader.style.display = 'none'; }, 800);
+                }, 1000); 
+            }
+        }
+
         // --- Content Configuration ---
         const content = {
             en: {
@@ -741,17 +719,10 @@
                 themeWhite: "Switch to Whiteboard", themeBlack: "Switch to Blackboard",
                 archiveBtn: "📂 2021-22 Archive", readLabel: "Click to Read 📖",
                 comingSoon: "Coming Soon 🚧", loadMore: "Load More 📸",
-                
-                // Video Labels
                 vid_principal: "Principal's Message", vid_editor: "Editor's Message",
                 vid_teacher: "Teacher's Message", vid_ex_teacher: "Ex-Teacher's Message",
                 vid_ex_trainee: "Ex-Trainee Teacher's Message",
-
-                // Filters (Simplified & Logical)
-                filterAll: "All Photos", 
-                filterCampus: "Campus & Art",
-                filterPortraits: "Portraits", 
-                filterEvents: "Group Photos"
+                filterAll: "All Photos", filterCampus: "Campus & Art", filterPortraits: "Portraits", filterEvents: "Group Photos"
             },
             hi: {
                 tabTitle: "ई-बालारुण २०२६ | डिजिटल संस्करण",
@@ -768,17 +739,10 @@
                 themeWhite: "व्हाइटबोर्ड पर जाएं", themeBlack: "ब्लैकबोर्ड पर जाएं",
                 archiveBtn: "📂 २०२१-२२ संग्रह", readLabel: "पढ़ने के लिए क्लिक करें 📖",
                 comingSoon: "जल्द आ रहा है 🚧", loadMore: "और देखें 📸",
-
-                // Video Labels
                 vid_principal: "प्राचार्य महोदय का संदेश", vid_editor: "संपादक का संदेश",
                 vid_teacher: "दीदी का संदेश", vid_ex_teacher: "पूर्व दीदी का संदेश",
                 vid_ex_trainee: "पूर्व प्रशिक्षु दीदी का संदेश",
-
-                // Filters
-                filterAll: "सभी फोटो", 
-                filterCampus: "परिसर और कला",
-                filterPortraits: "पोर्ट्रेट्स", 
-                filterEvents: "समूह फोटो"
+                filterAll: "सभी फोटो", filterCampus: "परिसर और कला", filterPortraits: "पोर्ट्रेट्स", filterEvents: "समूह फोटो"
             }
         };
 
@@ -791,11 +755,6 @@
             tour: [{ key: 'tourTitle', id: '2Zbh6GzVhmo' }]
         };
 
-        // --- INLINED JSON DATA (No external fetch needed) ---
-        // Logical Mapping: 
-        // 0 faces -> Campus
-        // 1 face -> Portrait
-        // 2+ faces -> Events/Groups
         const rawGalleryData = [
           { "src": "e-balarun-gallery (1).webp", "faces": 12, "category": "crowd" },
           { "src": "e-balarun-gallery (10).webp", "faces": 12, "category": "crowd" },
@@ -990,73 +949,14 @@
 
         let currentLang = 'en';
         let isAnimating = false;
-        
-        // --- SMART GALLERY VARIABLES ---
         let galleryData = rawGalleryData;
         let filteredImages = [];        
         let currentGalleryIndex = 0;   
         const galleryBatchSize = 12;
 
         document.addEventListener('DOMContentLoaded', () => {
-            checkMobileNote();
-            updateLangButton(); 
-            updateThemeButtonText();
-            initCustomContextMenu();
-            initStickyHeader();
+            checkMobileNote(); updateLangButton(); updateThemeButtonText(); initCustomContextMenu(); initStickyHeader();
         });
-
-        // --- NEW LOADER LOGIC ---
-        // We use state flags to coordinate between the minimum animation time 
-        // and the actual window load event.
-        let minAnimationDone = false;
-        let pageFullyLoaded = false;
-        const loader = document.getElementById('loader');
-
-        // 1. Start the animation sequence as soon as the DOM is ready (visual start)
-        document.addEventListener('DOMContentLoaded', () => {
-            // Wait 1.5 seconds, then swap from Balarun Logo to Vande Mataram Logo
-            setTimeout(() => {
-                loader.classList.add('step-swap');
-            }, 1500);
-
-            // Wait 3.5 seconds total to ensure the user has seen the Vande Mataram logo breathe
-            setTimeout(() => {
-                minAnimationDone = true;
-                checkLoaderFinish();
-            }, 3500);
-        });
-
-        // 2. Listen for the actual page load
-        window.addEventListener('load', () => {
-            pageFullyLoaded = true;
-            checkLoaderFinish();
-
-            // --- OPTIMIZATION: IDLE PRELOADER ---
-            setTimeout(() => {
-                const firstBatch = galleryData.slice(0, 12);
-                firstBatch.forEach(img => {
-                    const link = document.createElement('link');
-                    link.rel = 'preload';
-                    link.as = 'image';
-                    link.href = `gallery/thumbnails/${img.src}`; 
-                    document.head.appendChild(link);
-                });
-            }, 3000);
-        });
-
-        // 3. Coordinate the finish
-        function checkLoaderFinish() {
-            // Only finish if BOTH the minimum animation time has passed AND the page is loaded
-            if (minAnimationDone && pageFullyLoaded) {
-                // Trigger the "Pop Zoom" explosion
-                loader.classList.add('step-finish');
-                
-                // Remove the loader from DOM/layout after the explosion animation ends
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                }, 800); // 0.8s matches the css animation duration
-            }
-        }
 
         // --- Sticky Header Logic ---
         function initStickyHeader() {
@@ -1087,88 +987,54 @@
             }, { passive: true });
         }
 
-        // --- SMART GALLERY LOGIC ---
         function openGallery() {
             const modal = document.getElementById('galleryModal');
             updateGalleryText();
             modal.classList.add('active');
             checkGalleryNote();
-            
-            if (filteredImages.length === 0) {
-                 applyFilter('all');
-            }
+            if (filteredImages.length === 0) applyFilter('all');
         }
 
         function applyFilter(category) {
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.filter === category);
             });
-
-            if (category === 'all') {
-                filteredImages = galleryData;
-            } else if (category === 'events') {
-                filteredImages = galleryData.filter(img => img.category === 'groups' || img.category === 'crowd');
-            } else {
-                filteredImages = galleryData.filter(img => img.category === category);
-            }
-
+            if (category === 'all') filteredImages = galleryData;
+            else if (category === 'events') filteredImages = galleryData.filter(img => img.category === 'groups' || img.category === 'crowd');
+            else filteredImages = galleryData.filter(img => img.category === category);
             document.getElementById('gallery-grid-content').innerHTML = '';
             currentGalleryIndex = 0;
-            
             if (filteredImages.length === 0) {
                 document.getElementById('gallery-grid-content').innerHTML = '<div style="grid-column: 1/-1; text-align: center; opacity: 0.5;">No images found in this category.</div>';
                 document.getElementById('btn-load-more').style.display = 'none';
-            } else {
-                loadNextGalleryBatch();
-            }
+            } else loadNextGalleryBatch();
         }
 
         function loadNextGalleryBatch() {
             const galleryContainer = document.getElementById('gallery-grid-content');
             const loadMoreBtn = document.getElementById('btn-load-more');
             const fragment = document.createDocumentFragment();
-            
             const nextIndex = Math.min(currentGalleryIndex + galleryBatchSize, filteredImages.length);
             const batch = filteredImages.slice(currentGalleryIndex, nextIndex);
-            
             batch.forEach(imgObj => {
                 const thumbPath = `gallery/thumbnails/${imgObj.src}`; 
                 const fullPath = `gallery/${imgObj.src}`;            
-                
                 const frame = document.createElement('div');
                 frame.className = 'photo-frame';
                 frame.onclick = () => openFullscreen(fullPath);
-                
-                frame.innerHTML = `
-                    <div class="photo-placeholder">
-                        <img src="${thumbPath}" loading="lazy" decoding="async" alt="Gallery Image" onload="this.classList.add('loaded')">
-                    </div>
-                `;
+                frame.innerHTML = `<div class="photo-placeholder"><img src="${thumbPath}" loading="lazy" decoding="async" alt="Gallery Image" onload="this.classList.add('loaded')"></div>`;
                 fragment.appendChild(frame);
             });
-            
             galleryContainer.appendChild(fragment);
             currentGalleryIndex = nextIndex;
-
-            if (currentGalleryIndex >= filteredImages.length) {
-                loadMoreBtn.style.display = 'none';
-            } else {
-                loadMoreBtn.style.display = 'block';
-            }
+            loadMoreBtn.style.display = (currentGalleryIndex >= filteredImages.length) ? 'none' : 'block';
         }
 
         function updateGalleryText() {
             const data = content[currentLang];
             document.getElementById('gallery-title-text').textContent = data.galleryTitle;
             document.getElementById('btn-load-more').textContent = data.loadMore;
-            
-            const filters = {
-                'all': data.filterAll,
-                'campus': data.filterCampus,
-                'portraits': data.filterPortraits,
-                'events': data.filterEvents
-            };
-            
+            const filters = { 'all': data.filterAll, 'campus': data.filterCampus, 'portraits': data.filterPortraits, 'events': data.filterEvents };
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 const key = btn.dataset.filter;
                 if (filters[key]) btn.textContent = filters[key];
@@ -1179,7 +1045,6 @@
             currentLang = currentLang === 'en' ? 'hi' : 'en';
             const data = content[currentLang];
             const body = document.getElementById('body');
-
             body.classList.toggle('hindi-active', currentLang === 'hi');
             document.title = data.tabTitle;
             document.getElementById('label-digital').textContent = data.digital;
@@ -1190,10 +1055,7 @@
             document.getElementById('footer-dynamic').innerHTML = data.footerHtml;
             document.getElementById('btn-archive').textContent = data.archiveBtn;
             document.getElementById('label-read').textContent = data.readLabel;
-            
-            updateGalleryText(); 
-            updateLangButton();
-            updateThemeButtonText();
+            updateGalleryText(); updateLangButton(); updateThemeButtonText();
         }
 
         function updateLangButton() {
@@ -1230,22 +1092,10 @@
             modal.classList.add('active');
         }
 
-        function closeModal() {
-            document.getElementById('videoModal').classList.remove('active');
-            document.getElementById('modal-content-body').innerHTML = ""; 
-        }
-
+        function closeModal() { document.getElementById('videoModal').classList.remove('active'); document.getElementById('modal-content-body').innerHTML = ""; }
         function closeGallery() { document.getElementById('galleryModal').classList.remove('active'); }
-        function openFullscreen(imageSrc) {
-            const modal = document.getElementById('fullscreenModal');
-            document.getElementById('fullscreen-img').src = imageSrc;
-            modal.classList.add('active');
-        }
-        function closeFullscreen() {
-            const modal = document.getElementById('fullscreenModal');
-            modal.classList.remove('active');
-            setTimeout(() => { document.getElementById('fullscreen-img').src = ""; }, 300);
-        }
+        function openFullscreen(imageSrc) { const modal = document.getElementById('fullscreenModal'); document.getElementById('fullscreen-img').src = imageSrc; modal.classList.add('active'); }
+        function closeFullscreen() { const modal = document.getElementById('fullscreenModal'); modal.classList.remove('active'); setTimeout(() => { document.getElementById('fullscreen-img').src = ""; }, 300); }
 
         function toggleTheme() {
             if (isAnimating) return; 
@@ -1294,25 +1144,21 @@
             const openBtn = document.getElementById('ctx-open');
             const openBtnText = document.getElementById('ctx-open-text');
             const shareBtn = document.getElementById('ctx-share');
-
             document.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 const targetElement = e.target.closest('[data-action]');
                 if (targetElement) {
                     currentContextAction = targetElement.getAttribute('data-action');
-                    openBtn.classList.remove('disabled');
-                    openBtnText.textContent = "Open / View"; 
+                    openBtn.classList.remove('disabled'); openBtnText.textContent = "Open / View"; 
                 } else {
                     currentContextAction = null;
-                    openBtn.classList.add('disabled');
-                    openBtnText.textContent = "Open (Select Item)";
+                    openBtn.classList.add('disabled'); openBtnText.textContent = "Open (Select Item)";
                 }
                 let x = e.clientX, y = e.clientY;
                 if (x + 180 > window.innerWidth) x -= 180;
                 if (y + 150 > window.innerHeight) y -= 150;
                 contextMenu.style.left = `${x}px`; contextMenu.style.top = `${y}px`; contextMenu.style.display = 'block';
             });
-
             openBtn.addEventListener('click', () => {
                 if (openBtn.classList.contains('disabled')) return;
                 hideContextMenu();
@@ -1321,7 +1167,6 @@
                 else if (currentContextAction === 'tour') openModal('tour');
                 else if (currentContextAction === 'gallery') openGallery();
             });
-
             shareBtn.addEventListener('click', async () => {
                 hideContextMenu();
                 if (navigator.share) {
@@ -1334,16 +1179,13 @@
                     setTimeout(() => { toast.className = ""; setTimeout(() => { toast.textContent = oldText; }, 500); }, 2000);
                 }
             });
-
             document.addEventListener('click', (e) => { if (!contextMenu.contains(e.target)) hideContextMenu(); });
             window.addEventListener('scroll', hideContextMenu, { passive: true });
         }
         function hideContextMenu() { document.getElementById('custom-context-menu').style.display = 'none'; }
-
         const bindModalClose = (id, func) => { document.getElementById(id).addEventListener('click', (e) => { if (e.target === document.getElementById(id)) func(); }); };
         bindModalClose('videoModal', closeModal); bindModalClose('galleryModal', closeGallery); bindModalClose('fullscreenModal', closeFullscreen);
         document.addEventListener('keydown', (e) => { if (e.key === "Escape") { closeModal(); closeGallery(); closeFullscreen(); } });
-        
         let resizeTimer;
         window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(updateLangButton, 100); }, { passive: true });
     </script>
