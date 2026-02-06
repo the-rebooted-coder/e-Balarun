@@ -430,46 +430,46 @@
 
         /* --- GALLERY & FILTERS --- */
         .gallery-filter-bar {
-    	display: flex; 
-   	gap: 12px; 
-    
-    	/* SCROLL FIXES */
-    	overflow-x: auto; 
-    	overflow-y: hidden;  /* PREVENTS the "little up and down" scroll */
-    
-    	/* Layout */
-    	padding: 10px 5px 35px 5px; /* Increased bottom padding so chips + shadows don't get cut off */
-    	border-bottom: 2px dashed var(--ink-dim); 
-    	margin-bottom: 15px;
-    
-    	/* Smoothness */
-    	-webkit-overflow-scrolling: touch;
-    	scrollbar-width: none; 
-}
+            display: flex; 
+            gap: 12px; 
+            
+            /* SCROLL FIXES */
+            overflow-x: auto; 
+            overflow-y: hidden;  /* PREVENTS the "little up and down" scroll */
+            
+            /* Layout */
+            padding: 10px 5px 35px 5px; /* Increased bottom padding so chips + shadows don't get cut off */
+            border-bottom: 2px dashed var(--ink-dim); 
+            margin-bottom: 15px;
+            
+            /* Smoothness */
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; 
+        }
         .gallery-filter-bar::-webkit-scrollbar { display: none; } /* Safari and Chrome */
 
         .filter-btn {
-    	/* Layout & Alignment Fixes */
-    	display: inline-flex;       /* Makes the box behave like a flex container */
-    	align-items: center;        /* Forces text to center vertically */
-    	justify-content: center;    /* Forces text to center horizontally */
-    	line-height: 1;            /* Resets line height to prevent gaps */
-    	min-height: 45px;          /* Enforces a good minimum height */
-    
-    /* Visuals */
-    background: transparent; 
-    border: 2px solid var(--ink-dim); 
-    color: var(--ink-dim);
-    padding: 0 25px;           /* Horizontal padding only, height is handled by min-height */
-    border-radius: 50px; 
-    font-family: var(--font-body); 
-    font-weight: bold;
-    font-size: 1.2rem;         /* Slightly larger text for readability */
-    cursor: pointer; 
-    white-space: nowrap; 
-    transition: all 0.2s ease;
-    flex: 0 0 auto;
-}
+            /* Layout & Alignment Fixes */
+            display: inline-flex;       /* Makes the box behave like a flex container */
+            align-items: center;        /* Forces text to center vertically */
+            justify-content: center;    /* Forces text to center horizontally */
+            line-height: 1;            /* Resets line height to prevent gaps */
+            min-height: 45px;          /* Enforces a good minimum height */
+            
+            /* Visuals */
+            background: transparent; 
+            border: 2px solid var(--ink-dim); 
+            color: var(--ink-dim);
+            padding: 0 25px;           /* Horizontal padding only, height is handled by min-height */
+            border-radius: 50px; 
+            font-family: var(--font-body); 
+            font-weight: bold;
+            font-size: 1.2rem;         /* Slightly larger text for readability */
+            cursor: pointer; 
+            white-space: nowrap; 
+            transition: all 0.2s ease;
+            flex: 0 0 auto;
+        }
         .filter-btn:hover { border-color: var(--ink); color: var(--ink); }
         
         .filter-btn.active {
@@ -979,6 +979,19 @@
         window.addEventListener('load', () => {
             const loader = document.getElementById('loader');
             setTimeout(() => { loader.classList.add('hidden'); }, 5500);
+
+            // --- OPTIMIZATION: IDLE PRELOADER ---
+            // After 3 seconds (when user is likely reading cover), start downloading thumbnails silently
+            setTimeout(() => {
+                const firstBatch = galleryData.slice(0, 12);
+                firstBatch.forEach(img => {
+                    const link = document.createElement('link');
+                    link.rel = 'preload';
+                    link.as = 'image';
+                    link.href = `gallery/thumbnails/${img.src}`; // Optimistic preloading of thumbnails
+                    document.head.appendChild(link);
+                });
+            }, 3000);
         });
 
         // --- Sticky Header Logic ---
@@ -1063,15 +1076,18 @@
             const batch = filteredImages.slice(currentGalleryIndex, nextIndex);
             
             batch.forEach(imgObj => {
-                const imagePath = `gallery/${imgObj.src}`;
+                // --- OPTIMIZATION: USE THUMBNAILS FOR GRID ---
+                const thumbPath = `gallery/thumbnails/${imgObj.src}`; // Small image for speed
+                const fullPath = `gallery/${imgObj.src}`;            // Large image for quality
                 
                 const frame = document.createElement('div');
                 frame.className = 'photo-frame';
-                frame.onclick = () => openFullscreen(imagePath);
+                // Pass fullPath to fullscreen modal
+                frame.onclick = () => openFullscreen(fullPath);
                 
                 frame.innerHTML = `
                     <div class="photo-placeholder">
-                        <img src="${imagePath}" loading="lazy" alt="Gallery Image" onload="this.classList.add('loaded')">
+                        <img src="${thumbPath}" loading="lazy" decoding="async" alt="Gallery Image" onload="this.classList.add('loaded')">
                     </div>
                 `;
                 fragment.appendChild(frame);
