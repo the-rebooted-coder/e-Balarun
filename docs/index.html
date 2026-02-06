@@ -431,59 +431,62 @@
         }
         .video-active iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-        /* --- GALLERY & FILTERS --- */
+        /* --- FIXED GALLERY FILTER BAR --- */
         .gallery-filter-bar {
-            display: flex; 
-            gap: 15px; 
+            display: flex;
+            flex-wrap: nowrap; /* Forces horizontal layout */
+            gap: 12px;
             
-            /* SCROLL FIXES */
-            overflow-x: auto; 
-            /* REMOVED overflow-y: hidden; to stop clipping */
+            /* SCROLL CONFIG */
+            overflow-x: auto;
+            overflow-y: hidden; 
             
-            /* Layout - Optimized padding */
-            /* Top: 10px, Right: 5px, Bottom: 25px (Space for shadow + spacing), Left: 5px */
-            padding: 10px 5px 25px 5px; 
+            /* PADDING FIX: Enough space for shadows and hover effects */
+            padding: 15px 5px; 
             
-            border-bottom: 2px dashed var(--ink-dim); 
+            border-bottom: 2px dashed var(--ink-dim);
             margin-bottom: 15px;
             
-            /* Alignment Fixes */
+            /* ALIGNMENT */
             align-items: center; 
             
-            /* Smoothness */
+            /* HIDE SCROLLBARS */
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; 
+            scrollbar-width: none; /* Firefox */
         }
-        .gallery-filter-bar::-webkit-scrollbar { display: none; } /* Safari and Chrome */
+        .gallery-filter-bar::-webkit-scrollbar { display: none; } /* Chrome/Safari */
 
         .filter-btn {
-            /* Layout & Alignment Fixes */
-            display: inline-flex;       
-            align-items: center;        
-            justify-content: center;    
+            /* NO SHRINKING */
+            flex: 0 0 auto; 
             
-            line-height: 1.2;          /* Increased from 1 to 1.2 to fix text clipping */
-            min-height: 45px;          
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             
-            /* Visuals */
-            background: transparent; 
-            border: 2px solid var(--ink-dim); 
+            /* VISUALS */
+            background: transparent;
+            border: 2px solid var(--ink-dim);
             color: var(--ink-dim);
-            padding: 0 25px;           
-            border-radius: 50px; 
-            font-family: var(--font-body); 
+            
+            /* SIZING */
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-family: var(--font-body);
             font-weight: bold;
-            font-size: 1.2rem;         
-            cursor: pointer; 
-            white-space: nowrap; 
+            font-size: 1.1rem;
+            line-height: 1;
+            
+            cursor: pointer;
             transition: all 0.2s ease;
-            flex: 0 0 auto;
         }
+
         .filter-btn:hover { border-color: var(--ink); color: var(--ink); }
         
         .filter-btn.active {
             background: var(--ink); color: var(--paper); border-color: var(--ink);
-            box-shadow: 2px 2px 0 var(--accent); transform: translateY(-2px);
+            box-shadow: 0px 4px 0px var(--accent); /* Shadow moves down */
+            transform: translateY(-4px); /* Chip moves up */
         }
 
         .gallery-grid {
