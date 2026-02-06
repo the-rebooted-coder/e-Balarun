@@ -25,54 +25,47 @@
     
     <style>
         :root {
-            /* --- DEFAULT THEME: Blackboard (Dark) --- */
-            --paper: #18181b; /* Zinc 900 */
-            --ink: #f4f4f5;   /* Zinc 100 */
-            --ink-dim: #a1a1aa;
-            --accent: #facc15; /* Yellow Chalk */
-            --grid-color: #27272a;
-            --trail-color: #ffffff; /* White chalk for dark mode */
-            
-            --font-title: 'Amatic SC', cursive;
-            --font-body: 'Patrick Hand', cursive;
-            --font-hindi: 'Noto Serif Devanagari', serif;
-            
-            --ease: cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        /* Class for manual Whiteboard mode override */
-        body.theme-whiteboard {
-            --paper: #fffbeb; /* Cream Paper */
-            --ink: #1e293b;   /* Navy Ink */
-            --ink-dim: #64748b;
-            --accent: #d97706; /* Orange Highlighter */
-            --grid-color: #e5e7eb;
-            --trail-color: #3f3f46; /* Dark Grey charcoal for light mode */
-        }
-
-        /* Check system preference if no manual override is set */
-        @media (prefers-color-scheme: light) {
-            body:not(.theme-blackboard) {
-                --paper: #fffbeb; 
-                --ink: #1e293b;   
-                --ink-dim: #64748b;
-                --accent: #d97706; 
-                --grid-color: #e5e7eb;
-                --trail-color: #3f3f46; /* Dark Grey charcoal */
-            }
-        }
-
-        /* Class for manual Blackboard mode override (if system is light) */
-        body.theme-blackboard {
+            /* --- THEME VARIABLES --- */
             --paper: #18181b; 
             --ink: #f4f4f5;   
             --ink-dim: #a1a1aa;
             --accent: #facc15; 
             --grid-color: #27272a;
             --trail-color: #ffffff;
+            
+            --font-title: 'Amatic SC', cursive;
+            --font-body: 'Patrick Hand', cursive;
+            --font-hindi: 'Noto Serif Devanagari', serif;
+            
+            /* Optimized Easing for smooth UI */
+            --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+            --ease-in-out: cubic-bezier(0.645, 0.045, 0.355, 1);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        /* --- THEMES --- */
+        body.theme-whiteboard {
+            --paper: #fffbeb; 
+            --ink: #1e293b;   
+            --ink-dim: #64748b;
+            --accent: #d97706; 
+            --grid-color: #e5e7eb;
+            --trail-color: #3f3f46;
+        }
+
+        @media (prefers-color-scheme: light) {
+            body:not(.theme-blackboard) {
+                --paper: #fffbeb; --ink: #1e293b; --ink-dim: #64748b;
+                --accent: #d97706; --grid-color: #e5e7eb; --trail-color: #3f3f46;
+            }
+        }
+
+        body.theme-blackboard {
+            --paper: #18181b; --ink: #f4f4f5; --ink-dim: #a1a1aa;
+            --accent: #facc15; --grid-color: #27272a; --trail-color: #ffffff;
+        }
+
+        /* --- GLOBAL RESET & BASE --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
         
         body {
             background-color: var(--paper);
@@ -84,41 +77,33 @@
             flex-direction: column;
             overflow-x: hidden;
             
-            /* Custom Chalk Cursor */
+            /* Custom Cursor */
             cursor: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="2.5" width="10" height="20" rx="1" transform="rotate(-30 8 12)" fill="white" stroke="gray" stroke-width="1"/></svg>') 0 20, auto;
 
-            /* Grid Pattern Background */
+            /* Performance Pattern */
             background-image: 
                 linear-gradient(var(--grid-color) 1px, transparent 1px),
                 linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
             background-size: 30px 30px;
+            
+            /* Font smoothing */
+            -webkit-font-smoothing: antialiased;
         }
 
         /* --- LOADER --- */
         #loader {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--paper);
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--paper); z-index: 99999;
+            display: flex; align-items: center; justify-content: center;
             transition: opacity 0.5s ease-out, visibility 0.5s;
         }
-
-        #loader.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
+        #loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
         .loader-logo {
-            width: 150px;
-            height: auto;
+            width: 150px; height: auto;
             filter: grayscale(100%); 
-            animation: popZoom 2.8s forwards cubic-bezier(0.65, 0, 0.35, 1);
-            will-change: transform, opacity, filter; /* Optimization hint */
+            animation: popZoom 2.8s forwards var(--ease-out);
+            will-change: transform, opacity, filter; 
         }
 
         @keyframes popZoom {
@@ -129,760 +114,302 @@
             100% { transform: scale(30); opacity: 0; }
         }
 
-        /* --- CHALK TRAIL CANVAS --- */
-        #trail-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 9999;
-        }
-
-        /* --- WIPE ANIMATION LAYERS --- */
+        /* --- CANVAS & ANIMATIONS --- */
+        #trail-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
+        
         #wipe-overlay {
-            position: fixed;
-            top: 0; left: 0; bottom: 0;
-            width: 0%; /* Starts invisible */
-            z-index: 99990; /* High z-index but below loader */
-            pointer-events: none;
-            background-size: 30px 30px;
-            overflow: visible;
+            position: fixed; top: 0; left: 0; bottom: 0; width: 0%;
+            z-index: 99990; pointer-events: none;
+            background-size: 30px 30px; will-change: width;
         }
 
         #duster {
-            position: absolute;
-            right: -25px; /* Hang off the edge slightly */
-            top: 50%;
+            position: absolute; right: -25px; top: 50%;
             transform: translateY(-50%) rotate(5deg);
-            width: 60px;
-            height: 140px;
-            display: none; /* Hidden until animating */
+            width: 60px; height: 140px; display: none;
         }
 
-        /* CSS-Drawn Duster */
         .duster-handle {
-            width: 100%;
-            height: 100%;
-            background: #854d0e; /* Wood color */
-            border-radius: 10px;
-            box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
-            border: 2px solid #503106;
-            position: relative;
-            z-index: 2;
+            width: 100%; height: 100%; background: #854d0e;
+            border-radius: 10px; box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
+            border: 2px solid #503106; position: relative; z-index: 2;
         }
-        /* Wood grain effect */
-        .duster-handle::after {
-            content: '';
-            position: absolute;
-            top: 10px; left: 10px; right: 10px; bottom: 10px;
-            border: 1px dashed #a16207;
-            opacity: 0.5;
-            border-radius: 5px;
-        }
-
         .duster-felt {
-            position: absolute;
-            left: -10px;
-            top: 5px;
-            width: 20px;
-            height: 130px;
-            background: repeating-linear-gradient(
-                45deg,
-                #333,
-                #333 5px,
-                #444 5px,
-                #444 10px
-            );
-            border-radius: 5px 0 0 5px;
-            z-index: 1;
-            box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+            position: absolute; left: -10px; top: 5px; width: 20px; height: 130px;
+            background: repeating-linear-gradient(45deg, #333, #333 5px, #444 5px, #444 10px);
+            border-radius: 5px 0 0 5px; z-index: 1; box-shadow: -2px 0 5px rgba(0,0,0,0.2);
         }
 
-        /* --- STYLES FOR CHALK BORDERS --- */
-        .chalk-border-1 {
+        /* --- CHALK BORDERS --- */
+        .chalk-border-1, .chalk-border-2, .chalk-border-sm {
             border: 2px solid var(--ink);
-            /* Shape 1: Top-heavy wobble */
-            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
             box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
-            transition: all 0.3s var(--ease);
+            transition: all 0.3s var(--ease-out);
         }
+        .chalk-border-1 { border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px; }
+        .chalk-border-2 { border-radius: 25px 225px 25px 225px / 225px 25px 225px 25px; }
+        .chalk-border-sm { border-radius: 255px 25px 225px 25px / 25px 225px 25px 255px; }
 
-        .chalk-border-2 {
-            border: 2px solid var(--ink);
-            /* Shape 2: Bottom-heavy wobble, distinct from Shape 1 */
-            border-radius: 25px 225px 25px 225px / 225px 25px 225px 25px;
-            box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
-            transition: all 0.3s var(--ease);
-        }
-
-        .chalk-border-sm {
-            border: 2px solid var(--ink);
-            /* Shape 3: Tighter wobble for small buttons */
-            border-radius: 255px 25px 225px 25px / 25px 225px 25px 255px;
-            transition: all 0.3s var(--ease);
-        }
-        
         a, button, .sketch-card { cursor: pointer; }
 
-        /* --- HEADER --- */
+        /* --- LAYOUT --- */
         .container {
-            width: 90%;
-            max-width: 1000px;
-            margin: 0 auto;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 2rem 0;
-            position: relative;
-            z-index: 10;
+            width: 90%; max-width: 1000px; margin: 0 auto;
+            flex: 1; display: flex; flex-direction: column;
+            padding: 2rem 0; position: relative; z-index: 10;
         }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 3rem;
-            width: 100%;
-        }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; width: 100%; }
+        .brand { display: flex; align-items: center; gap: 15px; }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        /* --- LOGO STYLING --- */
         .logo-sketch {
-            height: 50px;
-            /* Default: Grayscale */
-            filter: grayscale(1) contrast(1.2);
-            transition: all 0.4s ease; /* Smooth transition */
-            transform-origin: center;
+            height: 50px; filter: grayscale(1) contrast(1.2);
+            transition: transform 0.4s var(--ease-out), filter 0.4s;
+            transform-origin: center; will-change: transform, filter;
         }
-
-        /* Hover Effect: Colorize & Scale */
-        .logo-sketch:hover {
-            filter: grayscale(0) contrast(1);
-            transform: scale(1.1) rotate(-2deg);
-        }
+        .logo-sketch:hover { filter: grayscale(0) contrast(1); transform: scale(1.1) rotate(-2deg); }
 
         .digital-badge {
-            font-family: var(--font-title);
-            font-size: 1.5rem; 
-            font-weight: 700;
-            border-bottom: 2px solid var(--accent);
-            padding-bottom: 2px;
-            white-space: nowrap;
+            font-family: var(--font-title); font-size: 1.5rem; font-weight: 700;
+            border-bottom: 2px solid var(--accent); padding-bottom: 2px; white-space: nowrap;
         }
 
         .lang-btn {
-            background: transparent;
-            font-family: var(--font-hindi); 
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--ink);
-            padding: 5px 20px;
-            white-space: nowrap;
+            background: transparent; font-family: var(--font-hindi); 
+            font-weight: 700; font-size: 1.1rem; color: var(--ink);
+            padding: 5px 20px; white-space: nowrap;
         }
+        .lang-btn:hover { background: var(--ink); color: var(--paper); transform: rotate(-2deg) scale(1.05); }
 
-        .lang-btn:hover {
-            background: var(--ink);
-            color: var(--paper);
-            transform: rotate(-2deg) scale(1.05);
-        }
+        /* --- HERO & 3D BOOK --- */
+        .hero { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; padding-bottom: 3rem; }
 
-        /* --- HERO & TRUE 3D BOOK --- */
-        .hero {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            justify-content: center;
-            padding-bottom: 3rem;
-        }
-
-        /* 3D BOOK CONTAINER */
         .book-container {
-            perspective: 1500px; /* High perspective for realistic depth */
-            width: 240px; 
-            height: 340px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 2rem;
-            z-index: 50;
-            position: relative;
+            perspective: 1500px; width: 240px; height: 340px;
+            display: flex; justify-content: center; align-items: center;
+            margin-bottom: 2rem; z-index: 50; position: relative;
         }
-
-        /* Removed <a> styling, added general pointer cursor for div wrapper */
-        .book-wrapper {
-            cursor: pointer;
-            text-decoration: none;
-        }
+        
+        .book-wrapper { cursor: pointer; text-decoration: none; }
 
         .book {
-            position: relative;
-            width: 220px;
-            height: 310px;
+            position: relative; width: 220px; height: 310px;
             transform-style: preserve-3d;
-            /* Initial Angle: Tilted to show spine (Left) and Cover */
             transform: rotateY(-35deg) rotateX(10deg); 
-            transition: transform 0.6s var(--ease);
-            /* Ambient shadow on the floor */
+            transition: transform 0.6s var(--ease-out), box-shadow 0.6s;
             box-shadow: 20px 20px 50px rgba(0,0,0,0.4); 
+            will-change: transform;
         }
 
         .book:hover {
-            /* On hover: Face forward, lift up */
             transform: rotateY(0deg) rotateX(0deg) translateZ(30px) scale(1.05);
             box-shadow: 0 40px 60px rgba(0,0,0,0.3);
         }
 
-        /* Common face styles */
-        .book-face {
-            position: absolute;
-            background-color: #fff;
-            backface-visibility: hidden; /* Hide back of faces for performance */
-        }
-
-        /* FRONT COVER */
+        .book-face { position: absolute; background-color: #fff; backface-visibility: hidden; }
+        
         .book-front {
-            width: 220px;
-            height: 310px;
-            /* Move forward by half thickness (20px) */
-            transform: translateZ(20px);
-            background: #222;
-            border-radius: 2px 4px 4px 2px;
-            overflow: hidden;
-            z-index: 2;
+            width: 220px; height: 310px; transform: translateZ(20px);
+            background: #222; border-radius: 2px 4px 4px 2px; overflow: hidden; z-index: 2;
         }
-
-        .book-front img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Gloss sheen overlay on cover */
+        .book-front img { width: 100%; height: 100%; object-fit: cover; }
         .book-front::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; bottom: 0; width: 30px;
-            background: linear-gradient(to right, rgba(255,255,255,0.2) 0%, transparent 100%);
-            pointer-events: none;
+            content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 30px;
+            background: linear-gradient(to right, rgba(255,255,255,0.2) 0%, transparent 100%); pointer-events: none;
         }
 
-        /* SPINE (Left Face) */
         .book-spine {
-            width: 40px; /* Thickness */
-            height: 310px;
-            background: #8B4513; /* Warm Brown */
-            /* Position at left edge */
-            left: -20px; /* Center of spine element is at left edge of container */
-            /* Rotate -90deg to face Left. Translate Z to 0 (center of book) */
-            transform: rotateY(-90deg) translateZ(0); 
-            /* Inner shadow to make it look rounded */
-            box-shadow: inset 5px 0 15px rgba(0,0,0,0.3);
+            width: 40px; height: 310px; background: #8B4513; left: -20px;
+            transform: rotateY(-90deg) translateZ(0); box-shadow: inset 5px 0 15px rgba(0,0,0,0.3);
         }
 
-        /* PAGES (Right Face) */
         .book-pages {
-            width: 40px; /* Thickness */
-            height: 304px; /* Slightly shorter than cover */
-            top: 3px;
-            background: #fdf6e3;
-            /* Position at right edge */
-            right: -20px;
+            width: 40px; height: 304px; top: 3px; background: #fdf6e3; right: -20px;
             transform: rotateY(90deg) translateZ(0);
-            /* Paper lines pattern */
-            background-image: repeating-linear-gradient(
-                90deg, 
-                #fdf6e3 0px, 
-                #fdf6e3 2px, 
-                #dcdcdc 3px
-            );
-            box-shadow: inset -2px 0 5px rgba(0,0,0,0.1);
+            background-image: repeating-linear-gradient(90deg, #fdf6e3 0px, #fdf6e3 2px, #dcdcdc 3px);
         }
+        .book-back { width: 220px; height: 310px; transform: rotateY(180deg) translateZ(20px); background: #2e2e2e; }
 
-        /* BACK COVER (For completeness/rotation) */
-        .book-back {
-            width: 220px;
-            height: 310px;
-            transform: rotateY(180deg) translateZ(20px);
-            background: #2e2e2e;
-        }
-
-        /* "Click to Read" Tooltip */
         .read-tooltip {
-            position: absolute;
-            bottom: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-family: var(--font-body);
-            color: var(--accent);
-            font-weight: bold;
-            font-size: 1.3rem;
-            opacity: 0;
-            transition: opacity 0.4s ease, transform 0.4s ease;
-            pointer-events: none;
-            white-space: nowrap;
+            position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%);
+            font-family: var(--font-body); color: var(--accent); font-weight: bold;
+            font-size: 1.3rem; opacity: 0; transition: opacity 0.4s, transform 0.4s; pointer-events: none;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
-
-        .book-container:hover .read-tooltip {
-            opacity: 1;
-            transform: translateX(-50%) translateY(-5px);
-        }
+        .book-container:hover .read-tooltip { opacity: 1; transform: translateX(-50%) translateY(-5px); }
 
         h1 {
-            font-family: var(--font-title);
-            font-size: clamp(4rem, 10vw, 7rem);
-            font-weight: 700;
-            line-height: 0.9;
-            margin-bottom: 3rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            font-family: var(--font-title); font-size: clamp(4rem, 10vw, 7rem);
+            font-weight: 700; line-height: 0.9; margin-bottom: 3rem;
+            text-transform: uppercase; letter-spacing: 2px;
         }
+        body.hindi-active h1 { font-family: var(--font-hindi); font-size: clamp(3rem, 8vw, 5rem); line-height: 1.2; }
 
-        body.hindi-active h1 {
-            font-family: var(--font-hindi);
-            font-size: clamp(3rem, 8vw, 5rem);
-            line-height: 1.2;
-        }
-
-        /* --- DOODLE CARDS --- */
-        .cards-container {
-            display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
-            justify-content: center;
-            width: 100%;
-        }
+        /* --- CARDS --- */
+        .cards-container { display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; width: 100%; }
 
         .sketch-card {
-            background: var(--paper);
-            padding: 2rem;
-            width: 100%;
-            max-width: 300px; /* Reduced slightly to fit 3 cards better */
-            position: relative;
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            background: var(--paper); padding: 2rem; width: 100%; max-width: 300px;
+            position: relative; text-align: left; display: flex; flex-direction: column; justify-content: center;
+            will-change: transform; transition: transform 0.2s, box-shadow 0.2s;
         }
+        .sketch-card:hover { transform: translateY(-5px) rotate(1deg); box-shadow: 8px 8px 0px var(--ink); }
+        .sketch-card:active { transform: translateY(0px); box-shadow: 2px 2px 0px var(--ink); }
 
-        .sketch-card:hover {
-            transform: translateY(-5px) rotate(1deg);
-            box-shadow: 8px 8px 0px var(--ink);
+        .card-icon { margin-bottom: 1rem; color: var(--accent); }
+        .card-title { font-family: var(--font-title); font-size: 2.2rem; font-weight: 700; line-height: 1; }
+
+        /* --- STICKY NOTES --- */
+        #mobile-note, #gallery-note {
+            background: #fef3c7; color: #1e1e1e; font-family: var(--font-body);
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.3); z-index: 500;
         }
-
-        .sketch-card:active {
-            transform: translateY(0px);
-            box-shadow: 2px 2px 0px var(--ink);
-        }
-
-        .card-icon {
-            margin-bottom: 1rem;
-            color: var(--accent);
-        }
-
-        .card-title {
-            font-family: var(--font-title);
-            font-size: 2.2rem;
-            font-weight: 700;
-            line-height: 1;
-        }
-
-        /* --- MOBILE STICKY NOTE --- */
         #mobile-note {
-            display: none; /* Hidden on desktop */
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 250px;
-            background: #fef3c7; /* Sticky note yellow */
-            color: #1e1e1e;
-            padding: 15px;
-            transform: rotate(-3deg);
-            box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
-            font-family: var(--font-body);
-            font-size: 1rem;
-            line-height: 1.3;
-            z-index: 500;
-            animation: slideUp 1s ease-out 4s backwards; /* Appears after loader */
+            display: none; position: fixed; bottom: 20px; right: 20px; width: 250px;
+            padding: 15px; transform: rotate(-3deg); animation: slideUp 1s ease-out 4s backwards;
         }
-        
-        /* --- GALLERY STICKY NOTE --- */
         #gallery-note {
-            display: none; 
-            position: absolute;
-            bottom: -20px;
-            right: -20px;
-            width: 200px;
-            background: #fef3c7; /* Sticky note yellow */
-            color: #1e1e1e;
-            padding: 12px;
-            transform: rotate(4deg);
-            box-shadow: 3px 3px 10px rgba(0,0,0,0.4);
-            font-family: var(--font-body);
-            font-size: 1rem;
-            line-height: 1.2;
-            z-index: 150; /* Above images */
-            text-align: center;
-            border: 1px solid #eab308;
+            display: none; position: absolute; bottom: -20px; right: -20px; width: 200px;
+            padding: 12px; transform: rotate(4deg); text-align: center; border: 1px solid #eab308; z-index: 150;
         }
-
-        /* Tape effect on note */
         #mobile-note::before, #gallery-note::before {
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 15px;
-            background: rgba(255, 255, 255, 0.4);
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 40px; height: 15px; background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
+        .note-close { position: absolute; top: 2px; right: 5px; font-weight: bold; cursor: pointer; opacity: 0.5; }
 
-        .note-close {
-            position: absolute;
-            top: 2px;
-            right: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1.2rem;
-            opacity: 0.5;
-        }
+        @keyframes slideUp { from { transform: translateY(100%) rotate(-3deg); opacity: 0; } to { transform: translateY(0) rotate(-3deg); opacity: 1; } }
 
-        @keyframes slideUp {
-            from { transform: translateY(100%) rotate(-3deg); opacity: 0; }
-            to { transform: translateY(0) rotate(-3deg); opacity: 1; }
-        }
-
-        /* --- TOAST NOTIFICATION --- */
+        /* --- TOAST --- */
         #toast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: var(--ink); /* Inverted for high visibility but within theme */
-            color: var(--paper);
-            text-align: center;
-            border-radius: 50px;
-            padding: 16px 25px;
-            position: fixed;
-            z-index: 10000;
-            left: 50%;
-            bottom: 30px;
-            transform: translateX(-50%) translateY(20px);
-            font-family: var(--font-body);
-            font-size: 1.2rem;
-            font-weight: bold;
-            box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
-            opacity: 0;
-            transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.4s;
-            border: 2px solid var(--accent); /* Subtle border matching accent */
+            visibility: hidden; min-width: 250px; background-color: var(--ink); color: var(--paper);
+            text-align: center; border-radius: 50px; padding: 16px 25px; position: fixed; z-index: 10000;
+            left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px);
+            font-family: var(--font-body); font-weight: bold; box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+            opacity: 0; transition: all 0.4s var(--ease-out); border: 2px solid var(--accent);
         }
-
-        #toast.show {
-            visibility: visible;
-            opacity: 1;
-            transform: translateX(-50%) translateY(0px);
-        }
+        #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0px); }
 
         /* --- FOOTER --- */
         footer {
-            border-top: 2px dashed var(--ink-dim);
-            padding-top: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            color: var(--ink-dim);
-            margin-top: auto;
-            text-align: center;
-            gap: 1.5rem;
+            border-top: 2px dashed var(--ink-dim); padding-top: 1.5rem;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 1.1rem; color: var(--ink-dim); margin-top: auto; text-align: center; gap: 1.5rem;
+            content-visibility: auto; /* Optimization */
         }
-
-        .footer-actions {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .loc-text {
-            color: var(--ink);
-            font-weight: 700;
-            text-decoration: underline;
-            text-decoration-style: wavy;
-            text-decoration-color: var(--accent);
-        }
+        .footer-actions { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; align-items: center; }
+        .loc-text { color: var(--ink); font-weight: 700; text-decoration: underline; text-decoration-style: wavy; text-decoration-color: var(--accent); }
         
-        /* --- THEME TOGGLE & ARCHIVE BUTTONS --- */
         .theme-toggle-btn, .archive-btn {
-            background: none;
-            border: 1px dashed var(--ink-dim);
-            color: var(--ink-dim);
-            padding: 5px 15px;
-            font-family: var(--font-body);
-            font-size: 0.9rem;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            opacity: 0.7;
-            text-decoration: none; /* Ensure link doesn't look like default link */
-            display: inline-block;
+            background: none; border: 1px dashed var(--ink-dim); color: var(--ink-dim);
+            padding: 5px 15px; font-family: var(--font-body); font-size: 0.9rem;
+            border-radius: 20px; cursor: pointer; transition: all 0.3s ease; opacity: 0.7; text-decoration: none; display: inline-block;
         }
-        
-        .theme-toggle-btn:hover, .archive-btn:hover {
-            opacity: 1;
-            border-color: var(--accent);
-            color: var(--accent);
-        }
+        .theme-toggle-btn:hover, .archive-btn:hover { opacity: 1; border-color: var(--accent); color: var(--accent); }
 
-        /* --- MODAL --- */
+        /* --- MODALS --- */
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-            backdrop-filter: blur(5px);
-            cursor: default;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9);
+            z-index: 100; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(5px);
         }
-
         .modal-overlay.active { opacity: 1; pointer-events: all; }
 
         .modal-paper {
-            background: var(--paper);
-            color: var(--ink);
-            width: 90%;
-            max-width: 800px;
-            padding: 10px;
-            border: 2px solid var(--ink);
-            box-shadow: 15px 15px 0px var(--accent); 
-            /* Straight modal - no rotation */
-            display: flex;
-            flex-direction: column;
-            max-height: 90vh; /* Don't exceed screen height */
-            position: relative; /* Context for sticky note */
+            background: var(--paper); color: var(--ink); width: 90%; max-width: 800px;
+            padding: 10px; border: 2px solid var(--ink); box-shadow: 15px 15px 0px var(--accent);
+            display: flex; flex-direction: column; max-height: 90vh; position: relative;
         }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 10px 20px 10px;
-            flex-shrink: 0; /* Prevent header from shrinking */
-        }
-
-        .modal-title {
-            font-family: var(--font-title);
-            font-size: 2rem;
-            font-weight: 700;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--ink);
-            transition: transform 0.2s;
-            cursor: pointer;
-        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 10px 20px 10px; flex-shrink: 0; }
+        .modal-title { font-family: var(--font-title); font-size: 2rem; font-weight: 700; }
+        .close-btn { background: none; border: none; color: var(--ink); transition: transform 0.2s; cursor: pointer; }
         .close-btn:hover { transform: scale(1.2) rotate(90deg); }
 
-        .modal-scroll-content {
-            overflow-y: auto;
-            flex: 1;
-            padding-right: 5px;
-        }
-        
+        .modal-scroll-content { overflow-y: auto; flex: 1; padding-right: 5px; overscroll-behavior: contain; }
         .modal-scroll-content::-webkit-scrollbar { width: 8px; }
         .modal-scroll-content::-webkit-scrollbar-track { background: transparent; }
         .modal-scroll-content::-webkit-scrollbar-thumb { background-color: var(--ink-dim); border-radius: 4px; }
 
-        .video-wrapper {
-            margin-bottom: 2rem;
+        /* Optimized Video Facade */
+        .video-wrapper { margin-bottom: 2rem; }
+        .video-label { font-family: var(--font-title); font-size: 1.5rem; color: var(--accent); margin-bottom: 0.5rem; display: block; }
+        
+        .video-facade {
+            position: relative; padding-bottom: 56.25%; height: 0; background: #000;
+            border: 2px solid var(--ink); cursor: pointer; overflow: hidden;
+        }
+        .video-facade img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.3s;
+        }
+        .video-facade:hover img { opacity: 0.5; }
+        .play-btn-overlay {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 60px; height: 40px; background: rgba(255,0,0,0.9); border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; pointer-events: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .play-btn-overlay::after {
+            content: ''; border-style: solid; border-width: 10px 0 10px 18px;
+            border-color: transparent transparent transparent white;
         }
         
-        .video-label {
-            font-family: var(--font-title);
-            font-size: 1.5rem;
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-            display: block;
-        }
+        /* Iframe injected after click */
+        .video-active iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-        .video-box {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            background: black;
-            border: 2px solid var(--ink);
-        }
-        .video-box iframe {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-        }
-
-        /* --- GALLERY GRID & PHOTO STYLES --- */
+        /* --- GALLERY --- */
         .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            padding: 1rem;
-            overflow-y: auto; /* Scrollable inside modal */
-            border-top: 2px dashed var(--ink-dim);
-            /* Content-visibility optimization */
-            content-visibility: auto;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem; padding: 1rem; overflow-y: auto; border-top: 2px dashed var(--ink-dim);
+            content-visibility: auto; overscroll-behavior: contain;
         }
-
-        /* Scrollbar styling for Gallery */
         .gallery-grid::-webkit-scrollbar { width: 8px; }
         .gallery-grid::-webkit-scrollbar-track { background: transparent; }
         .gallery-grid::-webkit-scrollbar-thumb { background-color: var(--ink-dim); border-radius: 4px; }
 
-        /* Polaroid / Scrapbook Frame */
         .photo-frame {
-            background: #fff;
-            padding: 10px 10px 40px 10px; /* Polaroid bottom heavy padding */
-            box-shadow: 3px 3px 6px rgba(0,0,0,0.3);
-            transform: rotate(2deg); /* Tilted look */
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
-            text-align: center;
-            position: relative;
-            cursor: zoom-in; /* Indicate clickable */
-            /* GPU layer for smooth hover */
-            will-change: transform;
+            background: #fff; padding: 10px 10px 40px 10px; box-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            transform: rotate(2deg); transition: transform 0.3s var(--ease-out), box-shadow 0.3s;
+            text-align: center; position: relative; cursor: zoom-in; will-change: transform;
         }
-
-        /* Alternate tilts for natural look */
         .photo-frame:nth-child(even) { transform: rotate(-2deg); }
         .photo-frame:nth-child(3n) { transform: rotate(1.5deg); }
+        .photo-frame:hover { transform: scale(1.05) rotate(0deg); z-index: 10; box-shadow: 10px 10px 15px rgba(0,0,0,0.4); }
 
-        /* Hover effect: Straighten up and pop */
-        .photo-frame:hover {
-            transform: scale(1.05) rotate(0deg);
-            z-index: 10;
-            box-shadow: 10px 10px 15px rgba(0,0,0,0.4);
-        }
-
-        /* Placeholder styles */
         .photo-placeholder {
-            width: 100%;
-            aspect-ratio: 1/1; /* Square photos */
-            background-color: #e5e5e5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #888;
-            font-family: var(--font-body);
-            font-weight: bold;
-            font-size: 1.2rem;
-            border: 1px solid #ccc;
-            overflow: hidden;
+            width: 100%; aspect-ratio: 1/1; background-color: #e5e5e5;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid #ccc; overflow: hidden;
         }
-        
-        .photo-placeholder img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
+        .photo-placeholder img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-        /* --- FULLSCREEN IMAGE MODAL --- */
-        #fullscreenModal {
-            z-index: 200; /* Higher than gallery modal (100) */
-            background: rgba(0, 0, 0, 0.95); /* Darker background */
-        }
-        
+        #fullscreenModal { z-index: 200; background: rgba(0, 0, 0, 0.95); }
         #fullscreenModal img {
-            max-width: 90%;
-            max-height: 90vh;
-            border: 4px solid #fff;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            animation: popZoom 0.4s ease-out;
+            max-width: 90%; max-height: 90vh; border: 4px solid #fff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5); animation: popZoom 0.4s ease-out;
         }
-
         .fullscreen-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            color: #fff;
-            font-size: 2rem;
-            background: rgba(255,255,255,0.1);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
+            position: absolute; top: 20px; right: 20px; color: #fff; font-size: 2rem;
+            background: rgba(255,255,255,0.1); width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s;
         }
-        .fullscreen-close:hover {
-            background: rgba(255,255,255,0.3);
-            transform: scale(1.1);
-        }
+        .fullscreen-close:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
 
-        svg path, svg circle {
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            fill: none;
-            stroke: currentColor;
-        }
+        svg path, svg circle { stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; stroke: currentColor; }
 
-        /* --- RESPONSIVE ADJUSTMENTS --- */
+        /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
-            header { 
-                /* Keep row direction for mobile header */
-                flex-direction: row; 
-                justify-content: space-between;
-                align-items: center;
-                gap: 10px;
-                margin-bottom: 2rem;
-            }
-            
-            .brand {
-                gap: 8px; /* Tighter spacing */
-            }
-
-            .logo-sketch {
-                height: 35px; /* Smaller logo */
-            }
-
-            .digital-badge {
-                font-size: 1.2rem; /* Adjusted for mobile but still bold */
-            }
-
-            .lang-btn {
-                padding: 4px 10px;
-                font-size: 1rem;
-            }
-
+            header { flex-direction: row; gap: 10px; margin-bottom: 2rem; }
+            .brand { gap: 8px; }
+            .logo-sketch { height: 35px; }
+            .digital-badge { font-size: 1.2rem; }
+            .lang-btn { padding: 4px 10px; font-size: 1rem; }
             h1 { margin-bottom: 2rem; }
             .cards-container { flex-direction: column; }
             .sketch-card { max-width: 100%; }
-            
-            /* Show the sticky note only on mobile */
             #mobile-note { display: block; }
-
-            /* Adjust gallery note position for mobile */
-            #gallery-note {
-                right: 10px;
-                bottom: 10px;
-                width: 150px;
-                font-size: 0.9rem;
-            }
+            #gallery-note { right: 10px; bottom: 10px; width: 150px; font-size: 0.9rem; }
         }
     </style>
 </head>
@@ -939,9 +466,7 @@
             <div class="cards-container">
                 <div class="sketch-card chalk-border-1" onclick="openModal('messages')">
                     <div class="card-icon">
-                        <svg width="40" height="40" viewBox="0 0 24 24">
-                            <path d="M5 3l14 9-14 9V3z" />
-                        </svg>
+                        <svg width="40" height="40" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z" /></svg>
                     </div>
                     <div class="card-title" id="btn-watch-text">Video Messages</div>
                 </div>
@@ -990,9 +515,7 @@
             <div class="modal-header">
                 <span class="modal-title" id="modal-title-text">Playing Video...</span>
                 <button class="close-btn" onclick="closeModal()">
-                    <svg width="24" height="24" viewBox="0 0 24 24">
-                        <path d="M18 6L6 18M6 6l12 12" />
-                    </svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" /></svg>
                 </button>
             </div>
             <div id="modal-content-body" class="modal-scroll-content">
@@ -1005,13 +528,10 @@
             <div class="modal-header">
                 <span class="modal-title" id="gallery-title-text">Photo Scrapbook</span>
                 <button class="close-btn" onclick="closeGallery()">
-                    <svg width="24" height="24" viewBox="0 0 24 24">
-                        <path d="M18 6L6 18M6 6l12 12" />
-                    </svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" /></svg>
                 </button>
             </div>
-            <div class="gallery-grid" id="gallery-grid-content">
-                </div>
+            <div class="gallery-grid" id="gallery-grid-content"></div>
             
             <div id="gallery-note">
                 <span class="note-close" onclick="dismissGalleryNote()">×</span>
@@ -1026,7 +546,7 @@
     </div>
 
     <script>
-        // --- Content Data ---
+        // --- Content Configuration ---
         const content = {
             en: {
                 tabTitle: "E-Balarun 2026 | Digital Edition",
@@ -1091,56 +611,58 @@
                 { key: 'vid_ex_trainee', id: 'aHu-F3yuaKE' }
             ],
             tour: [
-                { key: 'tourTitle', id: '2Zbh6GzVhmo' } // uses tourTitle from main content
+                { key: 'tourTitle', id: '2Zbh6GzVhmo' }
             ]
         };
 
         let currentLang = 'en';
         let isAnimating = false;
-        let galleryLoaded = false; // Flag for optimization
+        let galleryLoaded = false; 
 
         // --- Initialization ---
-        // Optimization: Use DOMContentLoaded for faster script execution
         document.addEventListener('DOMContentLoaded', () => {
             checkMobileNote();
             updateLangButton(); 
             updateThemeButtonText();
         });
 
-        // Loader still waits for window.load to ensure assets are ready (User Experience)
         window.addEventListener('load', () => {
             const loader = document.getElementById('loader');
+            // Slight delay to ensure paint is ready
             setTimeout(() => {
                 loader.classList.add('hidden');
             }, 3000);
         });
 
-        // --- Gallery Generation Logic (OPTIMIZED: Lazy Load) ---
+        // --- Optimized Gallery Logic ---
         function generateGalleryImages() {
-            if (galleryLoaded) return; // Optimization: Don't regenerate if already loaded
+            if (galleryLoaded) return; 
 
             const galleryContainer = document.getElementById('gallery-grid-content');
             const totalImages = 23;
-            const fileExtension = '.webp'; 
-            
-            let htmlContent = '';
+            // Document Fragment prevents multiple reflows
+            const fragment = document.createDocumentFragment();
             
             for (let i = 1; i <= totalImages; i++) {
-                const imagePath = `gallery/e-balarun-gallery (${i})${fileExtension}`;
-                // Uses loading="lazy" for network optimization
-                htmlContent += `
-                <div class="photo-frame" onclick="openFullscreen('${imagePath}')">
+                const imagePath = `gallery/e-balarun-gallery (${i}).webp`;
+                
+                const frame = document.createElement('div');
+                frame.className = 'photo-frame';
+                frame.onclick = () => openFullscreen(imagePath);
+                
+                frame.innerHTML = `
                     <div class="photo-placeholder">
                         <img src="${imagePath}" loading="lazy" alt="Gallery Image ${i}">
                     </div>
-                </div>`;
+                `;
+                fragment.appendChild(frame);
             }
             
-            galleryContainer.innerHTML = htmlContent;
+            galleryContainer.appendChild(fragment);
             galleryLoaded = true;
         }
 
-        // --- Responsive Lang Button Logic ---
+        // --- UI Updates ---
         function updateLangButton() {
             const btn = document.getElementById('btn-lang');
             const data = content[currentLang];
@@ -1148,39 +670,32 @@
             btn.textContent = isMobile ? data.langBtnMobile : data.langBtn;
         }
 
-        window.addEventListener('resize', updateLangButton);
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(updateLangButton, 100);
+        }, { passive: true });
 
-        // --- Mobile Note Logic ---
+        // --- Local Storage Checks ---
         function checkMobileNote() {
-            const note = document.getElementById('mobile-note');
             if (localStorage.getItem('mobileNoteDismissed') === 'true') {
-                note.style.display = 'none'; 
+                document.getElementById('mobile-note').style.display = 'none'; 
             }
         }
-
         function dismissMobileNote() {
-            const note = document.getElementById('mobile-note');
-            note.style.display = 'none';
+            document.getElementById('mobile-note').style.display = 'none';
             localStorage.setItem('mobileNoteDismissed', 'true');
         }
-
-        // --- Gallery Sticky Note Logic ---
         function checkGalleryNote() {
             const note = document.getElementById('gallery-note');
-            if (localStorage.getItem('galleryNoteDismissed') !== 'true') {
-                note.style.display = 'block'; 
-            } else {
-                note.style.display = 'none';
-            }
+            note.style.display = (localStorage.getItem('galleryNoteDismissed') !== 'true') ? 'block' : 'none';
         }
-
         function dismissGalleryNote() {
-            const note = document.getElementById('gallery-note');
-            note.style.display = 'none';
+            document.getElementById('gallery-note').style.display = 'none';
             localStorage.setItem('galleryNoteDismissed', 'true');
         }
         
-        // --- Theme Toggle Logic ---
+        // --- Theme Toggle ---
         function toggleTheme() {
             if (isAnimating) return; 
             isAnimating = true;
@@ -1189,29 +704,13 @@
             const wipeOverlay = document.getElementById('wipe-overlay');
             const duster = document.getElementById('duster');
             
-            let targetClass = '';
-            let targetPaperColor = '';
-            let targetGridColor = '';
-            
-            let isCurrentlyBlack = true;
-            if (body.classList.contains('theme-whiteboard')) {
-                isCurrentlyBlack = false;
-            } else if (body.classList.contains('theme-blackboard')) {
-                isCurrentlyBlack = true;
-            } else {
-                 const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                 isCurrentlyBlack = sysDark;
-            }
+            const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            let isCurrentlyBlack = body.classList.contains('theme-blackboard') || (!body.classList.contains('theme-whiteboard') && sysDark);
 
-            if (isCurrentlyBlack) {
-                targetClass = 'theme-whiteboard';
-                targetPaperColor = '#fffbeb'; 
-                targetGridColor = '#e5e7eb'; 
-            } else {
-                targetClass = 'theme-blackboard';
-                targetPaperColor = '#18181b'; 
-                targetGridColor = '#27272a'; 
-            }
+            const targetClass = isCurrentlyBlack ? 'theme-whiteboard' : 'theme-blackboard';
+            // Pre-calculate colors to avoid getComputedStyle thrashing inside animation
+            const targetPaperColor = isCurrentlyBlack ? '#fffbeb' : '#18181b'; 
+            const targetGridColor = isCurrentlyBlack ? '#e5e7eb' : '#27272a'; 
 
             wipeOverlay.style.backgroundColor = targetPaperColor;
             wipeOverlay.style.backgroundImage = `
@@ -1221,24 +720,15 @@
             duster.style.display = 'block';
 
             const animation = wipeOverlay.animate(
-                [
-                    { width: '0%' },
-                    { width: '100%' }
-                ],
-                {
-                    duration: 1200, 
-                    easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
-                    fill: 'forwards' 
-                }
+                [{ width: '0%' }, { width: '100%' }],
+                { duration: 1000, easing: 'cubic-bezier(0.25, 1, 0.5, 1)', fill: 'forwards' }
             );
 
             animation.onfinish = () => {
                 body.classList.remove('theme-whiteboard', 'theme-blackboard');
                 body.classList.add(targetClass);
-                
                 updateThemeButtonText();
                 animation.cancel();
-                
                 wipeOverlay.style.width = '0%'; 
                 duster.style.display = 'none';
                 isAnimating = false;
@@ -1247,82 +737,63 @@
 
         function updateThemeButtonText() {
             const body = document.body;
-            const btn = document.getElementById('btn-theme-toggle');
-            const data = content[currentLang];
+            const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            let isDark = body.classList.contains('theme-blackboard') || (!body.classList.contains('theme-whiteboard') && sysDark);
             
-            let isDark = true; 
-            if (body.classList.contains('theme-whiteboard')) {
-                isDark = false;
-            } else if (body.classList.contains('theme-blackboard')) {
-                isDark = true;
-            } else {
-                 isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            }
-            
-            btn.textContent = isDark ? data.themeWhite : data.themeBlack;
+            document.getElementById('btn-theme-toggle').textContent = isDark ? content[currentLang].themeWhite : content[currentLang].themeBlack;
         }
 
-        // --- Chalk Trail Logic (OPTIMIZED) ---
+        // --- Optimized Chalk Trail ---
         const canvas = document.getElementById('trail-canvas');
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: true });
         let points = [];
-        const maxPoints = 40; 
-        let isTrailAnimating = false; // Optimization flag
+        let isTrailAnimating = false;
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
-        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('resize', resizeCanvas, { passive: true });
         resizeCanvas();
 
         document.addEventListener('mousemove', (e) => {
             points.push({ x: e.clientX, y: e.clientY, age: 0 });
-            // Optimization: Only start animation loop if it's not running
-            if (!isTrailAnimating) {
-                isTrailAnimating = true;
-                animateTrail();
-            }
-        });
+            if (!isTrailAnimating) { isTrailAnimating = true; animateTrail(); }
+        }, { passive: true });
 
         function animateTrail() {
             if (!isTrailAnimating) return;
-
-            // Optimization: If no points left, stop the loop to save battery
             if (points.length === 0) {
                 isTrailAnimating = false;
-                ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear one last time
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 return;
             }
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const strokeColor = getComputedStyle(document.body).getPropertyValue('--trail-color') || '#ffffff';
 
-            ctx.beginPath();
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-
-            for (let i = 0; i < points.length; i++) {
+            
+            // Batch drawing
+            for (let i = 0; i < points.length - 1; i++) {
                 const p = points[i];
-                const nextP = points[i + 1];
-
+                const nextP = points[i+1];
                 p.age++;
-                if (nextP) {
-                    ctx.beginPath();
-                    ctx.moveTo(p.x, p.y);
-                    ctx.lineTo(nextP.x, nextP.y);
-                    
-                    const opacity = 1 - (p.age / maxPoints);
-                    ctx.strokeStyle = strokeColor;
-                    ctx.globalAlpha = opacity;
-                    ctx.lineWidth = (1 - (p.age / maxPoints)) * 6;
-                    ctx.stroke();
-                }
+
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(nextP.x, nextP.y);
+                
+                const opacity = 1 - (p.age / 40);
+                ctx.strokeStyle = strokeColor;
+                ctx.globalAlpha = opacity;
+                ctx.lineWidth = (1 - (p.age / 40)) * 6;
+                ctx.stroke();
             }
-            points = points.filter(p => p.age < maxPoints);
+            points = points.filter(p => p.age < 40);
             requestAnimationFrame(animateTrail);
         }
-        // No initial call to animateTrail() needed, it starts on mousemove.
 
         // --- App Logic ---
         function toggleLanguage() {
@@ -1331,67 +802,58 @@
             const body = document.getElementById('body');
 
             body.classList.toggle('hindi-active', currentLang === 'hi');
-
             document.title = data.tabTitle;
             document.getElementById('label-digital').textContent = data.digital;
             document.getElementById('main-title').textContent = data.title;
-            
             document.getElementById('btn-watch-text').textContent = data.watch;
             document.getElementById('btn-tour-text').textContent = data.tour;
             document.getElementById('btn-gallery-text').textContent = data.gallery; 
-            
             document.getElementById('footer-dynamic').innerHTML = data.footerHtml;
             document.getElementById('btn-archive').textContent = data.archiveBtn;
             document.getElementById('label-read').textContent = data.readLabel;
-            
             document.getElementById('gallery-title-text').textContent = data.galleryTitle;
             
             updateLangButton();
             updateThemeButtonText();
         }
 
-        // --- TOAST FUNCTION ---
         function showToast() {
             const toast = document.getElementById("toast");
             toast.textContent = content[currentLang].comingSoon;
             toast.className = "show";
-            setTimeout(function(){ 
-                toast.className = toast.className.replace("show", ""); 
-            }, 3000);
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
         }
 
-        // --- VIDEO MODAL FUNCTIONS ---
+        // --- OPTIMIZED VIDEO FACADE LOGIC ---
+        function loadVideo(wrapper, videoId) {
+            wrapper.classList.add('video-active');
+            wrapper.innerHTML = `
+                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0" 
+                title="YouTube video player" frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen></iframe>`;
+        }
+
         function openModal(videoCategory) {
             const modal = document.getElementById('videoModal');
             const contentBody = document.getElementById('modal-content-body');
             
-            // Set Modal Title
-            const titleText = videoCategory === 'messages' ? content[currentLang].messagesTitle : content[currentLang].tourTitle;
-            document.getElementById('modal-title-text').textContent = titleText;
+            document.getElementById('modal-title-text').textContent = videoCategory === 'messages' ? content[currentLang].messagesTitle : content[currentLang].tourTitle;
             
-            // Build Video List
             let htmlHTML = '';
             const videos = videoData[videoCategory];
             
             videos.forEach(video => {
-                // Determine label text. If key exists in lang data, use it, else use existing key.
-                // For tour, the key is 'tourTitle' which maps directly. 
-                // For messages, keys are like 'vid_principal'.
                 let labelText = content[currentLang][video.key] || "";
-                
-                // Only show label if it exists (Tour might not need specific sub-label if it's the only one)
                 const labelHtml = labelText ? `<span class="video-label">${labelText}</span>` : '';
 
+                // Render Thumbnail instead of Iframe
                 htmlHTML += `
                     <div class="video-wrapper">
                         ${labelHtml}
-                        <div class="video-box">
-                            <iframe src="https://www.youtube.com/embed/${video.id}?rel=0" 
-                                title="YouTube video player" 
-                                frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen>
-                            </iframe>
+                        <div class="video-facade" onclick="loadVideo(this, '${video.id}')">
+                            <img src="https://img.youtube.com/vi/${video.id}/hqdefault.jpg" loading="lazy" alt="Video Thumbnail">
+                            <div class="play-btn-overlay"></div>
                         </div>
                     </div>
                 `;
@@ -1403,34 +865,26 @@
 
         function closeModal() {
             const modal = document.getElementById('videoModal');
-            const contentBody = document.getElementById('modal-content-body');
-            // Clear content to stop videos from playing in background
-            contentBody.innerHTML = "";
+            document.getElementById('modal-content-body').innerHTML = ""; // Stop videos
             modal.classList.remove('active');
         }
 
-        // --- GALLERY MODAL FUNCTIONS ---
+        // --- Modals General ---
         function openGallery() {
             const modal = document.getElementById('galleryModal');
             document.getElementById('gallery-title-text').textContent = content[currentLang].galleryTitle;
             modal.classList.add('active');
-            
-            // Optimization: Generate images NOW, not on page load
             generateGalleryImages();
-            
             checkGalleryNote();
         }
 
         function closeGallery() {
-            const modal = document.getElementById('galleryModal');
-            modal.classList.remove('active');
+            document.getElementById('galleryModal').classList.remove('active');
         }
 
-        // --- FULLSCREEN IMAGE FUNCTIONS ---
         function openFullscreen(imageSrc) {
             const modal = document.getElementById('fullscreenModal');
-            const img = document.getElementById('fullscreen-img');
-            img.src = imageSrc;
+            document.getElementById('fullscreen-img').src = imageSrc;
             modal.classList.add('active');
         }
 
@@ -1440,25 +894,18 @@
             setTimeout(() => { document.getElementById('fullscreen-img').src = ""; }, 300);
         }
 
-        // --- MODAL EVENT LISTENERS ---
-        document.getElementById('videoModal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('videoModal')) closeModal();
-        });
-        
-        document.getElementById('galleryModal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('galleryModal')) closeGallery();
-        });
+        // --- Event Listeners ---
+        const bindModalClose = (id, func) => {
+            document.getElementById(id).addEventListener('click', (e) => {
+                if (e.target === document.getElementById(id)) func();
+            });
+        };
+        bindModalClose('videoModal', closeModal);
+        bindModalClose('galleryModal', closeGallery);
+        bindModalClose('fullscreenModal', closeFullscreen);
 
-        document.getElementById('fullscreenModal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('fullscreenModal')) closeFullscreen();
-        });
-        
         document.addEventListener('keydown', (e) => {
-            if (e.key === "Escape") {
-                closeModal();
-                closeGallery();
-                closeFullscreen();
-            }
+            if (e.key === "Escape") { closeModal(); closeGallery(); closeFullscreen(); }
         });
     </script>
 </body>
