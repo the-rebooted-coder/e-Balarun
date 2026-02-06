@@ -6,11 +6,11 @@
     
     <title id="tab-title">E-Balarun 2026 | Digital Edition</title>
     <meta name="description" content="Digital Edition of E-Balarun 2026. Watch video messages and take a virtual campus tour.">
-    <meta name="keywords" content="E-Balarun, 2026, Digital Edition, Campus Tour, Jabalpur">
+    <meta name="keywords" content="E-Balarun, 2026, Digital Edition, Campus Tour, Jabalpur, Vande Mataram">
     
     <meta property="og:type" content="website">
     <meta property="og:title" content="E-Balarun 2026 | Digital Edition">
-    <meta property="og:description" content="Experience the Digital Edition of E-Balarun 2026.">
+    <meta property="og:description" content="Experience the Digital Edition of E-Balarun 2026. Celebrating 150 Years of Vande Mataram.">
     <meta property="og:image" content="https://i.ibb.co/rKPF6PHv/og-image.png">
     
     <meta name="twitter:card" content="summary_large_image">
@@ -97,17 +97,48 @@
         }
         #loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
+        .loader-content {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loader-logo, .loader-vande {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            margin: auto;
+            width: 100%; height: auto;
+            object-fit: contain;
+        }
+
         .loader-logo {
-            width: 150px; height: auto;
-            filter: grayscale(100%); 
-            animation: popZoom 2.8s forwards var(--ease-out);
-            will-change: transform, opacity, filter; 
+            /* Initial logo */
+            animation: fadeOutBalarun 0.5s forwards 2s; /* Shows for 2s then fades */
+        }
+
+        .loader-vande {
+            /* Secondary logo - Color preserved */
+            opacity: 0;
+            /* Wait 2s, Fade In (0.5s), Wait 0.5s, then PopZoom (2.5s) */
+            animation: fadeInVande 0.5s forwards 2s, popZoom 2.8s forwards 3s var(--ease-out);
+            will-change: transform, opacity; 
+        }
+
+        @keyframes fadeOutBalarun {
+            to { opacity: 0; transform: scale(0.9); }
+        }
+
+        @keyframes fadeInVande {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         @keyframes popZoom {
-            0% { transform: scale(0.8); filter: grayscale(100%); opacity: 0; }
-            15% { opacity: 1; transform: scale(1); }
-            40% { filter: grayscale(0%); transform: scale(1.1); }
+            0% { transform: scale(1); opacity: 1; }
+            40% { transform: scale(1.1); opacity: 1; }
             70% { transform: scale(0.95); opacity: 1; }
             100% { transform: scale(30); opacity: 0; }
         }
@@ -156,18 +187,58 @@
         }
 
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; width: 100%; }
-        .brand { display: flex; align-items: center; gap: 15px; }
+        
+        /* UPDATED BRAND CARD */
+        .brand { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            
+            /* Card Styling */
+            background-color: #ffffff; /* Always white so logos pop */
+            padding: 10px 20px;
+            border-radius: 50px; /* Rounded pill shape */
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.2); /* Drop shadow */
+            border: 2px solid #333; /* Slight border definition */
+            color: #333; /* Force text to be dark inside the card */
+            transform: rotate(-1deg); /* Slight sketch tilt */
+            transition: transform 0.3s ease;
+        }
+        
+        .brand:hover {
+            transform: scale(1.02) rotate(0deg);
+        }
 
         .logo-sketch {
-            height: 50px; filter: grayscale(1) contrast(1.2);
-            transition: transform 0.4s var(--ease-out), filter 0.4s;
-            transform-origin: center; will-change: transform, filter;
+            height: 50px; 
+            /* Full color by default */
+            transition: transform 0.4s var(--ease-out);
+            transform-origin: center; will-change: transform;
         }
-        .logo-sketch:hover { filter: grayscale(0) contrast(1); transform: scale(1.1) rotate(-2deg); }
+        .logo-sketch:hover { transform: scale(1.1) rotate(-2deg); }
+
+        .logo-vande {
+            height: 55px; 
+            /* Full color by default */
+            transition: transform 0.4s var(--ease-out);
+            transform-origin: center;
+        }
+        .logo-vande:hover { transform: scale(1.1) rotate(2deg); }
+        
+        .brand-separator {
+            font-size: 2rem;
+            color: #ccc;
+            font-weight: 300;
+            margin: 0 5px;
+            font-family: var(--font-body);
+            opacity: 0.8;
+            transform: rotate(5deg);
+        }
 
         .digital-badge {
             font-family: var(--font-title); font-size: 1.5rem; font-weight: 700;
-            border-bottom: 2px solid var(--accent); padding-bottom: 2px; white-space: nowrap;
+            border-bottom: 2px solid #facc15; padding-bottom: 2px; white-space: nowrap;
+            color: #333; /* Dark text inside white card */
         }
 
         .lang-btn {
@@ -453,9 +524,11 @@
         /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
             header { flex-direction: row; gap: 10px; margin-bottom: 2rem; }
-            .brand { gap: 8px; }
+            .brand { gap: 8px; padding: 8px 15px; } /* Adjust padding for mobile */
             .logo-sketch { height: 35px; }
-            .digital-badge { font-size: 1.2rem; }
+            .logo-vande { height: 35px; }
+            .brand-separator { font-size: 1.5rem; }
+            .digital-badge { font-size: 1rem; }
             .lang-btn { padding: 4px 10px; font-size: 1rem; }
             h1 { margin-bottom: 2rem; }
             .cards-container { flex-direction: column; }
@@ -468,7 +541,10 @@
 <body id="body">
     
     <div id="loader">
-        <img src="https://i.ibb.co/ymGmHBXm/balarun-logo.png" alt="Logo" class="loader-logo">
+        <div class="loader-content">
+            <img src="https://i.ibb.co/ymGmHBXm/balarun-logo.png" alt="Logo" class="loader-logo">
+            <img src="vande_mataram.png" alt="Vande Mataram" class="loader-vande">
+        </div>
     </div>
 
     <div id="wipe-overlay">
@@ -508,8 +584,11 @@
         <header>
             <div class="brand">
                 <img src="https://i.ibb.co/ymGmHBXm/balarun-logo.png" alt="Logo" class="logo-sketch">
+                <span class="brand-separator">|</span>
+                <img src="vande_mataram.png" alt="Vande Mataram" class="logo-vande">
                 <span class="digital-badge" id="label-digital">Digital Edition</span>
             </div>
+            
             <button class="lang-btn chalk-border-sm" onclick="toggleLanguage()" id="btn-lang">
                 हिन्दी
             </button>
@@ -628,7 +707,7 @@
                 tourTitle: "Virtual Campus Tour",
                 galleryTitle: "Photo Scrapbook", 
                 langBtn: "हिन्दी",        
-                langBtnMobile: "हिं",      
+                langBtnMobile: "हिं",       
                 footerHtml: 'Published with ❤️ in <span class="loc-text">Jabalpur</span>',
                 themeWhite: "Switch to Whiteboard",
                 themeBlack: "Switch to Blackboard",
@@ -653,7 +732,7 @@
                 messagesTitle: "वीडियो संदेश",
                 tourTitle: "कैंपस का भ्रमण",
                 galleryTitle: "फ़ोटो एल्बम", 
-                langBtn: "English",       
+                langBtn: "English",        
                 langBtnMobile: "En",    
                 footerHtml: '<span class="loc-text">जबलपुर</span> से ❤️ प्रकाशित',
                 themeWhite: "व्हाइटबोर्ड पर जाएं",
@@ -698,10 +777,10 @@
 
         window.addEventListener('load', () => {
             const loader = document.getElementById('loader');
-            // Slight delay to ensure paint is ready
+            // Extended delay for the logo animation
             setTimeout(() => {
                 loader.classList.add('hidden');
-            }, 3000);
+            }, 5500);
         });
 
         // --- Optimized Gallery Logic ---
