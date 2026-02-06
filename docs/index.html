@@ -547,12 +547,65 @@
         .photo-frame:nth-child(3n) { transform: rotate(1.5deg); }
         .photo-frame:hover { transform: scale(1.05) rotate(0deg); z-index: 10; box-shadow: 10px 10px 15px rgba(0,0,0,0.4); }
 
+        /* Shimmer Animation for Placeholders */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
         .photo-placeholder {
-            width: 100%; aspect-ratio: 1/1; background-color: #e5e5e5;
+            width: 100%; aspect-ratio: 1/1; 
+            background: #e5e5e5;
+            /* Gradient for shimmer effect */
+            background-image: linear-gradient(90deg, #e5e5e5 25%, #f0f0f0 50%, #e5e5e5 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
             display: flex; align-items: center; justify-content: center;
             border: 1px solid #ccc; overflow: hidden;
+            position: relative;
         }
-        .photo-placeholder img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .photo-placeholder img { 
+            width: 100%; height: 100%; object-fit: cover; display: block;
+            opacity: 0; /* Hidden initially to show shimmer */
+            transition: opacity 0.5s ease-in;
+        }
+
+        .photo-placeholder img.loaded {
+            opacity: 1; /* Fade in when loaded */
+        }
+
+        /* Load More Button Styling */
+        .load-more-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+            margin-top: 10px;
+        }
+
+        .btn-load-more {
+            background: var(--paper); 
+            border: 2px solid var(--ink); 
+            color: var(--ink);
+            font-family: var(--font-title); 
+            font-size: 1.8rem; 
+            padding: 8px 30px;
+            border-radius: 5px; 
+            cursor: pointer; 
+            transition: all 0.3s;
+            box-shadow: 4px 4px 0px var(--accent);
+        }
+
+        .btn-load-more:hover { 
+            transform: scale(1.05) rotate(-1deg); 
+            box-shadow: 6px 6px 0px var(--accent); 
+        }
+
+        .btn-load-more:active {
+            transform: scale(0.98);
+            box-shadow: 2px 2px 0px var(--accent);
+        }
 
         #fullscreenModal { z-index: 200; background: rgba(0, 0, 0, 0.95); }
         #fullscreenModal img {
@@ -731,6 +784,12 @@
             </div>
             <div class="gallery-grid" id="gallery-grid-content"></div>
             
+            <div class="load-more-container">
+                <button id="btn-load-more" class="btn-load-more" onclick="loadNextGalleryBatch()">
+                    Load More 📸
+                </button>
+            </div>
+
             <div id="gallery-note">
                 <span class="note-close" onclick="dismissGalleryNote()">×</span>
                 🔍 <b>Tip:</b> Click an image to view fullscreen! 📸
@@ -764,6 +823,7 @@
                 archiveBtn: "📂 2021-22 Archive",
                 readLabel: "Click to Read 📖",
                 comingSoon: "Coming Soon 🚧",
+                loadMore: "Load More 📸",
                 
                 // Video Labels
                 vid_principal: "Principal's Message",
@@ -790,6 +850,7 @@
                 archiveBtn: "📂 २०२१-२२ संग्रह",
                 readLabel: "पढ़ने के लिए क्लिक करें 📖",
                 comingSoon: "जल्द आ रहा है 🚧",
+                loadMore: "और देखें 📸",
 
                 // Video Labels
                 vid_principal: "प्राचार्य महोदय का संदेश",
@@ -815,7 +876,11 @@
 
         let currentLang = 'en';
         let isAnimating = false;
-        let galleryLoaded = false; 
+        
+        // Gallery State Variables
+        let currentGalleryIndex = 1;
+        const totalGalleryImages = 189;
+        const galleryBatchSize = 12; // Load 12 images at a time (divisible by 2,3,4)
 
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -875,32 +940,55 @@
             }, { passive: true });
         }
 
-        // --- Optimized Gallery Logic ---
-        function generateGalleryImages() {
-            if (galleryLoaded) return; 
-
+        // --- Optimized Gallery Logic with Batch Loading ---
+        function openGallery() {
+            const modal = document.getElementById('galleryModal');
+            document.getElementById('gallery-title-text').textContent = content[currentLang].galleryTitle;
+            document.getElementById('btn-load-more').textContent = content[currentLang].loadMore;
+            
+            modal.classList.add('active');
+            
+            // Initial load if empty
             const galleryContainer = document.getElementById('gallery-grid-content');
-            const totalImages = 189;
-            // Document Fragment prevents multiple reflows
+            if (galleryContainer.children.length === 0) {
+                loadNextGalleryBatch();
+            }
+            
+            checkGalleryNote();
+        }
+
+        function loadNextGalleryBatch() {
+            const galleryContainer = document.getElementById('gallery-grid-content');
+            const loadMoreBtn = document.getElementById('btn-load-more');
             const fragment = document.createDocumentFragment();
             
-            for (let i = 1; i <= totalImages; i++) {
+            const endIndex = Math.min(currentGalleryIndex + galleryBatchSize - 1, totalGalleryImages);
+            
+            for (let i = currentGalleryIndex; i <= endIndex; i++) {
                 const imagePath = `gallery/e-balarun-gallery (${i}).webp`;
                 
                 const frame = document.createElement('div');
                 frame.className = 'photo-frame';
                 frame.onclick = () => openFullscreen(imagePath);
                 
+                // Added onload handler to remove shimmering/show image
                 frame.innerHTML = `
                     <div class="photo-placeholder">
-                        <img src="${imagePath}" loading="lazy" alt="Gallery Image ${i}">
+                        <img src="${imagePath}" loading="lazy" alt="Gallery Image ${i}" onload="this.classList.add('loaded')">
                     </div>
                 `;
                 fragment.appendChild(frame);
             }
             
             galleryContainer.appendChild(fragment);
-            galleryLoaded = true;
+            currentGalleryIndex = endIndex + 1;
+
+            // Hide button if all images loaded
+            if (currentGalleryIndex > totalGalleryImages) {
+                loadMoreBtn.style.display = 'none';
+            } else {
+                loadMoreBtn.style.display = 'block';
+            }
         }
 
         // --- UI Updates ---
@@ -1098,6 +1186,7 @@
             document.getElementById('btn-archive').textContent = data.archiveBtn;
             document.getElementById('label-read').textContent = data.readLabel;
             document.getElementById('gallery-title-text').textContent = data.galleryTitle;
+            document.getElementById('btn-load-more').textContent = data.loadMore;
             
             updateLangButton();
             updateThemeButtonText();
@@ -1156,14 +1245,6 @@
         }
 
         // --- Modals General ---
-        function openGallery() {
-            const modal = document.getElementById('galleryModal');
-            document.getElementById('gallery-title-text').textContent = content[currentLang].galleryTitle;
-            modal.classList.add('active');
-            generateGalleryImages();
-            checkGalleryNote();
-        }
-
         function closeGallery() {
             document.getElementById('galleryModal').classList.remove('active');
         }
