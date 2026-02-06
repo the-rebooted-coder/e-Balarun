@@ -30,7 +30,7 @@
         :root {
             /* --- THEME VARIABLES --- */
             --paper: #18181b; 
-            --ink: #f4f4f5;   
+            --ink: #f4f4f5;    
             --ink-dim: #a1a1aa;
             --accent: #facc15; 
             --grid-color: #27272a;
@@ -47,7 +47,7 @@
         /* --- THEMES --- */
         body.theme-whiteboard {
             --paper: #fffbeb; 
-            --ink: #1e293b;   
+            --ink: #1e293b;    
             --ink-dim: #64748b;
             --accent: #d97706; 
             --grid-color: #e5e7eb;
@@ -596,8 +596,8 @@
     
     <div id="loader">
         <div class="loader-content">
-            <img src="https://i.ibb.co/ymGmHBXm/balarun-logo.png" alt="Logo" class="loader-logo">
-            <img src="vande_mataram.png" alt="Vande Mataram" class="loader-vande">
+            <img src="https://i.ibb.co/ymGmHBXm/balarun-logo.png" alt="Logo" class="loader-logo" loading="eager">
+            <img src="vande_mataram.png" alt="Vande Mataram" class="loader-vande" loading="eager">
         </div>
     </div>
 
@@ -1010,16 +1010,21 @@
         window.addEventListener('load', () => {
             const loader = document.getElementById('loader');
             
-            // --- FIX: NO MORE 5500ms DELAY ---
-            // Let the animation finish on its own CSS timeline.
-            // The keyframes handle the opacity and scale. 
-            // We just need to remove the element from the DOM after animation completes.
+            // --- FIX START: Optimized Loading Logic ---
+            // Calculate how much time has passed since the page started loading (performance.now()).
+            // The animation sequence (Fade In + Pop Zoom) finishes visually around 3200ms-3500ms.
+            // We ensure the loader stays for AT LEAST 3500ms to let the animation play out.
+            // If the page took longer (e.g., 5000ms), 'remaining' will be 0, and we hide immediately.
+            // This prevents the "blank page" gap where the animation finished but JS was waiting for a fixed timer.
             
-            // The popZoom animation ends at 3.5s total time (1.5s delay + 2s duration approx)
-            // We set a failsafe timeout slightly longer than the CSS animation total duration
+            const timeElapsed = performance.now();
+            const minAnimationTime = 3500; 
+            const remaining = Math.max(0, minAnimationTime - timeElapsed);
+
             setTimeout(() => {
-                 loader.classList.add('hidden');
-            }, 3500); 
+                loader.classList.add('hidden');
+            }, remaining);
+            // --- FIX END ---
 
             // --- OPTIMIZATION: IDLE PRELOADER ---
             setTimeout(() => {
