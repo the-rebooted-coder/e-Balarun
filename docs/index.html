@@ -295,11 +295,12 @@
             background-color: var(--paper);
             border: 2px solid var(--ink);
             box-shadow: 4px 4px 0px var(--accent);
-            padding: 5px 0;
+            padding-bottom: 5px;
             border-radius: 5px 20px 5px 20px;
-            min-width: 150px;
+            min-width: 180px;
             font-family: var(--font-body);
             animation: fadeInMenu 0.1s ease-out;
+            overflow: hidden;
         }
 
         @keyframes fadeInMenu {
@@ -307,8 +308,20 @@
             to { opacity: 1; transform: scale(1); }
         }
 
-        .context-menu-item {
+        .context-menu-header {
+            background-color: var(--ink);
+            color: var(--paper);
             padding: 8px 15px;
+            font-family: var(--font-title);
+            font-size: 1.4rem;
+            font-weight: bold;
+            border-bottom: 2px solid var(--accent);
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .context-menu-item {
+            padding: 10px 15px;
             cursor: pointer;
             color: var(--ink);
             font-weight: bold;
@@ -316,6 +329,7 @@
             align-items: center;
             gap: 10px;
             transition: background 0.2s, color 0.2s;
+            font-size: 1.1rem;
         }
 
         .context-menu-item:hover {
@@ -324,12 +338,9 @@
         }
         
         .context-menu-item.disabled {
-            opacity: 0.5;
-            cursor: default;
-        }
-        .context-menu-item.disabled:hover {
-            background-color: transparent;
-            color: var(--ink);
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
         }
 
         /* --- FOOTER --- */
@@ -475,14 +486,18 @@
     <div id="toast">Coming Soon 🚧</div>
 
     <div id="custom-context-menu">
+        <div class="context-menu-header">E-Balarun</div>
+        
         <div class="context-menu-item" id="ctx-open">
             <svg width="18" height="18" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14L21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
-            Open / View
+            <span id="ctx-open-text">Open / View</span>
         </div>
-        <div class="context-menu-item disabled">
-            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
-            Share (N/A)
+        
+        <div class="context-menu-item" id="ctx-share">
+            <svg width="18" height="18" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            Share
         </div>
+        
         <div class="context-menu-item" onclick="hideContextMenu()">
             <svg width="18" height="18" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
             Close Menu
@@ -803,41 +818,82 @@
 
         function initCustomContextMenu() {
             const contextMenu = document.getElementById('custom-context-menu');
-            const targets = document.querySelectorAll('.ctx-target');
             const openBtn = document.getElementById('ctx-open');
+            const openBtnText = document.getElementById('ctx-open-text');
+            const shareBtn = document.getElementById('ctx-share');
 
-            targets.forEach(target => {
-                target.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                    
-                    // Store the action associated with the right-clicked element
-                    currentContextAction = target.getAttribute('data-action');
-                    
-                    // Calculate position
-                    let x = e.clientX;
-                    let y = e.clientY;
-                    
-                    // Boundary checks
-                    const menuWidth = 150; // min-width
-                    const menuHeight = 100; // estimated height
-                    
-                    if (x + menuWidth > window.innerWidth) x -= menuWidth;
-                    if (y + menuHeight > window.innerHeight) y -= menuHeight;
-                    
-                    contextMenu.style.left = `${x}px`;
-                    contextMenu.style.top = `${y}px`;
-                    contextMenu.style.display = 'block';
-                });
+            // Attach to global document
+            document.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                
+                // Check if the click is on or inside an element with 'data-action'
+                // This allows the "Open" button to be smart
+                const targetElement = e.target.closest('[data-action]');
+                
+                if (targetElement) {
+                    // We are on a specific item (Book, Card, etc.)
+                    currentContextAction = targetElement.getAttribute('data-action');
+                    openBtn.classList.remove('disabled');
+                    openBtnText.textContent = "Open / View"; // Could customize based on action
+                } else {
+                    // We are on the background or generic element
+                    currentContextAction = null;
+                    openBtn.classList.add('disabled');
+                    openBtnText.textContent = "Open (Select Item)";
+                }
+                
+                // Calculate position
+                let x = e.clientX;
+                let y = e.clientY;
+                
+                // Boundary checks
+                const menuWidth = 180;
+                const menuHeight = 150;
+                
+                if (x + menuWidth > window.innerWidth) x -= menuWidth;
+                if (y + menuHeight > window.innerHeight) y -= menuHeight;
+                
+                contextMenu.style.left = `${x}px`;
+                contextMenu.style.top = `${y}px`;
+                contextMenu.style.display = 'block';
             });
 
             // Handle "Open" click
             openBtn.addEventListener('click', () => {
+                if (openBtn.classList.contains('disabled')) return;
+                
                 hideContextMenu();
                 if (currentContextAction) {
                     if (currentContextAction === 'toast') showToast();
                     else if (currentContextAction === 'messages') openModal('messages');
                     else if (currentContextAction === 'tour') openModal('tour');
                     else if (currentContextAction === 'gallery') openGallery();
+                }
+            });
+
+            // Handle "Share" click
+            shareBtn.addEventListener('click', async () => {
+                hideContextMenu();
+                const shareData = {
+                    title: 'E-Balarun 2026',
+                    text: 'Check out the Digital Edition of E-Balarun 2026!',
+                    url: window.location.href
+                };
+
+                // Use Native Share if available (Mobile), else Copy to Clipboard
+                if (navigator.share) {
+                    try { await navigator.share(shareData); } catch (err) { console.log('Share canceled'); }
+                } else {
+                    navigator.clipboard.writeText(window.location.href);
+                    // Show a quick custom toast for "Copied"
+                    const toast = document.getElementById("toast");
+                    const oldText = toast.textContent;
+                    toast.textContent = "Link Copied! 📋";
+                    toast.className = "show";
+                    setTimeout(() => { 
+                        toast.className = toast.className.replace("show", ""); 
+                        setTimeout(() => { toast.textContent = oldText; }, 500); // Reset text
+                    }, 2000);
                 }
             });
 
