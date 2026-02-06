@@ -84,24 +84,24 @@
         }
 
         /* =========================================
-           REFINED LOADER STYLES
+           STRICT BLOCKING LOADER STYLES
            ========================================= */
         #loader {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--paper); /* Matches theme background */
+            background-color: var(--paper); /* Solid background initially */
             z-index: 99999;
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Ensure smooth fade of background color at end */
-            transition: background-color 0.8s ease-out, visibility 0.8s linear;
+            /* Fade out opacity only when told */
+            transition: opacity 0.5s ease-out 0.2s; 
         }
 
         .loader-wrapper {
             position: relative;
-            width: 200px;
-            height: 200px;
+            width: 220px;
+            height: 220px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -112,47 +112,31 @@
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
-            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-            will-change: opacity, transform;
+            transition: opacity 1.2s ease, transform 1.2s ease;
         }
 
-        /* STATE 1: Initial Load */
-        /* Balarun visible, Vande hidden */
+        /* STATE 1: Balarun (Default) */
         #img-balarun { opacity: 1; transform: scale(1); }
-        #img-vande { opacity: 0; transform: scale(0.9); }
+        #img-vande { opacity: 0; transform: scale(0.8); }
 
-        /* STATE 2: Crossfade (.swap-logos) */
-        /* Triggered via JS after delay */
+        /* STATE 2: Swap Logos (Triggered by JS) */
         #loader.swap-logos #img-balarun { opacity: 0; transform: scale(1.1); }
         #loader.swap-logos #img-vande { opacity: 1; transform: scale(1); }
 
-        /* STATE 3: Explosion (.explode-out) */
-        /* Triggered when page load is complete */
+        /* STATE 3: Explode Out (Triggered by JS after page load) */
         #loader.explode-out {
-            background-color: transparent; /* Fade out background */
-            pointer-events: none; /* Let clicks pass through */
+            pointer-events: none;
+            opacity: 0; /* Fade out the background wrapper slightly after zoom starts */
         }
 
         #loader.explode-out #img-vande {
-            /* The Pop Zoom Effect */
-            animation: zoomThrough 0.8s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+            /* This animation expands the logo to create the reveal effect */
+            animation: massiveZoom 0.8s ease-in forwards;
         }
 
-        /* The Zoom Animation */
-        @keyframes zoomThrough {
-            0% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            20% {
-                /* Anticipation: slight shrink before explode */
-                opacity: 1;
-                transform: scale(0.9);
-            }
-            100% {
-                opacity: 0;
-                transform: scale(40); /* Massive scale to simulate going 'through' */
-            }
+        @keyframes massiveZoom {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(50); opacity: 0; }
         }
 
         /* =========================================
@@ -653,26 +637,27 @@
         })();
 
         // --- ANIMATION SEQUENCE LOGIC ---
-        // 1. Minimum display time for Balarun Logo (1.2s)
-        // 2. Minimum display time for Vande Mataram Logo (1.5s)
-        // 3. Page load check
+        // We use flags to coordinate:
+        // 1. Min animation time (1.2s Balarun, 1.2s Vande Mataram)
+        // 2. Page fully loaded state
         
-        let phase1Done = false; // Balarun shown
-        let pageLoaded = false; // Page content ready
+        let phase1Done = false; // Balarun -> Vande Swap happened
+        let pageLoaded = false; // Window load event fired
 
         const loader = document.getElementById('loader');
         
-        // Timer 1: Swap Logo
+        // Step 1: Trigger the Logo Swap (Balarun fades out, Vande fades in)
+        // Background remains SOLID OPAQUE here.
         setTimeout(() => {
-            loader.classList.add('swap-logos'); // Fades Balarun out, Vande in
+            loader.classList.add('swap-logos');
             phase1Done = true;
-            checkFinish();
+            checkFinish(); // Check if page is already loaded
         }, 1200);
 
-        // Window Load Event
+        // Step 2: Listen for page load
         window.addEventListener('load', () => {
             pageLoaded = true;
-            checkFinish();
+            checkFinish(); // Check if animation phase 1 is done
             
             // Background preload for gallery
             setTimeout(() => {
@@ -686,17 +671,19 @@
             }, 3000);
         });
 
+        // Step 3: Coordinate the Finish (Explosion)
         function checkFinish() {
-            // We wait until:
-            // 1. The first logo swap has happened (at 1.2s)
-            // 2. The page is actually loaded
-            // 3. We ensure the Vande Mataram logo has been visible for at least 1s
-            
+            // Only proceed if BOTH the logo swap occurred AND the page is ready.
             if (phase1Done && pageLoaded) {
-                // Add a small buffer to ensure the Vande logo is fully visible before exploding
+                // Wait another 1s to ensure Vande Mataram is fully visible/readable
                 setTimeout(() => {
+                    // Trigger the explosion class.
+                    // This class does 2 things in CSS:
+                    // 1. Scales the Vande logo to 50x (zoom effect)
+                    // 2. Fades the loader background opacity to 0
                     loader.classList.add('explode-out');
-                    // Remove loader from DOM after animation completes to free resources
+                    
+                    // Finally remove the loader from DOM
                     setTimeout(() => { loader.style.display = 'none'; }, 800);
                 }, 1000); 
             }
