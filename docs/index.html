@@ -115,27 +115,17 @@
         }
 
         .loader-logo {
-            /* Initial logo */
-            animation: fadeOutBalarun 0.5s forwards 2s; /* Shows for 2s then fades */
+            animation: fadeOutBalarun 0.5s forwards 2s; 
         }
 
         .loader-vande {
-            /* Secondary logo - Color preserved */
             opacity: 0;
-            /* Wait 2s, Fade In (0.5s), Wait 0.5s, then PopZoom (2.5s) */
             animation: fadeInVande 0.5s forwards 2s, popZoom 2.8s forwards 3s var(--ease-out);
             will-change: transform, opacity; 
         }
 
-        @keyframes fadeOutBalarun {
-            to { opacity: 0; transform: scale(0.9); }
-        }
-
-        @keyframes fadeInVande {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
+        @keyframes fadeOutBalarun { to { opacity: 0; transform: scale(0.9); } }
+        @keyframes fadeInVande { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         @keyframes popZoom {
             0% { transform: scale(1); opacity: 1; }
             40% { transform: scale(1.1); opacity: 1; }
@@ -187,68 +177,34 @@
         }
 
         /* --- HEADER & STICKY LOGIC --- */
-        /* Wrapper for the entire header area (Logo + Lang Button) */
         header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 3rem; 
-            width: 100%; 
-            position: relative; /* Context for children */
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 3rem; width: 100%; position: relative;
         }
         
-        /* Placeholder to prevent layout jump when logo floats */
-        #brand-placeholder {
-            display: none;
-            /* Dimensions are set via JS match */
-        }
+        #brand-placeholder { display: none; }
 
-        /* BRAND CARD (The Floating Pill) */
         .brand { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            
-            /* Card Styling */
-            background-color: #ffffff;
-            padding: 10px 20px;
-            border-radius: 50px;
-            box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
-            border: 2px solid #333;
-            color: #333;
-            transform: rotate(-1deg);
-            transition: all 0.4s var(--ease-out); 
-            z-index: 2000; /* High z-index for floating */
+            display: flex; align-items: center; gap: 15px; 
+            background-color: #ffffff; padding: 10px 20px;
+            border-radius: 50px; box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+            border: 2px solid #333; color: #333;
+            transform: rotate(-1deg); transition: all 0.4s var(--ease-out); 
+            z-index: 2000;
         }
         
-        /* Sticky State for Brand Card */
         .brand.sticky-active {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            /* Translate to center, but also clear any rotation */
+            position: fixed; top: 20px; left: 50%;
             transform: translateX(-50%) rotate(0deg) scale(0.95); 
-            
-            /* Visual tweaks */
             background-color: rgba(255, 255, 255, 0.85); 
-            backdrop-filter: blur(5px);
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
-            border-color: rgba(51, 51, 51, 0.5);
-            cursor: pointer; /* Click to top */
+            backdrop-filter: blur(5px); box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            border-color: rgba(51, 51, 51, 0.5); cursor: pointer;
         }
-
-        .brand:hover {
-            transform: scale(1.02) rotate(0deg);
-        }
-        
-        /* Ensure hover state in sticky mode doesn't break centering */
-        .brand.sticky-active:hover {
-            transform: translateX(-50%) rotate(0deg) scale(1); 
-        }
+        .brand:hover { transform: scale(1.02) rotate(0deg); }
+        .brand.sticky-active:hover { transform: translateX(-50%) rotate(0deg) scale(1); }
 
         .logo-sketch, .logo-vande {
-            height: 50px; 
-            transition: transform 0.4s var(--ease-out);
+            height: 50px; transition: transform 0.4s var(--ease-out);
             transform-origin: center; will-change: transform;
         }
         .logo-vande { height: 55px; }
@@ -256,46 +212,29 @@
         .logo-vande:hover { transform: scale(1.1) rotate(2deg); }
         
         .brand-separator {
-            font-size: 2rem;
-            color: #ccc;
-            font-weight: 300;
-            margin: 0 5px;
-            font-family: var(--font-body);
-            opacity: 0.8;
-            transform: rotate(5deg);
+            font-size: 2rem; color: #ccc; font-weight: 300; margin: 0 5px;
+            font-family: var(--font-body); opacity: 0.8; transform: rotate(5deg);
         }
 
         .digital-badge {
             font-family: var(--font-title); font-size: 1.5rem; font-weight: 700;
             border-bottom: 2px solid #facc15; padding-bottom: 2px; white-space: nowrap;
-            color: #333; 
-            
-            /* Transitions for collapsing */
-            opacity: 1;
-            max-width: 200px;
-            margin-left: 10px;
-            transition: all 0.4s ease;
-            overflow: hidden;
+            color: #333; opacity: 1; max-width: 200px; margin-left: 10px;
+            transition: all 0.4s ease; overflow: hidden;
         }
 
-        /* Hide text in sticky mode */
         .brand.sticky-active .digital-badge {
-            opacity: 0;
-            max-width: 0;
-            margin-left: 0;
-            padding: 0;
-            border: none;
+            opacity: 0; max-width: 0; margin-left: 0; padding: 0; border: none;
         }
 
         .lang-btn {
             background: transparent; font-family: var(--font-hindi); 
             font-weight: 700; font-size: 1.1rem; color: var(--ink);
-            padding: 5px 20px; white-space: nowrap;
-            z-index: 10; /* Lower than sticky brand */
+            padding: 5px 20px; white-space: nowrap; z-index: 10;
         }
         .lang-btn:hover { background: var(--ink); color: var(--paper); transform: rotate(-2deg) scale(1.05); }
 
-        /* --- HERO & 3D BOOK --- */
+        /* --- HERO & BOOK --- */
         .hero { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; padding-bottom: 3rem; }
 
         .book-container {
@@ -303,7 +242,6 @@
             display: flex; justify-content: center; align-items: center;
             margin-bottom: 2rem; z-index: 50; position: relative;
         }
-        
         .book-wrapper { cursor: pointer; text-decoration: none; }
 
         .book {
@@ -314,14 +252,12 @@
             box-shadow: 20px 20px 50px rgba(0,0,0,0.4); 
             will-change: transform;
         }
-
         .book:hover {
             transform: rotateY(0deg) rotateX(0deg) translateZ(30px) scale(1.05);
             box-shadow: 0 40px 60px rgba(0,0,0,0.3);
         }
 
         .book-face { position: absolute; background-color: #fff; backface-visibility: hidden; }
-        
         .book-front {
             width: 220px; height: 310px; transform: translateZ(20px);
             background: #222; border-radius: 2px 4px 4px 2px; overflow: hidden; z-index: 2;
@@ -331,12 +267,10 @@
             content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 30px;
             background: linear-gradient(to right, rgba(255,255,255,0.2) 0%, transparent 100%); pointer-events: none;
         }
-
         .book-spine {
             width: 40px; height: 310px; background: #8B4513; left: -20px;
             transform: rotateY(-90deg) translateZ(0); box-shadow: inset 5px 0 15px rgba(0,0,0,0.3);
         }
-
         .book-pages {
             width: 40px; height: 304px; top: 3px; background: #fdf6e3; right: -20px;
             transform: rotateY(90deg) translateZ(0);
@@ -407,66 +341,35 @@
 
         /* --- CUSTOM CONTEXT MENU --- */
         #custom-context-menu {
-            display: none;
-            position: fixed;
-            z-index: 999999;
-            background-color: var(--paper);
-            border: 2px solid var(--ink);
-            box-shadow: 4px 4px 0px var(--accent);
-            padding-bottom: 5px;
-            border-radius: 5px 20px 5px 20px;
-            min-width: 180px;
-            font-family: var(--font-body);
-            animation: fadeInMenu 0.1s ease-out;
-            overflow: hidden;
+            display: none; position: fixed; z-index: 999999;
+            background-color: var(--paper); border: 2px solid var(--ink);
+            box-shadow: 4px 4px 0px var(--accent); padding-bottom: 5px;
+            border-radius: 5px 20px 5px 20px; min-width: 180px;
+            font-family: var(--font-body); animation: fadeInMenu 0.1s ease-out; overflow: hidden;
         }
 
-        @keyframes fadeInMenu {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
+        @keyframes fadeInMenu { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
         .context-menu-header {
-            background-color: var(--ink);
-            color: var(--paper);
-            padding: 8px 15px;
-            font-family: var(--font-title);
-            font-size: 1.4rem;
-            font-weight: bold;
-            border-bottom: 2px solid var(--accent);
-            text-align: center;
-            letter-spacing: 1px;
+            background-color: var(--ink); color: var(--paper); padding: 8px 15px;
+            font-family: var(--font-title); font-size: 1.4rem; font-weight: bold;
+            border-bottom: 2px solid var(--accent); text-align: center; letter-spacing: 1px;
         }
 
         .context-menu-item {
-            padding: 10px 15px;
-            cursor: pointer;
-            color: var(--ink);
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: background 0.2s, color 0.2s;
+            padding: 10px 15px; cursor: pointer; color: var(--ink); font-weight: bold;
+            display: flex; align-items: center; gap: 10px; transition: background 0.2s, color 0.2s;
             font-size: 1.1rem;
         }
-
-        .context-menu-item:hover {
-            background-color: var(--ink);
-            color: var(--paper);
-        }
-        
-        .context-menu-item.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
+        .context-menu-item:hover { background-color: var(--ink); color: var(--paper); }
+        .context-menu-item.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 
         /* --- FOOTER --- */
         footer {
             border-top: 2px dashed var(--ink-dim); padding-top: 1.5rem;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             font-size: 1.1rem; color: var(--ink-dim); margin-top: auto; text-align: center; gap: 1.5rem;
-            content-visibility: auto; /* Optimization */
+            content-visibility: auto; 
         }
         .footer-actions { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; align-items: center; }
         .loc-text { color: var(--ink); font-weight: 700; text-decoration: underline; text-decoration-style: wavy; text-decoration-color: var(--accent); }
@@ -502,10 +405,9 @@
         .modal-scroll-content::-webkit-scrollbar-track { background: transparent; }
         .modal-scroll-content::-webkit-scrollbar-thumb { background-color: var(--ink-dim); border-radius: 4px; }
 
-        /* Optimized Video Facade */
+        /* Video Facade */
         .video-wrapper { margin-bottom: 2rem; }
         .video-label { font-family: var(--font-title); font-size: 1.5rem; color: var(--accent); margin-bottom: 0.5rem; display: block; }
-        
         .video-facade {
             position: relative; padding-bottom: 56.25%; height: 0; background: #000;
             border: 2px solid var(--ink); cursor: pointer; overflow: hidden;
@@ -524,14 +426,31 @@
             content: ''; border-style: solid; border-width: 10px 0 10px 18px;
             border-color: transparent transparent transparent white;
         }
-        
-        /* Iframe injected after click */
         .video-active iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-        /* --- GALLERY --- */
+        /* --- GALLERY & FILTERS --- */
+        .gallery-filter-bar {
+            display: flex; gap: 10px; overflow-x: auto; padding: 0 5px 15px 5px;
+            border-bottom: 2px dashed var(--ink-dim); margin-bottom: 15px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .gallery-filter-bar::-webkit-scrollbar { display: none; } /* Hide scrollbar for cleaner look */
+
+        .filter-btn {
+            background: transparent; border: 2px solid var(--ink-dim); color: var(--ink-dim);
+            padding: 5px 15px; border-radius: 20px; font-family: var(--font-body); font-weight: bold;
+            cursor: pointer; white-space: nowrap; transition: all 0.2s ease;
+        }
+        .filter-btn:hover { border-color: var(--ink); color: var(--ink); }
+        
+        .filter-btn.active {
+            background: var(--ink); color: var(--paper); border-color: var(--ink);
+            box-shadow: 2px 2px 0 var(--accent); transform: translateY(-2px);
+        }
+
         .gallery-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem; padding: 1rem; overflow-y: auto; border-top: 2px dashed var(--ink-dim);
+            gap: 2rem; padding: 1rem; overflow-y: auto; 
             content-visibility: auto; overscroll-behavior: contain;
         }
         .gallery-grid::-webkit-scrollbar { width: 8px; }
@@ -547,7 +466,7 @@
         .photo-frame:nth-child(3n) { transform: rotate(1.5deg); }
         .photo-frame:hover { transform: scale(1.05) rotate(0deg); z-index: 10; box-shadow: 10px 10px 15px rgba(0,0,0,0.4); }
 
-        /* Shimmer Animation for Placeholders */
+        /* Shimmer Animation */
         @keyframes shimmer {
             0% { background-position: -200% 0; }
             100% { background-position: 200% 0; }
@@ -556,7 +475,6 @@
         .photo-placeholder {
             width: 100%; aspect-ratio: 1/1; 
             background: #e5e5e5;
-            /* Gradient for shimmer effect */
             background-image: linear-gradient(90deg, #e5e5e5 25%, #f0f0f0 50%, #e5e5e5 75%);
             background-size: 200% 100%;
             animation: shimmer 1.5s infinite;
@@ -567,45 +485,22 @@
 
         .photo-placeholder img { 
             width: 100%; height: 100%; object-fit: cover; display: block;
-            opacity: 0; /* Hidden initially to show shimmer */
-            transition: opacity 0.5s ease-in;
+            opacity: 0; transition: opacity 0.5s ease-in;
         }
+        .photo-placeholder img.loaded { opacity: 1; }
 
-        .photo-placeholder img.loaded {
-            opacity: 1; /* Fade in when loaded */
-        }
-
-        /* Load More Button Styling */
         .load-more-container {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            padding: 20px 0;
-            margin-top: 10px;
+            width: 100%; display: flex; justify-content: center; padding: 20px 0; margin-top: 10px;
         }
-
         .btn-load-more {
-            background: var(--paper); 
-            border: 2px solid var(--ink); 
-            color: var(--ink);
-            font-family: var(--font-title); 
-            font-size: 1.8rem; 
-            padding: 8px 30px;
-            border-radius: 5px; 
-            cursor: pointer; 
-            transition: all 0.3s;
+            background: var(--paper); border: 2px solid var(--ink); color: var(--ink);
+            font-family: var(--font-title); font-size: 1.8rem; padding: 8px 30px;
+            border-radius: 5px; cursor: pointer; transition: all 0.3s;
             box-shadow: 4px 4px 0px var(--accent);
         }
-
-        .btn-load-more:hover { 
-            transform: scale(1.05) rotate(-1deg); 
-            box-shadow: 6px 6px 0px var(--accent); 
-        }
-
-        .btn-load-more:active {
-            transform: scale(0.98);
-            box-shadow: 2px 2px 0px var(--accent);
-        }
+        .btn-load-more:hover { transform: scale(1.05) rotate(-1deg); box-shadow: 6px 6px 0px var(--accent); }
+        .btn-load-more:active { transform: scale(0.98); box-shadow: 2px 2px 0px var(--accent); }
+        .btn-load-more.hidden { display: none; }
 
         #fullscreenModal { z-index: 200; background: rgba(0, 0, 0, 0.95); }
         #fullscreenModal img {
@@ -624,9 +519,8 @@
         /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
             header { flex-direction: row; gap: 10px; margin-bottom: 2rem; }
-            .brand { gap: 8px; padding: 8px 15px; } /* Adjust padding for mobile */
-            .logo-sketch { height: 35px; }
-            .logo-vande { height: 35px; }
+            .brand { gap: 8px; padding: 8px 15px; } 
+            .logo-sketch, .logo-vande { height: 35px; }
             .brand-separator { font-size: 1.5rem; }
             .digital-badge { font-size: 1rem; }
             .lang-btn { padding: 4px 10px; font-size: 1rem; }
@@ -663,17 +557,14 @@
 
     <div id="custom-context-menu">
         <div class="context-menu-header">E-Balarun</div>
-        
         <div class="context-menu-item" id="ctx-open">
             <svg width="18" height="18" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14L21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
             <span id="ctx-open-text">Open / View</span>
         </div>
-        
         <div class="context-menu-item" id="ctx-share">
             <svg width="18" height="18" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
             Share
         </div>
-        
         <div class="context-menu-item" onclick="hideContextMenu()">
             <svg width="18" height="18" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
             Close Menu
@@ -681,29 +572,22 @@
     </div>
 
     <div class="container">
-        
         <header id="main-header">
             <div id="brand-placeholder"></div>
-
             <div class="brand" id="floating-pill">
                 <img src="https://i.ibb.co/ymGmHBXm/balarun-logo.png" alt="Logo" class="logo-sketch">
                 <span class="brand-separator">|</span>
                 <img src="vande_mataram.png" alt="Vande Mataram" class="logo-vande">
                 <span class="digital-badge" id="label-digital">Digital Edition</span>
             </div>
-            
-            <button class="lang-btn chalk-border-sm" onclick="toggleLanguage()" id="btn-lang">
-                हिन्दी
-            </button>
+            <button class="lang-btn chalk-border-sm" onclick="toggleLanguage()" id="btn-lang">हिन्दी</button>
         </header>
 
         <main class="hero">
             <div class="book-container ctx-target" data-action="toast">
                 <div class="book-wrapper" onclick="showToast()">
                     <div class="book">
-                        <div class="book-face book-front">
-                            <img src="150_Poster.jpg" alt="E-Balarun Poster Cover">
-                        </div>
+                        <div class="book-face book-front"><img src="150_Poster.jpg" alt="E-Balarun Poster Cover"></div>
                         <div class="book-face book-spine"></div>
                         <div class="book-face book-pages"></div>
                         <div class="book-face book-back"></div>
@@ -716,47 +600,25 @@
 
             <div class="cards-container">
                 <div class="sketch-card chalk-border-1 ctx-target" data-action="messages" onclick="openModal('messages')">
-                    <div class="card-icon">
-                        <svg width="40" height="40" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z" /></svg>
-                    </div>
+                    <div class="card-icon"><svg width="40" height="40" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z" /></svg></div>
                     <div class="card-title" id="btn-watch-text">Video Messages</div>
                 </div>
-
                 <div class="sketch-card chalk-border-2 ctx-target" data-action="tour" onclick="openModal('tour')">
-                    <div class="card-icon">
-                        <svg width="40" height="40" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="3" />
-                            <path d="M12 2C7.5 2 4 5.5 4 10c0 5 8 12 8 12s8-7 8-12c0-4.5-3.5-8-8-8z" />
-                        </svg>
-                    </div>
+                    <div class="card-icon"><svg width="40" height="40" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M12 2C7.5 2 4 5.5 4 10c0 5 8 12 8 12s8-7 8-12c0-4.5-3.5-8-8-8z" /></svg></div>
                     <div class="card-title" id="btn-tour-text">Campus Tour</div>
                 </div>
-
                 <div class="sketch-card chalk-border-1 ctx-target" data-action="gallery" onclick="openGallery()">
-                    <div class="card-icon">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                            <circle cx="12" cy="13" r="4"></circle>
-                        </svg>
-                    </div>
+                    <div class="card-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></div>
                     <div class="card-title" id="btn-gallery-text">Image Gallery</div>
                 </div>
             </div>
         </main>
 
         <footer>
-            <div id="footer-dynamic">
-                Published with ❤️ in <span class="loc-text">Jabalpur</span>
-            </div>
-            
+            <div id="footer-dynamic">Published with ❤️ in <span class="loc-text">Jabalpur</span></div>
             <div class="footer-actions">
-                <a href="https://the-rebooted-coder.github.io/e-Balarun/archive" class="archive-btn" id="btn-archive">
-                    📂 2021-22 Archive
-                </a>
-
-                <button class="theme-toggle-btn" id="btn-theme-toggle" onclick="toggleTheme()">
-                    Switch to Whiteboard
-                </button>
+                <a href="https://the-rebooted-coder.github.io/e-Balarun/archive" class="archive-btn" id="btn-archive">📂 2021-22 Archive</a>
+                <button class="theme-toggle-btn" id="btn-theme-toggle" onclick="toggleTheme()">Switch to Whiteboard</button>
             </div>
         </footer>
     </div>
@@ -765,12 +627,9 @@
         <div class="modal-paper">
             <div class="modal-header">
                 <span class="modal-title" id="modal-title-text">Playing Video...</span>
-                <button class="close-btn" onclick="closeModal()">
-                    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" /></svg>
-                </button>
+                <button class="close-btn" onclick="closeModal()"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" /></svg></button>
             </div>
-            <div id="modal-content-body" class="modal-scroll-content">
-                </div>
+            <div id="modal-content-body" class="modal-scroll-content"></div>
         </div>
     </div>
 
@@ -778,16 +637,21 @@
         <div class="modal-paper" style="max-width: 900px;">
             <div class="modal-header">
                 <span class="modal-title" id="gallery-title-text">Photo Scrapbook</span>
-                <button class="close-btn" onclick="closeGallery()">
-                    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" /></svg>
-                </button>
+                <button class="close-btn" onclick="closeGallery()"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" /></svg></button>
             </div>
+            
+            <div class="gallery-filter-bar">
+                <button class="filter-btn active" data-filter="all" onclick="applyFilter('all')">All</button>
+                <button class="filter-btn" data-filter="campus" onclick="applyFilter('campus')">Campus & Art</button>
+                <button class="filter-btn" data-filter="portraits" onclick="applyFilter('portraits')">Solos</button>
+                <button class="filter-btn" data-filter="groups" onclick="applyFilter('groups')">Buddies</button>
+                <button class="filter-btn" data-filter="crowd" onclick="applyFilter('crowd')">Class Photos</button>
+            </div>
+
             <div class="gallery-grid" id="gallery-grid-content"></div>
             
             <div class="load-more-container">
-                <button id="btn-load-more" class="btn-load-more" onclick="loadNextGalleryBatch()">
-                    Load More 📸
-                </button>
+                <button id="btn-load-more" class="btn-load-more" onclick="loadNextGalleryBatch()">Load More 📸</button>
             </div>
 
             <div id="gallery-note">
@@ -815,22 +679,20 @@
                 messagesTitle: "Video Messages",
                 tourTitle: "Virtual Campus Tour",
                 galleryTitle: "Photo Scrapbook", 
-                langBtn: "हिन्दी",        
-                langBtnMobile: "हिं",       
+                langBtn: "हिन्दी", langBtnMobile: "हिं",       
                 footerHtml: 'Published with ❤️ in <span class="loc-text">Jabalpur</span>',
-                themeWhite: "Switch to Whiteboard",
-                themeBlack: "Switch to Blackboard",
-                archiveBtn: "📂 2021-22 Archive",
-                readLabel: "Click to Read 📖",
-                comingSoon: "Coming Soon 🚧",
-                loadMore: "Load More 📸",
+                themeWhite: "Switch to Whiteboard", themeBlack: "Switch to Blackboard",
+                archiveBtn: "📂 2021-22 Archive", readLabel: "Click to Read 📖",
+                comingSoon: "Coming Soon 🚧", loadMore: "Load More 📸",
                 
                 // Video Labels
-                vid_principal: "Principal's Message",
-                vid_editor: "Editor's Message",
-                vid_teacher: "Teacher's Message",
-                vid_ex_teacher: "Ex-Teacher's Message",
-                vid_ex_trainee: "Ex-Trainee Teacher's Message"
+                vid_principal: "Principal's Message", vid_editor: "Editor's Message",
+                vid_teacher: "Teacher's Message", vid_ex_teacher: "Ex-Teacher's Message",
+                vid_ex_trainee: "Ex-Trainee Teacher's Message",
+
+                // Filters
+                filterAll: "All", filterCampus: "Campus & Art",
+                filterSolos: "Solos", filterGroups: "Buddies", filterCrowd: "Class Photos"
             },
             hi: {
                 tabTitle: "ई-बालारुण २०२६ | डिजिटल संस्करण",
@@ -842,93 +704,73 @@
                 messagesTitle: "वीडियो संदेश",
                 tourTitle: "कैंपस का भ्रमण",
                 galleryTitle: "फ़ोटो एल्बम", 
-                langBtn: "English",        
-                langBtnMobile: "En",    
+                langBtn: "English", langBtnMobile: "En",    
                 footerHtml: '<span class="loc-text">जबलपुर</span> से ❤️ प्रकाशित',
-                themeWhite: "व्हाइटबोर्ड पर जाएं",
-                themeBlack: "ब्लैकबोर्ड पर जाएं",
-                archiveBtn: "📂 २०२१-२२ संग्रह",
-                readLabel: "पढ़ने के लिए क्लिक करें 📖",
-                comingSoon: "जल्द आ रहा है 🚧",
-                loadMore: "और देखें 📸",
+                themeWhite: "व्हाइटबोर्ड पर जाएं", themeBlack: "ब्लैकबोर्ड पर जाएं",
+                archiveBtn: "📂 २०२१-२२ संग्रह", readLabel: "पढ़ने के लिए क्लिक करें 📖",
+                comingSoon: "जल्द आ रहा है 🚧", loadMore: "और देखें 📸",
 
                 // Video Labels
-                vid_principal: "प्राचार्य महोदय का संदेश",
-                vid_editor: "संपादक का संदेश",
-                vid_teacher: "दीदी का संदेश",
-                vid_ex_teacher: "पूर्व दीदी का संदेश",
-                vid_ex_trainee: "पूर्व प्रशिक्षु दीदी का संदेश"
+                vid_principal: "प्राचार्य महोदय का संदेश", vid_editor: "संपादक का संदेश",
+                vid_teacher: "दीदी का संदेश", vid_ex_teacher: "पूर्व दीदी का संदेश",
+                vid_ex_trainee: "पूर्व प्रशिक्षु दीदी का संदेश",
+
+                // Filters
+                filterAll: "सभी", filterCampus: "परिसर और कला",
+                filterSolos: "एकल", filterGroups: "मित्र", filterCrowd: "कक्षा फोटो"
             }
         };
 
         const videoData = {
             messages: [
-                { key: 'vid_principal', id: 'CzQg5KaU26g' },
-                { key: 'vid_editor', id: 'y6bLJ6j2EBg' },
-                { key: 'vid_teacher', id: 'p4AuVkiJIzg' },
-                { key: 'vid_ex_teacher', id: 'ZkiOgR5EH1c' },
+                { key: 'vid_principal', id: 'CzQg5KaU26g' }, { key: 'vid_editor', id: 'y6bLJ6j2EBg' },
+                { key: 'vid_teacher', id: 'p4AuVkiJIzg' }, { key: 'vid_ex_teacher', id: 'ZkiOgR5EH1c' },
                 { key: 'vid_ex_trainee', id: 'aHu-F3yuaKE' }
             ],
-            tour: [
-                { key: 'tourTitle', id: '2Zbh6GzVhmo' }
-            ]
+            tour: [{ key: 'tourTitle', id: '2Zbh6GzVhmo' }]
         };
 
         let currentLang = 'en';
         let isAnimating = false;
         
-        // Gallery State Variables
-        let currentGalleryIndex = 1;
-        const totalGalleryImages = 189;
-        const galleryBatchSize = 12; // Load 12 images at a time (divisible by 2,3,4)
+        // --- SMART GALLERY VARIABLES ---
+        let galleryData = [];          // Holds the full JSON
+        let filteredImages = [];       // Holds the currently active list
+        let currentGalleryIndex = 0;   // Where are we in the filtered list?
+        const galleryBatchSize = 12;
+        let galleryInitialized = false;
 
-        // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
             checkMobileNote();
             updateLangButton(); 
             updateThemeButtonText();
-            initCustomContextMenu(); // Initialize Context Menu
-            initStickyHeader(); // Initialize Sticky Header
+            initCustomContextMenu();
+            initStickyHeader();
         });
 
         window.addEventListener('load', () => {
             const loader = document.getElementById('loader');
-            // Extended delay for the logo animation
-            setTimeout(() => {
-                loader.classList.add('hidden');
-            }, 5500);
+            setTimeout(() => { loader.classList.add('hidden'); }, 5500);
         });
 
-        // --- STICKY HEADER LOGIC ---
+        // --- Sticky Header Logic ---
         function initStickyHeader() {
             const pill = document.getElementById('floating-pill');
             const placeholder = document.getElementById('brand-placeholder');
-            const threshold = 50; // Scroll amount before sticking
-
-            // Scroll to Top Logic
+            const threshold = 50; 
             pill.addEventListener('click', () => {
-                if (pill.classList.contains('sticky-active')) {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
+                if (pill.classList.contains('sticky-active')) window.scrollTo({ top: 0, behavior: 'smooth' });
             });
-
             window.addEventListener('scroll', () => {
-                // Requirement: Header should not detach if page is very little scrollable
-                // We check if the total scrollable height is significantly larger than viewport
                 const docHeight = document.documentElement.scrollHeight;
                 const winHeight = window.innerHeight;
-                
-                // If content is barely larger than screen (buffer 200px), don't stick
                 if (docHeight <= winHeight + 200) return;
-
                 if (window.scrollY > threshold) {
                     if (!pill.classList.contains('sticky-active')) {
-                        // Capture dimensions before fixing
                         const rect = pill.getBoundingClientRect();
                         placeholder.style.width = rect.width + 'px';
                         placeholder.style.height = rect.height + 'px';
                         placeholder.style.display = 'block';
-                        
                         pill.classList.add('sticky-active');
                     }
                 } else {
@@ -940,21 +782,61 @@
             }, { passive: true });
         }
 
-        // --- Optimized Gallery Logic with Batch Loading ---
-        function openGallery() {
+        // --- SMART GALLERY LOGIC ---
+        async function openGallery() {
             const modal = document.getElementById('galleryModal');
-            document.getElementById('gallery-title-text').textContent = content[currentLang].galleryTitle;
-            document.getElementById('btn-load-more').textContent = content[currentLang].loadMore;
-            
+            updateGalleryText();
             modal.classList.add('active');
+            checkGalleryNote();
+
+            // Load JSON only once
+            if (!galleryInitialized) {
+                try {
+                    const response = await fetch('gallery-map.json');
+                    if (!response.ok) throw new Error("JSON not found");
+                    galleryData = await response.json();
+                    
+                    // Initial State: All images
+                    filteredImages = galleryData;
+                    galleryInitialized = true;
+                    loadNextGalleryBatch(); 
+                } catch (e) {
+                    console.error("Could not load smart gallery, falling back to basic...", e);
+                    // Fallback if JSON missing: create dummy data for 1-189
+                    galleryData = [];
+                    for(let i=1; i<=189; i++) {
+                        galleryData.append({ src: `e-balarun-gallery (${i}).webp`, category: 'all' });
+                    }
+                    filteredImages = galleryData;
+                    loadNextGalleryBatch();
+                }
+            }
+        }
+
+        function applyFilter(category) {
+            // Update UI
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === category);
+            });
+
+            // Filter Data
+            if (category === 'all') {
+                filteredImages = galleryData;
+            } else {
+                filteredImages = galleryData.filter(img => img.category === category);
+            }
+
+            // Reset Grid
+            document.getElementById('gallery-grid-content').innerHTML = '';
+            currentGalleryIndex = 0;
             
-            // Initial load if empty
-            const galleryContainer = document.getElementById('gallery-grid-content');
-            if (galleryContainer.children.length === 0) {
+            // Check if empty
+            if (filteredImages.length === 0) {
+                document.getElementById('gallery-grid-content').innerHTML = '<div style="grid-column: 1/-1; text-align: center; opacity: 0.5;">No images found in this category.</div>';
+                document.getElementById('btn-load-more').style.display = 'none';
+            } else {
                 loadNextGalleryBatch();
             }
-            
-            checkGalleryNote();
         }
 
         function loadNextGalleryBatch() {
@@ -962,214 +844,56 @@
             const loadMoreBtn = document.getElementById('btn-load-more');
             const fragment = document.createDocumentFragment();
             
-            const endIndex = Math.min(currentGalleryIndex + galleryBatchSize - 1, totalGalleryImages);
+            // Calculate slice
+            const nextIndex = Math.min(currentGalleryIndex + galleryBatchSize, filteredImages.length);
+            const batch = filteredImages.slice(currentGalleryIndex, nextIndex);
             
-            for (let i = currentGalleryIndex; i <= endIndex; i++) {
-                const imagePath = `gallery/e-balarun-gallery (${i}).webp`;
+            batch.forEach(imgObj => {
+                const imagePath = `gallery/${imgObj.src}`;
                 
                 const frame = document.createElement('div');
                 frame.className = 'photo-frame';
                 frame.onclick = () => openFullscreen(imagePath);
                 
-                // Added onload handler to remove shimmering/show image
                 frame.innerHTML = `
                     <div class="photo-placeholder">
-                        <img src="${imagePath}" loading="lazy" alt="Gallery Image ${i}" onload="this.classList.add('loaded')">
+                        <img src="${imagePath}" loading="lazy" alt="Gallery Image" onload="this.classList.add('loaded')">
                     </div>
                 `;
                 fragment.appendChild(frame);
-            }
+            });
             
             galleryContainer.appendChild(fragment);
-            currentGalleryIndex = endIndex + 1;
+            currentGalleryIndex = nextIndex;
 
-            // Hide button if all images loaded
-            if (currentGalleryIndex > totalGalleryImages) {
+            // Button visibility
+            if (currentGalleryIndex >= filteredImages.length) {
                 loadMoreBtn.style.display = 'none';
             } else {
                 loadMoreBtn.style.display = 'block';
             }
         }
 
-        // --- UI Updates ---
-        function updateLangButton() {
-            const btn = document.getElementById('btn-lang');
+        function updateGalleryText() {
             const data = content[currentLang];
-            const isMobile = window.innerWidth <= 768;
-            btn.textContent = isMobile ? data.langBtnMobile : data.langBtn;
-        }
-
-        let resizeTimer;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(updateLangButton, 100);
-        }, { passive: true });
-
-        // --- Local Storage Checks ---
-        function checkMobileNote() {
-            if (localStorage.getItem('mobileNoteDismissed') === 'true') {
-                document.getElementById('mobile-note').style.display = 'none'; 
-            }
-        }
-        function dismissMobileNote() {
-            document.getElementById('mobile-note').style.display = 'none';
-            localStorage.setItem('mobileNoteDismissed', 'true');
-        }
-        function checkGalleryNote() {
-            const note = document.getElementById('gallery-note');
-            note.style.display = (localStorage.getItem('galleryNoteDismissed') !== 'true') ? 'block' : 'none';
-        }
-        function dismissGalleryNote() {
-            document.getElementById('gallery-note').style.display = 'none';
-            localStorage.setItem('galleryNoteDismissed', 'true');
-        }
-        
-        // --- Theme Toggle ---
-        function toggleTheme() {
-            if (isAnimating) return; 
-            isAnimating = true;
-
-            const body = document.body;
-            const wipeOverlay = document.getElementById('wipe-overlay');
-            const duster = document.getElementById('duster');
+            document.getElementById('gallery-title-text').textContent = data.galleryTitle;
+            document.getElementById('btn-load-more').textContent = data.loadMore;
             
-            const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            let isCurrentlyBlack = body.classList.contains('theme-blackboard') || (!body.classList.contains('theme-whiteboard') && sysDark);
-
-            const targetClass = isCurrentlyBlack ? 'theme-whiteboard' : 'theme-blackboard';
-            // Pre-calculate colors to avoid getComputedStyle thrashing inside animation
-            const targetPaperColor = isCurrentlyBlack ? '#fffbeb' : '#18181b'; 
-            const targetGridColor = isCurrentlyBlack ? '#e5e7eb' : '#27272a'; 
-
-            wipeOverlay.style.backgroundColor = targetPaperColor;
-            wipeOverlay.style.backgroundImage = `
-                linear-gradient(${targetGridColor} 1px, transparent 1px),
-                linear-gradient(90deg, ${targetGridColor} 1px, transparent 1px)
-            `;
-            duster.style.display = 'block';
-
-            const animation = wipeOverlay.animate(
-                [{ width: '0%' }, { width: '100%' }],
-                { duration: 1000, easing: 'cubic-bezier(0.25, 1, 0.5, 1)', fill: 'forwards' }
-            );
-
-            animation.onfinish = () => {
-                body.classList.remove('theme-whiteboard', 'theme-blackboard');
-                body.classList.add(targetClass);
-                updateThemeButtonText();
-                animation.cancel();
-                wipeOverlay.style.width = '0%'; 
-                duster.style.display = 'none';
-                isAnimating = false;
+            // Update Filter Button Text
+            const filters = {
+                'all': data.filterAll,
+                'campus': data.filterCampus,
+                'portraits': data.filterSolos,
+                'groups': data.filterGroups,
+                'crowd': data.filterCrowd
             };
-        }
-
-        function updateThemeButtonText() {
-            const body = document.body;
-            const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            let isDark = body.classList.contains('theme-blackboard') || (!body.classList.contains('theme-whiteboard') && sysDark);
             
-            document.getElementById('btn-theme-toggle').textContent = isDark ? content[currentLang].themeWhite : content[currentLang].themeBlack;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                const key = btn.dataset.filter;
+                if (filters[key]) btn.textContent = filters[key];
+            });
         }
 
-        // --- Custom Context Menu Logic ---
-        let currentContextAction = null;
-
-        function initCustomContextMenu() {
-            const contextMenu = document.getElementById('custom-context-menu');
-            const openBtn = document.getElementById('ctx-open');
-            const openBtnText = document.getElementById('ctx-open-text');
-            const shareBtn = document.getElementById('ctx-share');
-
-            // Attach to global document
-            document.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                
-                // Check if the click is on or inside an element with 'data-action'
-                // This allows the "Open" button to be smart
-                const targetElement = e.target.closest('[data-action]');
-                
-                if (targetElement) {
-                    // We are on a specific item (Book, Card, etc.)
-                    currentContextAction = targetElement.getAttribute('data-action');
-                    openBtn.classList.remove('disabled');
-                    openBtnText.textContent = "Open / View"; // Could customize based on action
-                } else {
-                    // We are on the background or generic element
-                    currentContextAction = null;
-                    openBtn.classList.add('disabled');
-                    openBtnText.textContent = "Open (Select Item)";
-                }
-                
-                // Calculate position
-                let x = e.clientX;
-                let y = e.clientY;
-                
-                // Boundary checks
-                const menuWidth = 180;
-                const menuHeight = 150;
-                
-                if (x + menuWidth > window.innerWidth) x -= menuWidth;
-                if (y + menuHeight > window.innerHeight) y -= menuHeight;
-                
-                contextMenu.style.left = `${x}px`;
-                contextMenu.style.top = `${y}px`;
-                contextMenu.style.display = 'block';
-            });
-
-            // Handle "Open" click
-            openBtn.addEventListener('click', () => {
-                if (openBtn.classList.contains('disabled')) return;
-                
-                hideContextMenu();
-                if (currentContextAction) {
-                    if (currentContextAction === 'toast') showToast();
-                    else if (currentContextAction === 'messages') openModal('messages');
-                    else if (currentContextAction === 'tour') openModal('tour');
-                    else if (currentContextAction === 'gallery') openGallery();
-                }
-            });
-
-            // Handle "Share" click
-            shareBtn.addEventListener('click', async () => {
-                hideContextMenu();
-                const shareData = {
-                    title: 'E-Balarun 2026',
-                    text: 'Check out the Digital Edition of E-Balarun 2026!',
-                    url: window.location.href
-                };
-
-                // Use Native Share if available (Mobile), else Copy to Clipboard
-                if (navigator.share) {
-                    try { await navigator.share(shareData); } catch (err) { console.log('Share canceled'); }
-                } else {
-                    navigator.clipboard.writeText(window.location.href);
-                    // Show a quick custom toast for "Copied"
-                    const toast = document.getElementById("toast");
-                    const oldText = toast.textContent;
-                    toast.textContent = "Link Copied! 📋";
-                    toast.className = "show";
-                    setTimeout(() => { 
-                        toast.className = toast.className.replace("show", ""); 
-                        setTimeout(() => { toast.textContent = oldText; }, 500); // Reset text
-                    }, 2000);
-                }
-            });
-
-            // Hide menu on any click outside
-            document.addEventListener('click', (e) => {
-                if (!contextMenu.contains(e.target)) hideContextMenu();
-            });
-
-            // Hide menu on scroll
-            window.addEventListener('scroll', hideContextMenu, { passive: true });
-        }
-
-        function hideContextMenu() {
-            document.getElementById('custom-context-menu').style.display = 'none';
-        }
-
-        // --- App Logic ---
         function toggleLanguage() {
             currentLang = currentLang === 'en' ? 'hi' : 'en';
             const data = content[currentLang];
@@ -1185,11 +909,18 @@
             document.getElementById('footer-dynamic').innerHTML = data.footerHtml;
             document.getElementById('btn-archive').textContent = data.archiveBtn;
             document.getElementById('label-read').textContent = data.readLabel;
-            document.getElementById('gallery-title-text').textContent = data.galleryTitle;
-            document.getElementById('btn-load-more').textContent = data.loadMore;
             
+            updateGalleryText(); // Updates gallery specific text
             updateLangButton();
             updateThemeButtonText();
+        }
+
+        // --- Standard UI Helper Functions ---
+        function updateLangButton() {
+            const btn = document.getElementById('btn-lang');
+            const data = content[currentLang];
+            const isMobile = window.innerWidth <= 768;
+            btn.textContent = isMobile ? data.langBtnMobile : data.langBtn;
         }
 
         function showToast() {
@@ -1199,81 +930,146 @@
             setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
         }
 
-        // --- OPTIMIZED VIDEO FACADE LOGIC ---
         function loadVideo(wrapper, videoId) {
             wrapper.classList.add('video-active');
-            wrapper.innerHTML = `
-                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0" 
-                title="YouTube video player" frameborder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowfullscreen></iframe>`;
+            wrapper.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
         }
 
         function openModal(videoCategory) {
             const modal = document.getElementById('videoModal');
             const contentBody = document.getElementById('modal-content-body');
-            
             document.getElementById('modal-title-text').textContent = videoCategory === 'messages' ? content[currentLang].messagesTitle : content[currentLang].tourTitle;
-            
             let htmlHTML = '';
             const videos = videoData[videoCategory];
-            
             videos.forEach(video => {
                 let labelText = content[currentLang][video.key] || "";
                 const labelHtml = labelText ? `<span class="video-label">${labelText}</span>` : '';
-
-                // Render Thumbnail instead of Iframe
-                htmlHTML += `
-                    <div class="video-wrapper">
-                        ${labelHtml}
-                        <div class="video-facade" onclick="loadVideo(this, '${video.id}')">
-                            <img src="https://img.youtube.com/vi/${video.id}/hqdefault.jpg" loading="lazy" alt="Video Thumbnail">
-                            <div class="play-btn-overlay"></div>
-                        </div>
-                    </div>
-                `;
+                htmlHTML += `<div class="video-wrapper">${labelHtml}<div class="video-facade" onclick="loadVideo(this, '${video.id}')"><img src="https://img.youtube.com/vi/${video.id}/hqdefault.jpg" loading="lazy" alt="Video Thumbnail"><div class="play-btn-overlay"></div></div></div>`;
             });
-
             contentBody.innerHTML = htmlHTML;
             modal.classList.add('active');
         }
 
         function closeModal() {
-            const modal = document.getElementById('videoModal');
-            document.getElementById('modal-content-body').innerHTML = ""; // Stop videos
-            modal.classList.remove('active');
+            document.getElementById('videoModal').classList.remove('active');
+            document.getElementById('modal-content-body').innerHTML = ""; 
         }
 
-        // --- Modals General ---
-        function closeGallery() {
-            document.getElementById('galleryModal').classList.remove('active');
-        }
-
+        function closeGallery() { document.getElementById('galleryModal').classList.remove('active'); }
         function openFullscreen(imageSrc) {
             const modal = document.getElementById('fullscreenModal');
             document.getElementById('fullscreen-img').src = imageSrc;
             modal.classList.add('active');
         }
-
         function closeFullscreen() {
             const modal = document.getElementById('fullscreenModal');
             modal.classList.remove('active');
             setTimeout(() => { document.getElementById('fullscreen-img').src = ""; }, 300);
         }
 
-        // --- Event Listeners ---
-        const bindModalClose = (id, func) => {
-            document.getElementById(id).addEventListener('click', (e) => {
-                if (e.target === document.getElementById(id)) func();
-            });
-        };
-        bindModalClose('videoModal', closeModal);
-        bindModalClose('galleryModal', closeGallery);
-        bindModalClose('fullscreenModal', closeFullscreen);
+        // --- Theme ---
+        function toggleTheme() {
+            if (isAnimating) return; 
+            isAnimating = true;
+            const body = document.body;
+            const wipeOverlay = document.getElementById('wipe-overlay');
+            const duster = document.getElementById('duster');
+            
+            const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            let isCurrentlyBlack = body.classList.contains('theme-blackboard') || (!body.classList.contains('theme-whiteboard') && sysDark);
+            const targetClass = isCurrentlyBlack ? 'theme-whiteboard' : 'theme-blackboard';
+            const targetPaperColor = isCurrentlyBlack ? '#fffbeb' : '#18181b'; 
+            const targetGridColor = isCurrentlyBlack ? '#e5e7eb' : '#27272a'; 
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === "Escape") { closeModal(); closeGallery(); closeFullscreen(); }
-        });
+            wipeOverlay.style.backgroundColor = targetPaperColor;
+            wipeOverlay.style.backgroundImage = `linear-gradient(${targetGridColor} 1px, transparent 1px), linear-gradient(90deg, ${targetGridColor} 1px, transparent 1px)`;
+            duster.style.display = 'block';
+
+            const animation = wipeOverlay.animate([{ width: '0%' }, { width: '100%' }], { duration: 1000, easing: 'cubic-bezier(0.25, 1, 0.5, 1)', fill: 'forwards' });
+            animation.onfinish = () => {
+                body.classList.remove('theme-whiteboard', 'theme-blackboard');
+                body.classList.add(targetClass);
+                updateThemeButtonText();
+                animation.cancel();
+                wipeOverlay.style.width = '0%'; 
+                duster.style.display = 'none';
+                isAnimating = false;
+            };
+        }
+        
+        function updateThemeButtonText() {
+            const body = document.body;
+            const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            let isDark = body.classList.contains('theme-blackboard') || (!body.classList.contains('theme-whiteboard') && sysDark);
+            document.getElementById('btn-theme-toggle').textContent = isDark ? content[currentLang].themeWhite : content[currentLang].themeBlack;
+        }
+
+        // --- Note Helpers ---
+        function checkMobileNote() { if (localStorage.getItem('mobileNoteDismissed') === 'true') document.getElementById('mobile-note').style.display = 'none'; }
+        function dismissMobileNote() { document.getElementById('mobile-note').style.display = 'none'; localStorage.setItem('mobileNoteDismissed', 'true'); }
+        function checkGalleryNote() { document.getElementById('gallery-note').style.display = (localStorage.getItem('galleryNoteDismissed') !== 'true') ? 'block' : 'none'; }
+        function dismissGalleryNote() { document.getElementById('gallery-note').style.display = 'none'; localStorage.setItem('galleryNoteDismissed', 'true'); }
+
+        // --- Context Menu ---
+        let currentContextAction = null;
+        function initCustomContextMenu() {
+            const contextMenu = document.getElementById('custom-context-menu');
+            const openBtn = document.getElementById('ctx-open');
+            const openBtnText = document.getElementById('ctx-open-text');
+            const shareBtn = document.getElementById('ctx-share');
+
+            document.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                const targetElement = e.target.closest('[data-action]');
+                if (targetElement) {
+                    currentContextAction = targetElement.getAttribute('data-action');
+                    openBtn.classList.remove('disabled');
+                    openBtnText.textContent = "Open / View"; 
+                } else {
+                    currentContextAction = null;
+                    openBtn.classList.add('disabled');
+                    openBtnText.textContent = "Open (Select Item)";
+                }
+                let x = e.clientX, y = e.clientY;
+                if (x + 180 > window.innerWidth) x -= 180;
+                if (y + 150 > window.innerHeight) y -= 150;
+                contextMenu.style.left = `${x}px`; contextMenu.style.top = `${y}px`; contextMenu.style.display = 'block';
+            });
+
+            openBtn.addEventListener('click', () => {
+                if (openBtn.classList.contains('disabled')) return;
+                hideContextMenu();
+                if (currentContextAction === 'toast') showToast();
+                else if (currentContextAction === 'messages') openModal('messages');
+                else if (currentContextAction === 'tour') openModal('tour');
+                else if (currentContextAction === 'gallery') openGallery();
+            });
+
+            shareBtn.addEventListener('click', async () => {
+                hideContextMenu();
+                if (navigator.share) {
+                    try { await navigator.share({ title: 'E-Balarun 2026', text: 'Check out the Digital Edition!', url: window.location.href }); } catch (err) {}
+                } else {
+                    navigator.clipboard.writeText(window.location.href);
+                    const toast = document.getElementById("toast");
+                    const oldText = toast.textContent;
+                    toast.textContent = "Link Copied! 📋"; toast.className = "show";
+                    setTimeout(() => { toast.className = ""; setTimeout(() => { toast.textContent = oldText; }, 500); }, 2000);
+                }
+            });
+
+            document.addEventListener('click', (e) => { if (!contextMenu.contains(e.target)) hideContextMenu(); });
+            window.addEventListener('scroll', hideContextMenu, { passive: true });
+        }
+        function hideContextMenu() { document.getElementById('custom-context-menu').style.display = 'none'; }
+
+        // --- Listeners ---
+        const bindModalClose = (id, func) => { document.getElementById(id).addEventListener('click', (e) => { if (e.target === document.getElementById(id)) func(); }); };
+        bindModalClose('videoModal', closeModal); bindModalClose('galleryModal', closeGallery); bindModalClose('fullscreenModal', closeFullscreen);
+        document.addEventListener('keydown', (e) => { if (e.key === "Escape") { closeModal(); closeGallery(); closeFullscreen(); } });
+        
+        let resizeTimer;
+        window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(updateLangButton, 100); }, { passive: true });
     </script>
 </body>
 </html>
