@@ -30,7 +30,7 @@
         :root {
             /* --- THEME VARIABLES --- */
             --paper: #18181b; 
-            --ink: #f4f4f5;    
+            --ink: #f4f4f5;     
             --ink-dim: #a1a1aa;
             --accent: #facc15; 
             --grid-color: #27272a;
@@ -45,7 +45,7 @@
         /* --- THEMES --- */
         body.theme-whiteboard {
             --paper: #fffbeb; 
-            --ink: #1e293b;    
+            --ink: #1e293b;     
             --ink-dim: #64748b;
             --accent: #d97706; 
             --grid-color: #e5e7eb;
@@ -416,20 +416,18 @@
         /* Gallery */
         .gallery-filter-bar {
             display: flex; flex-wrap: nowrap; gap: 12px; overflow-x: auto; overflow-y: hidden; 
-            /* REVISED: More top padding prevents clipping active buttons. Removed border. */
             padding: 20px 5px 20px 5px; 
             margin-bottom: 0;
-            border-bottom: none; /* REMOVED from here */
+            border-bottom: none; 
             align-items: center; -webkit-overflow-scrolling: touch; scrollbar-width: none;
         }
         .gallery-filter-bar::-webkit-scrollbar { display: none; }
         
-        /* NEW SEPARATE DIVIDER CLASS */
         .gallery-divider {
             width: 100%;
             border-bottom: 2px dashed var(--ink-dim);
-            margin-top: 0px;    
-            margin-bottom: 25px; /* Guaranteed space below the line */
+            margin-top: 0px;     
+            margin-bottom: 25px; 
             flex-shrink: 0;
         }
 
@@ -479,15 +477,35 @@
         .btn-load-more:hover { transform: scale(1.05) rotate(-1deg); box-shadow: 6px 6px 0px var(--accent); }
         .btn-load-more:active { transform: scale(0.98); box-shadow: 2px 2px 0px var(--accent); }
         .btn-load-more.hidden { display: none; }
-        #fullscreenModal { z-index: 200; background: rgba(0, 0, 0, 0.95); }
+        
+        /* Fullscreen Modal & Navigation */
+        #fullscreenModal { z-index: 200; background: rgba(0, 0, 0, 0.95); touch-action: pan-y pinch-zoom; }
         #fullscreenModal img {
             max-width: 90%; max-height: 90vh; border: 4px solid #fff;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5); animation: popZoom 0.4s ease-out;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5); 
+            transition: opacity 0.2s ease;
         }
+        
+        /* Navigation Arrows */
+        .nav-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            width: 50px; height: 50px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 210; transition: all 0.2s ease;
+            user-select: none; -webkit-user-select: none;
+        }
+        .nav-arrow:hover { background: rgba(255, 255, 255, 0.4); transform: translateY(-50%) scale(1.1); }
+        .nav-arrow:active { transform: translateY(-50%) scale(0.95); }
+        .nav-arrow.prev { left: 20px; }
+        .nav-arrow.next { right: 20px; }
+        .nav-arrow svg { width: 30px; height: 30px; stroke-width: 3; }
+
         .fullscreen-close {
             position: absolute; top: 20px; right: 20px; color: #fff; font-size: 2rem;
             background: rgba(255,255,255,0.1); width: 40px; height: 40px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s;
+            z-index: 210;
         }
         .fullscreen-close:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
 
@@ -505,6 +523,10 @@
             .sketch-card { max-width: 100%; }
             #mobile-note { display: block; }
             #gallery-note { right: 10px; bottom: 10px; width: 150px; font-size: 0.9rem; }
+            /* Adjust arrows for mobile */
+            .nav-arrow { width: 40px; height: 40px; background: rgba(0,0,0,0.3); }
+            .nav-arrow.prev { left: 10px; }
+            .nav-arrow.next { right: 10px; }
         }
     </style>
 </head>
@@ -640,40 +662,41 @@
 
     <div class="modal-overlay" id="fullscreenModal">
         <button class="close-btn fullscreen-close" onclick="closeFullscreen()">×</button>
+        
+        <div class="nav-arrow prev" onclick="navigateFullscreen(-1)">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" /></svg>
+        </div>
+        <div class="nav-arrow next" onclick="navigateFullscreen(1)">
+            <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" /></svg>
+        </div>
+
         <img id="fullscreen-img" src="" alt="Fullscreen view">
     </div>
 
     <script>
         // --- PRELOAD CRITICAL LOADER ASSETS ---
-        // This runs immediately to ensure the animation is smooth.
         (function preloadLoaderAssets() {
             const img1 = new Image(); img1.src = "https://i.ibb.co/ymGmHBXm/balarun-logo.png";
             const img2 = new Image(); img2.src = "vande_mataram.png";
         })();
 
         // --- ANIMATION SEQUENCE LOGIC ---
-        // We use flags to coordinate:
-        // 1. Min animation time (2.0s Balarun, 1.0s Vande Mataram)
-        // 2. Page fully loaded state
-        
-        let phase1Done = false; // Balarun -> Vande Swap happened
-        let pageLoaded = false; // Window load event fired
+        let phase1Done = false; 
+        let pageLoaded = false; 
 
         const loader = document.getElementById('loader');
         
-        // Step 1: Trigger the Logo Swap (Balarun fades out, Vande fades in)
-        // Background remains SOLID OPAQUE here.
-        // **UPDATED: 2000ms (2 seconds)**
+        // Step 1: Trigger the Logo Swap
         setTimeout(() => {
             loader.classList.add('swap-logos');
             phase1Done = true;
-            checkFinish(); // Check if page is already loaded
+            checkFinish(); 
         }, 2000);
 
         // Step 2: Listen for page load
         window.addEventListener('load', () => {
             pageLoaded = true;
-            checkFinish(); // Check if animation phase 1 is done
+            checkFinish(); 
             
             // Background preload for gallery
             setTimeout(() => {
@@ -689,17 +712,9 @@
 
         // Step 3: Coordinate the Finish (Explosion)
         function checkFinish() {
-            // Only proceed if BOTH the logo swap occurred AND the page is ready.
             if (phase1Done && pageLoaded) {
-                // Wait another 1s to ensure Vande Mataram is fully visible/readable
                 setTimeout(() => {
-                    // Trigger the explosion class.
-                    // This class does 2 things in CSS:
-                    // 1. Scales the Vande logo to 50x (zoom effect)
-                    // 2. Fades the loader background opacity to 0
                     loader.classList.add('explode-out');
-                    
-                    // Finally remove the loader from DOM
                     setTimeout(() => { loader.style.display = 'none'; }, 800);
                 }, 1000); 
             }
@@ -717,7 +732,7 @@
                 messagesTitle: "Video Messages",
                 tourTitle: "Virtual Campus Tour",
                 galleryTitle: "Photo Scrapbook", 
-                langBtn: "हिन्दी", langBtnMobile: "हिं",        
+                langBtn: "हिन्दी", langBtnMobile: "हिं",         
                 footerHtml: 'Published with ❤️ in <span class="loc-text">Jabalpur</span>',
                 themeWhite: "Switch to Whiteboard", themeBlack: "Switch to Blackboard",
                 archiveBtn: "📂 2021-22 Archive", readLabel: "Click to Read 📖",
@@ -737,7 +752,7 @@
                 messagesTitle: "वीडियो संदेश",
                 tourTitle: "कैंपस का भ्रमण",
                 galleryTitle: "फ़ोटो एल्बम", 
-                langBtn: "English", langBtnMobile: "En",    
+                langBtn: "English", langBtnMobile: "En",     
                 footerHtml: '<span class="loc-text">जबलपुर</span> से ❤️ प्रकाशित',
                 themeWhite: "व्हाइटबोर्ड पर जाएं", themeBlack: "ब्लैकबोर्ड पर जाएं",
                 archiveBtn: "📂 २०२१-२२ संग्रह", readLabel: "पढ़ने के लिए क्लिक करें 📖",
@@ -953,8 +968,8 @@
         let currentLang = 'en';
         let isAnimating = false;
         let galleryData = rawGalleryData;
-        let filteredImages = [];        
-        let currentGalleryIndex = 0;    
+        let filteredImages = [];         
+        let currentGalleryIndex = 0;     
         const galleryBatchSize = 12;
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -1018,16 +1033,20 @@
             const loadMoreBtn = document.getElementById('btn-load-more');
             const fragment = document.createDocumentFragment();
             const nextIndex = Math.min(currentGalleryIndex + galleryBatchSize, filteredImages.length);
-            const batch = filteredImages.slice(currentGalleryIndex, nextIndex);
-            batch.forEach(imgObj => {
+            
+            // Loop from current index to next index to access the correct global index
+            for (let i = currentGalleryIndex; i < nextIndex; i++) {
+                const imgObj = filteredImages[i];
                 const thumbPath = `gallery/thumbnails/${imgObj.src}`; 
-                const fullPath = `gallery/${imgObj.src}`;            
+                const fullPath = `gallery/${imgObj.src}`;             
                 const frame = document.createElement('div');
                 frame.className = 'photo-frame';
-                frame.onclick = () => openFullscreen(fullPath);
+                // Pass the index 'i' to openFullscreen
+                frame.onclick = () => openFullscreen(i);
                 frame.innerHTML = `<div class="photo-placeholder"><img src="${thumbPath}" loading="lazy" decoding="async" alt="Gallery Image" onload="this.classList.add('loaded')"></div>`;
                 fragment.appendChild(frame);
-            });
+            }
+
             galleryContainer.appendChild(fragment);
             currentGalleryIndex = nextIndex;
             loadMoreBtn.style.display = (currentGalleryIndex >= filteredImages.length) ? 'none' : 'block';
@@ -1097,9 +1116,91 @@
 
         function closeModal() { document.getElementById('videoModal').classList.remove('active'); document.getElementById('modal-content-body').innerHTML = ""; }
         function closeGallery() { document.getElementById('galleryModal').classList.remove('active'); }
-        function openFullscreen(imageSrc) { const modal = document.getElementById('fullscreenModal'); document.getElementById('fullscreen-img').src = imageSrc; modal.classList.add('active'); }
-        function closeFullscreen() { const modal = document.getElementById('fullscreenModal'); modal.classList.remove('active'); setTimeout(() => { document.getElementById('fullscreen-img').src = ""; }, 300); }
+        
+        // --- Fullscreen Navigation Logic ---
+        let currentFullscreenIndex = -1;
 
+        function openFullscreen(index) {
+            currentFullscreenIndex = index;
+            const modal = document.getElementById('fullscreenModal');
+            updateFullscreenImage();
+            modal.classList.add('active');
+        }
+
+        function updateFullscreenImage() {
+            if (currentFullscreenIndex < 0 || currentFullscreenIndex >= filteredImages.length) return;
+            const imgObj = filteredImages[currentFullscreenIndex];
+            const fullPath = `gallery/${imgObj.src}`;
+            const imgElement = document.getElementById('fullscreen-img');
+            
+            // Simple fade effect
+            imgElement.style.opacity = '0.5';
+            setTimeout(() => {
+                imgElement.src = fullPath;
+                imgElement.onload = () => { imgElement.style.opacity = '1'; };
+            }, 200);
+        }
+
+        function navigateFullscreen(direction) {
+            // direction: -1 (prev) or 1 (next)
+            if (currentFullscreenIndex === -1) return;
+            
+            let newIndex = currentFullscreenIndex + direction;
+            
+            // Wrap around logic
+            if (newIndex < 0) newIndex = filteredImages.length - 1;
+            if (newIndex >= filteredImages.length) newIndex = 0;
+            
+            currentFullscreenIndex = newIndex;
+            updateFullscreenImage();
+        }
+
+        function closeFullscreen() { 
+            const modal = document.getElementById('fullscreenModal'); 
+            modal.classList.remove('active'); 
+            setTimeout(() => { document.getElementById('fullscreen-img').src = ""; }, 300); 
+            currentFullscreenIndex = -1;
+        }
+
+        // --- Touch & Keyboard Events for Fullscreen ---
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const fullscreenModal = document.getElementById('fullscreenModal');
+
+        fullscreenModal.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, {passive: true});
+
+        fullscreenModal.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, {passive: true});
+
+        function handleSwipe() {
+            const threshold = 50; // Min distance to be considered a swipe
+            const diff = touchEndX - touchStartX;
+
+            if (Math.abs(diff) > threshold) {
+                if (diff > 0) {
+                    navigateFullscreen(-1); // Swipe Right -> Prev Image
+                } else {
+                    navigateFullscreen(1); // Swipe Left -> Next Image
+                }
+            }
+        }
+
+        document.addEventListener('keydown', (e) => { 
+            if (e.key === "Escape") { 
+                closeModal(); closeGallery(); closeFullscreen(); 
+            } 
+            // Only navigate if fullscreen modal is active
+            if (document.getElementById('fullscreenModal').classList.contains('active')) {
+                if (e.key === "ArrowLeft") navigateFullscreen(-1);
+                if (e.key === "ArrowRight") navigateFullscreen(1);
+            }
+        });
+
+        // --- Theme Toggle Logic ---
         function toggleTheme() {
             if (isAnimating) return; 
             isAnimating = true;
@@ -1188,7 +1289,6 @@
         function hideContextMenu() { document.getElementById('custom-context-menu').style.display = 'none'; }
         const bindModalClose = (id, func) => { document.getElementById(id).addEventListener('click', (e) => { if (e.target === document.getElementById(id)) func(); }); };
         bindModalClose('videoModal', closeModal); bindModalClose('galleryModal', closeGallery); bindModalClose('fullscreenModal', closeFullscreen);
-        document.addEventListener('keydown', (e) => { if (e.key === "Escape") { closeModal(); closeGallery(); closeFullscreen(); } });
         let resizeTimer;
         window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(updateLangButton, 100); }, { passive: true });
     </script>
