@@ -415,19 +415,24 @@
 
         /* Gallery */
         .gallery-filter-bar {
-            display: flex; flex-wrap: nowrap; gap: 12px; overflow-x: auto; overflow-y: hidden;
-            /* REMOVED border-bottom from here */
-            padding: 15px 5px 15px 5px; 
-            margin-bottom: 0; 
+            display: flex; flex-wrap: nowrap; gap: 12px; overflow-x: auto; overflow-y: hidden; 
+            /* REVISED: More top padding prevents clipping active buttons. Removed border. */
+            padding: 20px 5px 20px 5px; 
+            margin-bottom: 0;
+            border-bottom: none; /* REMOVED from here */
             align-items: center; -webkit-overflow-scrolling: touch; scrollbar-width: none;
         }
-	.gallery-divider {
+        .gallery-filter-bar::-webkit-scrollbar { display: none; }
+        
+        /* NEW SEPARATE DIVIDER CLASS */
+        .gallery-divider {
             width: 100%;
             border-bottom: 2px dashed var(--ink-dim);
-            margin-top: 15px;    /* Force space ABOVE the line */
-            margin-bottom: 25px; /* Force space BELOW the line */
+            margin-top: 0px;    
+            margin-bottom: 25px; /* Guaranteed space below the line */
+            flex-shrink: 0;
         }
-        .gallery-filter-bar::-webkit-scrollbar { display: none; }
+
         .filter-btn {
             flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
             background: transparent; border: 2px solid var(--ink-dim); color: var(--ink-dim);
@@ -617,7 +622,9 @@
                 <button class="filter-btn" data-filter="portraits" onclick="applyFilter('portraits')">Portraits</button>
                 <button class="filter-btn" data-filter="events" onclick="applyFilter('events')">Group Photos</button>
             </div>
-	    <div class="gallery-divider"></div>
+            
+            <div class="gallery-divider"></div>
+
             <div class="gallery-grid" id="gallery-grid-content"></div>
             
             <div class="load-more-container">
@@ -710,7 +717,7 @@
                 messagesTitle: "Video Messages",
                 tourTitle: "Virtual Campus Tour",
                 galleryTitle: "Photo Scrapbook", 
-                langBtn: "हिन्दी", langBtnMobile: "हिं",       
+                langBtn: "हिन्दी", langBtnMobile: "हिं",        
                 footerHtml: 'Published with ❤️ in <span class="loc-text">Jabalpur</span>',
                 themeWhite: "Switch to Whiteboard", themeBlack: "Switch to Blackboard",
                 archiveBtn: "📂 2021-22 Archive", readLabel: "Click to Read 📖",
@@ -947,7 +954,7 @@
         let isAnimating = false;
         let galleryData = rawGalleryData;
         let filteredImages = [];        
-        let currentGalleryIndex = 0;   
+        let currentGalleryIndex = 0;    
         const galleryBatchSize = 12;
 
         document.addEventListener('DOMContentLoaded', () => {
