@@ -515,90 +515,80 @@
         .fullscreen-close:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
 
         /* =================================================================
-           NEW "EFFICIENCY MODE" MAGAZINE STYLES 
+           NEW ULTRA-PREMIUM MAGAZINE STYLES 
            ================================================================= */
         #mag-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #111; /* Immersive dark mode */
-            z-index: 100000;
+            background: #111; /* Dark immersive background */
+            z-index: 99999;
             display: flex; flex-direction: column;
             opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
         }
         #mag-overlay.active { opacity: 1; pointer-events: all; }
 
-        /* Top Bar */
+        /* Top Bar (Title + Close) */
         .mag-topbar {
-            height: 60px; flex-shrink: 0; display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+            height: 60px; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 10;
         }
-        .mag-title { color: #facc15; font-family: var(--font-title); font-size: 1.5rem; letter-spacing: 1px; }
-        .mag-close { background: none; border: none; color: #fff; opacity: 0.7; cursor: pointer; transition: transform 0.2s; }
+        .mag-title { color: #facc15; font-family: var(--font-title); font-size: 1.8rem; letter-spacing: 1px; }
+        .mag-close { background: none; border: none; color: #fff; opacity: 0.8; cursor: pointer; transition: transform 0.2s; }
         .mag-close:hover { transform: scale(1.1); opacity: 1; }
 
-        /* THE READER CONTAINER 
-           This is the "Magic" part.
-           - On Mobile: It's a vertical scroll feed (No Crashing).
-           - On Desktop: It's a large scroll area.
-        */
-        #mag-reader {
-            flex: 1; 
-            overflow-y: scroll; 
-            overflow-x: hidden; 
-            background: #222;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch; /* Smooth iOS scroll */
-            padding-bottom: 100px; /* Space for controls */
+        /* Selection Screen */
+        #mag-selection {
+            flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 30px;
+            background: #111; z-index: 20; color: #fff;
+        }
+        .sel-btn {
+            background: rgba(255,255,255,0.1); border: 2px solid #facc15; color: #fff;
+            padding: 15px 30px; font-family: var(--font-title); font-size: 2rem;
+            cursor: pointer; border-radius: 10px; transition: all 0.3s; min-width: 280px;
             display: flex; flex-direction: column; align-items: center;
         }
+        .sel-btn:hover { background: #facc15; color: #111; transform: scale(1.05); }
+        .sel-small { font-family: var(--font-body); font-size: 1rem; opacity: 0.8; margin-top: 5px; }
 
-        /* The Page Wrapper (Lazy Placeholder) */
+        /* MODE 1: Flip Container */
+        #mag-flip-container { display: none; flex: 1; justify-content: center; align-items: center; overflow: hidden; background: #222; }
+        #flip-book { display: none; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .my-page { display: block; background-color: white; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+
+        /* MODE 2: Scroll Container (Mobile Efficient) */
+        #mag-scroll-container { 
+            display: none; flex: 1; overflow-y: scroll; overflow-x: hidden; 
+            background: #222; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; 
+            padding-bottom: 100px; flex-direction: column; align-items: center;
+        }
         .pdf-page-container {
-            position: relative;
-            background: #fff;
-            margin: 20px auto;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            min-height: 300px; /* Placeholder height */
-            /* Desktop Width default */
-            width: 800px; 
-            max-width: 95%;
+            position: relative; background: #fff; margin: 20px auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5); min-height: 300px;
+            width: 800px; max-width: 95%;
         }
+        .pdf-canvas { display: block; width: 100%; height: auto; }
+        .page-loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #888; font-family: var(--font-body); }
         
-        /* Mobile Page Sizing */
-        @media (max-width: 768px) {
-            .pdf-page-container { width: 100%; margin: 10px 0; border-radius: 0; }
-        }
-
-        /* The Actual Canvas (Rendered PDF) */
-        .pdf-canvas {
-            display: block; width: 100%; height: auto;
-        }
-
-        /* Loading Indicator per page */
-        .page-loader {
+        /* Global Loader */
+        #global-loader-text {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            color: #888; font-family: var(--font-body);
+            color: #facc15; font-family: var(--font-title); font-size: 2rem; z-index: 5; display: none;
         }
 
-        /* Bottom Controls (Floating) */
+        /* Controls */
         .mag-controls {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
             background: rgba(30, 30, 30, 0.9); backdrop-filter: blur(10px);
             padding: 10px 20px; border-radius: 30px;
-            display: flex; gap: 15px; align-items: center;
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            z-index: 20;
+            display: none; gap: 15px; align-items: center;
+            border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 20;
         }
         .mag-pg-text { color: #fff; font-family: var(--font-body); font-size: 1.1rem; min-width: 80px; text-align: center; }
-        
-        #global-loader-text {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            color: #facc15; font-family: var(--font-title); font-size: 2rem;
-            z-index: 5;
-        }
+        .ctrl-btn { background: transparent; border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .ctrl-btn:hover { background: rgba(255,255,255,0.2); }
 
-        /* Responsive Fixes */
+        /* Responsive */
+        svg path, svg circle { stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; stroke: currentColor; }
         @media (max-width: 768px) {
             header { flex-direction: row; gap: 10px; margin-bottom: 2rem; }
             .brand { gap: 8px; padding: 8px 15px; } 
@@ -616,8 +606,11 @@
             .nav-arrow.prev { left: 10px; }
             .nav-arrow.next { right: 10px; }
             
-            /* Mag controls smaller on mobile */
+            /* Magazine Mobile Specifics */
             .mag-controls { width: 90%; justify-content: space-between; bottom: 20px; }
+            .mag-topbar { padding: 0 10px; }
+            .mag-title { font-size: 1.4rem; }
+            .pdf-page-container { width: 100%; margin: 10px 0; }
         }
     </style>
 </head>
@@ -674,7 +667,7 @@
 
         <main class="hero">
             <div class="book-container ctx-target" data-action="magazine">
-                <div class="book-wrapper" onclick="openMagazine()">
+                <div class="book-wrapper" onclick="openMagazineChoice()">
                     <div class="book">
                         <div class="book-face book-front"><img src="150_Poster.jpg" alt="E-Balarun Poster Cover"></div>
                         <div class="book-face book-spine"></div>
@@ -720,13 +713,35 @@
             </button>
         </div>
 
-        <div id="global-loader-text">Opening Book...</div>
+        <div id="mag-selection">
+            <h2 style="font-family: var(--font-title); font-size: 3rem; color: #facc15;">Choose Reading Mode</h2>
+            <button class="sel-btn" onclick="startFlipMode()">
+                📖 Interactive Flipbook
+                <span class="sel-small">3D Experience • Best for Desktop</span>
+                <span class="sel-small" style="color:#ff6b6b; font-size:0.8rem; margin-top:5px;">⚠️ High Performance Required</span>
+            </button>
+            <button class="sel-btn" onclick="startScrollMode()">
+                📜 Vertical Scroll
+                <span class="sel-small">Fast & Fluid • Best for Mobile</span>
+            </button>
+        </div>
 
-        <div id="mag-reader">
-            </div>
+        <div id="global-loader-text">Loading Book...</div>
 
-        <div class="mag-controls">
-            <span class="mag-pg-text" id="page-indicator">Page 1 / --</span>
+        <div id="mag-flip-container">
+             <div id="flip-book"></div>
+        </div>
+
+        <div id="mag-scroll-container"></div>
+
+        <div class="mag-controls" id="mag-controls-flip">
+            <button class="ctrl-btn" onclick="if(flipBook) flipBook.flipPrev()">←</button>
+            <span class="mag-pg-text" id="page-indicator-flip">1</span>
+            <button class="ctrl-btn" onclick="if(flipBook) flipBook.flipNext()">→</button>
+        </div>
+        
+        <div class="mag-controls" id="mag-controls-scroll">
+            <span class="mag-pg-text" id="page-indicator-scroll">Page 1</span>
         </div>
     </div>
 
@@ -830,105 +845,146 @@
         }
 
         // ============================================
-        // NEW MAGAZINE ENGINE (SCROLL SNAP + INTERSECTION OBSERVER)
-        // This is strictly designed NOT to crash on mobile.
+        // DUAL MODE MAGAZINE ENGINE
         // ============================================
         let pdfDoc = null;
-        let isMagInit = false;
-        let observer = null;
+        let flipBook = null;
+        let isBookLoaded = false;
 
-        async function openMagazine() {
+        function openMagazineChoice() {
             document.getElementById('mag-overlay').classList.add('active');
-            
-            if(isMagInit) return; // Already loaded?
-            
-            const reader = document.getElementById('mag-reader');
-            const loaderText = document.getElementById('global-loader-text');
-            
-            try {
-                // 1. Initialize PDF.js
-                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
-                const loadingTask = pdfjsLib.getDocument(PDF_URL);
-                pdfDoc = await loadingTask.promise;
-                
-                document.getElementById('page-indicator').textContent = `1 / ${pdfDoc.numPages}`;
-                loaderText.style.display = 'none';
+            document.getElementById('mag-selection').style.display = 'flex';
+            document.getElementById('mag-flip-container').style.display = 'none';
+            document.getElementById('mag-scroll-container').style.display = 'none';
+            document.getElementById('mag-controls-flip').style.display = 'none';
+            document.getElementById('mag-controls-scroll').style.display = 'none';
+            document.getElementById('global-loader-text').style.display = 'none';
+        }
 
-                // 2. Setup Intersection Observer (The Magic Memory Saver)
-                // This watches for pages appearing on screen
-                observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            // Page is visible -> RENDER
-                            renderPage(entry.target);
-                            // Update current page number display
-                            const pageNum = entry.target.getAttribute('data-page-num');
-                            document.getElementById('page-indicator').textContent = `${pageNum} / ${pdfDoc.numPages}`;
-                        } else {
-                            // Page hidden -> CLEAR CANVAS (Free Memory)
-                            clearPage(entry.target);
-                        }
+        async function loadPdfDoc() {
+            if (pdfDoc) return pdfDoc;
+            document.getElementById('mag-selection').style.display = 'none';
+            document.getElementById('global-loader-text').style.display = 'block';
+            
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+            const loadingTask = pdfjsLib.getDocument(PDF_URL);
+            pdfDoc = await loadingTask.promise;
+            return pdfDoc;
+        }
+
+        // --- MODE 1: FLIPBOOK (With Just-In-Time Rendering) ---
+        async function startFlipMode() {
+            try {
+                await loadPdfDoc();
+                document.getElementById('global-loader-text').style.display = 'none';
+                document.getElementById('mag-flip-container').style.display = 'flex';
+                document.getElementById('mag-controls-flip').style.display = 'flex';
+                document.getElementById('flip-book').style.display = 'block';
+
+                if(!flipBook) {
+                    const bookElem = document.getElementById('flip-book');
+                    bookElem.innerHTML = "";
+                    
+                    // Create Placeholders
+                    for(let i=1; i<=pdfDoc.numPages; i++) {
+                        const div = document.createElement('div');
+                        div.className = 'my-page'; // Reusing style from CSS
+                        div.innerHTML = `<div style="display:flex;width:100%;height:100%;align-items:center;justify-content:center;background:#fff;color:#ccc;">Page ${i}</div>`;
+                        div.id = `flip-page-${i}`;
+                        bookElem.appendChild(div);
+                    }
+
+                    // Init Flip
+                    const isMobile = window.innerWidth < 768;
+                    flipBook = new St.PageFlip(bookElem, {
+                        width: isMobile ? 350 : 550, height: isMobile ? 500 : 800,
+                        size: "stretch", minWidth: 300, maxWidth: 1000, minHeight: 400, maxHeight: 1200,
+                        showCover: true, usePortrait: isMobile
                     });
-                }, { root: reader, rootMargin: '100px' });
 
-                // 3. Create Placeholder Divs
-                for (let i = 1; i <= pdfDoc.numPages; i++) {
-                    const pageContainer = document.createElement('div');
-                    pageContainer.className = 'pdf-page-container';
-                    pageContainer.setAttribute('data-page-num', i);
+                    flipBook.loadFromHTML(document.querySelectorAll('.my-page'));
                     
-                    // Add loading indicator inside
-                    pageContainer.innerHTML = `<div class="page-loader">Loading Page ${i}...</div>`;
+                    // Smart Render
+                    flipBook.on('flip', (e) => {
+                        document.getElementById('page-indicator-flip').innerText = (e.data + 1) + " / " + pdfDoc.numPages;
+                        renderFlipPage(e.data + 1);
+                    });
                     
-                    reader.appendChild(pageContainer);
-                    observer.observe(pageContainer); // Start watching
+                    // Initial
+                    renderFlipPage(1);
                 }
-                
-                isMagInit = true;
-
-            } catch (err) {
-                console.error(err);
-                loaderText.innerHTML = `Error Loading PDF.<br>Check file name.`;
-            }
+            } catch(e) { alert("Error: " + e.message); }
         }
 
-        async function renderPage(container) {
-            // If already has canvas, abort
-            if(container.querySelector('canvas')) return;
+        async function renderFlipPage(num) {
+            // Render Current, Prev, Next only
+            [num, num-1, num+1].forEach(async (n) => {
+                if(n < 1 || n > pdfDoc.numPages) return;
+                const wrapper = document.getElementById(`flip-page-${n}`);
+                if(wrapper.querySelector('canvas')) return; // Already rendered
 
-            const pageNum = parseInt(container.getAttribute('data-page-num'));
-            
-            try {
-                const page = await pdfDoc.getPage(pageNum);
-                
-                // Calculate Scale based on container width
-                // We render at 1.5x container width for sharpness, max 2.0
-                const containerWidth = container.clientWidth || 800; 
-                const unscaledViewport = page.getViewport({ scale: 1 });
-                const desiredScale = (containerWidth / unscaledViewport.width) * 1.5;
-                
-                const viewport = page.getViewport({ scale: desiredScale });
-                
+                const page = await pdfDoc.getPage(n);
+                const viewport = page.getViewport({ scale: 1.5 });
                 const canvas = document.createElement('canvas');
-                canvas.className = 'pdf-canvas';
-                canvas.width = viewport.width;
-                canvas.height = viewport.height;
+                canvas.width = viewport.width; canvas.height = viewport.height;
+                canvas.style.width = "100%"; canvas.style.height = "100%";
                 
-                const context = canvas.getContext('2d');
-                await page.render({ canvasContext: context, viewport: viewport }).promise;
-                
-                container.innerHTML = ''; // Clear loader
-                container.appendChild(canvas);
-                
-            } catch(e) { console.error(e); }
+                await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
+                wrapper.innerHTML = "";
+                wrapper.appendChild(canvas);
+            });
         }
 
-        function clearPage(container) {
-            // Remove canvas to free RAM
-            if(container.querySelector('canvas')) {
-                const pageNum = container.getAttribute('data-page-num');
-                container.innerHTML = `<div class="page-loader">Loading Page ${pageNum}...</div>`;
-            }
+        // --- MODE 2: SCROLL (Crash Proof) ---
+        async function startScrollMode() {
+            try {
+                await loadPdfDoc();
+                document.getElementById('global-loader-text').style.display = 'none';
+                document.getElementById('mag-scroll-container').style.display = 'flex';
+                document.getElementById('mag-controls-scroll').style.display = 'flex';
+                
+                const container = document.getElementById('mag-scroll-container');
+                if(container.children.length === 0) {
+                    // Setup Intersection Observer
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            const pNum = entry.target.getAttribute('data-num');
+                            if(entry.isIntersecting) {
+                                renderScrollPage(entry.target, parseInt(pNum));
+                                document.getElementById('page-indicator-scroll').innerText = `Page ${pNum} / ${pdfDoc.numPages}`;
+                            } else {
+                                // Clear memory when scrolled away
+                                if(entry.target.querySelector('canvas')) {
+                                    entry.target.innerHTML = `<div class="page-loader">Loading Page ${pNum}...</div>`;
+                                }
+                            }
+                        });
+                    }, { root: container, rootMargin: "200px" });
+
+                    // Create Placeholders
+                    for(let i=1; i<=pdfDoc.numPages; i++) {
+                        const div = document.createElement('div');
+                        div.className = 'pdf-page-container';
+                        div.setAttribute('data-num', i);
+                        div.innerHTML = `<div class="page-loader">Loading Page ${i}...</div>`;
+                        container.appendChild(div);
+                        observer.observe(div);
+                    }
+                }
+            } catch(e) { alert(e.message); }
+        }
+
+        async function renderScrollPage(wrapper, num) {
+            if(wrapper.querySelector('canvas')) return;
+            const page = await pdfDoc.getPage(num);
+            const scale = window.innerWidth < 768 ? 1.0 : 1.5; 
+            const viewport = page.getViewport({ scale: scale });
+            const canvas = document.createElement('canvas');
+            canvas.className = 'pdf-canvas';
+            canvas.width = viewport.width; canvas.height = viewport.height;
+            await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
+            wrapper.innerHTML = "";
+            wrapper.appendChild(canvas);
         }
 
         function closeMagazine() {
@@ -1187,11 +1243,23 @@
         let currentGalleryIndex = 0;      
         const galleryBatchSize = 12;
 
+        document.addEventListener('DOMContentLoaded', () => {
+            checkMobileNote(); updateLangButton(); updateThemeButtonText(); initCustomContextMenu(); initStickyHeader();
+        });
+
+        // --- Sticky Header Logic ---
         function initStickyHeader() {
             const pill = document.getElementById('floating-pill');
             const placeholder = document.getElementById('brand-placeholder');
+            const threshold = 50; 
+            pill.addEventListener('click', () => {
+                if (pill.classList.contains('sticky-active')) window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
             window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) {
+                const docHeight = document.documentElement.scrollHeight;
+                const winHeight = window.innerHeight;
+                if (docHeight <= winHeight + 200) return;
+                if (window.scrollY > threshold) {
                     if (!pill.classList.contains('sticky-active')) {
                         const rect = pill.getBoundingClientRect();
                         placeholder.style.width = rect.width + 'px';
@@ -1207,90 +1275,70 @@
                 }
             }, { passive: true });
         }
-        initStickyHeader();
 
-        // --- GALLERY ---
         function openGallery() {
-            document.getElementById('galleryModal').classList.add('active');
+            const modal = document.getElementById('galleryModal');
             updateGalleryText();
+            modal.classList.add('active');
+            checkGalleryNote();
             if (filteredImages.length === 0) applyFilter('all');
         }
-        function closeGallery() { document.getElementById('galleryModal').classList.remove('active'); }
 
         function applyFilter(category) {
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.filter === category));
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === category);
+            });
             if (category === 'all') filteredImages = galleryData;
             else if (category === 'events') filteredImages = galleryData.filter(img => img.category === 'groups' || img.category === 'crowd');
             else filteredImages = galleryData.filter(img => img.category === category);
             document.getElementById('gallery-grid-content').innerHTML = '';
             currentGalleryIndex = 0;
-            loadNextGalleryBatch();
+            if (filteredImages.length === 0) {
+                document.getElementById('gallery-grid-content').innerHTML = '<div style="grid-column: 1/-1; text-align: center; opacity: 0.5;">No images found in this category.</div>';
+                document.getElementById('btn-load-more').style.display = 'none';
+            } else loadNextGalleryBatch();
         }
 
         function loadNextGalleryBatch() {
-            const container = document.getElementById('gallery-grid-content');
+            const galleryContainer = document.getElementById('gallery-grid-content');
+            const loadMoreBtn = document.getElementById('btn-load-more');
+            const fragment = document.createDocumentFragment();
             const nextIndex = Math.min(currentGalleryIndex + galleryBatchSize, filteredImages.length);
+            
+            // Loop from current index to next index to access the correct global index
             for (let i = currentGalleryIndex; i < nextIndex; i++) {
                 const imgObj = filteredImages[i];
-                const frame = document.createElement('div'); frame.className = 'photo-frame';
+                const thumbPath = `gallery/thumbnails/${imgObj.src}`; 
+                const fullPath = `gallery/${imgObj.src}`;              
+                const frame = document.createElement('div');
+                frame.className = 'photo-frame';
+                // Pass the index 'i' to openFullscreen
                 frame.onclick = () => openFullscreen(i);
-                frame.innerHTML = `<div class="photo-placeholder"><img src="gallery/thumbnails/${imgObj.src}" loading="lazy" onload="this.classList.add('loaded')"></div>`;
-                container.appendChild(frame);
+                frame.innerHTML = `<div class="photo-placeholder"><img src="${thumbPath}" loading="lazy" decoding="async" alt="Gallery Image" onload="this.classList.add('loaded')"></div>`;
+                fragment.appendChild(frame);
             }
+
+            galleryContainer.appendChild(fragment);
             currentGalleryIndex = nextIndex;
-            document.getElementById('btn-load-more').style.display = (currentGalleryIndex >= filteredImages.length) ? 'none' : 'block';
+            loadMoreBtn.style.display = (currentGalleryIndex >= filteredImages.length) ? 'none' : 'block';
         }
 
         function updateGalleryText() {
             const data = content[currentLang];
             document.getElementById('gallery-title-text').textContent = data.galleryTitle;
             document.getElementById('btn-load-more').textContent = data.loadMore;
-        }
-
-        // --- FULLSCREEN ---
-        let fsIndex = -1;
-        function openFullscreen(index) {
-            fsIndex = index;
-            const modal = document.getElementById('fullscreenModal');
-            updateFullscreenImage();
-            modal.classList.add('active');
-        }
-        function updateFullscreenImage() {
-            if (fsIndex < 0 || fsIndex >= filteredImages.length) return;
-            const imgElement = document.getElementById('fullscreen-img');
-            imgElement.style.opacity = '0.5';
-            setTimeout(() => {
-                imgElement.src = `gallery/${filteredImages[fsIndex].src}`;
-                imgElement.onload = () => { imgElement.style.opacity = '1'; };
-            }, 100);
-        }
-        function navigateFullscreen(dir) {
-            if (fsIndex === -1) return;
-            fsIndex += dir;
-            if (fsIndex < 0) fsIndex = filteredImages.length - 1;
-            if (fsIndex >= filteredImages.length) fsIndex = 0;
-            updateFullscreenImage();
-        }
-        function closeFullscreen() { document.getElementById('fullscreenModal').classList.remove('active'); }
-
-        // --- VIDEO ---
-        function openModal(type) {
-            const modal = document.getElementById('videoModal');
-            const body = document.getElementById('modal-content-body');
-            document.getElementById('modal-title-text').textContent = type === 'messages' ? content[currentLang].messagesTitle : content[currentLang].tourTitle;
-            let html = '';
-            videoData[type].forEach(vid => {
-                html += `<div class="video-wrapper"><span class="video-label">${vid.label}</span><div class="video-facade" onclick="this.innerHTML='<iframe src=\\'https://www.youtube.com/embed/${vid.id}?autoplay=1\\' allowfullscreen></iframe>'; this.classList.add('video-active')"><img src="https://img.youtube.com/vi/${vid.id}/hqdefault.jpg"><div class="play-btn-overlay"></div></div></div>`;
+            const filters = { 'all': data.filterAll, 'campus': data.filterCampus, 'portraits': data.filterPortraits, 'events': data.filterEvents };
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                const key = btn.dataset.filter;
+                if (filters[key]) btn.textContent = filters[key];
             });
-            body.innerHTML = html;
-            modal.classList.add('active');
         }
-        function closeModal() { document.getElementById('videoModal').classList.remove('active'); document.getElementById('modal-content-body').innerHTML = ""; }
 
-        // --- MISC ---
         function toggleLanguage() {
             currentLang = currentLang === 'en' ? 'hi' : 'en';
             const data = content[currentLang];
+            const body = document.getElementById('body');
+            body.classList.toggle('hindi-active', currentLang === 'hi');
             document.title = data.tabTitle;
             document.getElementById('label-digital').textContent = data.digital;
             document.getElementById('main-title').textContent = data.title;
@@ -1300,52 +1348,221 @@
             document.getElementById('footer-dynamic').innerHTML = data.footerHtml;
             document.getElementById('btn-archive').textContent = data.archiveBtn;
             document.getElementById('label-read').textContent = data.readLabel;
-            updateLangButton();
+            updateGalleryText(); updateLangButton(); updateThemeButtonText();
         }
+
         function updateLangButton() {
             const btn = document.getElementById('btn-lang');
-            btn.textContent = window.innerWidth <= 768 ? content[currentLang].langBtnMobile : content[currentLang].langBtn;
+            const data = content[currentLang];
+            const isMobile = window.innerWidth <= 768;
+            btn.textContent = isMobile ? data.langBtnMobile : data.langBtn;
         }
+
+        function showToast() {
+            const toast = document.getElementById("toast");
+            toast.textContent = content[currentLang].comingSoon;
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        function loadVideo(wrapper, videoId) {
+            wrapper.classList.add('video-active');
+            wrapper.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+        }
+
+        function openModal(videoCategory) {
+            const modal = document.getElementById('videoModal');
+            const contentBody = document.getElementById('modal-content-body');
+            document.getElementById('modal-title-text').textContent = videoCategory === 'messages' ? content[currentLang].messagesTitle : content[currentLang].tourTitle;
+            let htmlHTML = '';
+            const videos = videoData[videoCategory];
+            videos.forEach(video => {
+                let labelText = content[currentLang][video.key] || "";
+                const labelHtml = labelText ? `<span class="video-label">${labelText}</span>` : '';
+                htmlHTML += `<div class="video-wrapper">${labelHtml}<div class="video-facade" onclick="loadVideo(this, '${video.id}')"><img src="https://img.youtube.com/vi/${video.id}/hqdefault.jpg" loading="lazy" alt="Video Thumbnail"><div class="play-btn-overlay"></div></div></div>`;
+            });
+            contentBody.innerHTML = htmlHTML;
+            modal.classList.add('active');
+        }
+
+        function closeModal() { document.getElementById('videoModal').classList.remove('active'); document.getElementById('modal-content-body').innerHTML = ""; }
+        function closeGallery() { document.getElementById('galleryModal').classList.remove('active'); }
+        
+        // --- Fullscreen Navigation Logic ---
+        let currentFullscreenIndex = -1;
+
+        function openFullscreen(index) {
+            currentFullscreenIndex = index;
+            const modal = document.getElementById('fullscreenModal');
+            updateFullscreenImage();
+            modal.classList.add('active');
+        }
+
+        function updateFullscreenImage() {
+            if (currentFullscreenIndex < 0 || currentFullscreenIndex >= filteredImages.length) return;
+            const imgObj = filteredImages[currentFullscreenIndex];
+            const fullPath = `gallery/${imgObj.src}`;
+            const imgElement = document.getElementById('fullscreen-img');
+            
+            // Simple fade effect
+            imgElement.style.opacity = '0.5';
+            setTimeout(() => {
+                imgElement.src = fullPath;
+                imgElement.onload = () => { imgElement.style.opacity = '1'; };
+            }, 200);
+        }
+
+        function navigateFullscreen(direction) {
+            // direction: -1 (prev) or 1 (next)
+            if (currentFullscreenIndex === -1) return;
+            
+            let newIndex = currentFullscreenIndex + direction;
+            
+            // Wrap around logic
+            if (newIndex < 0) newIndex = filteredImages.length - 1;
+            if (newIndex >= filteredImages.length) newIndex = 0;
+            
+            currentFullscreenIndex = newIndex;
+            updateFullscreenImage();
+        }
+
+        function closeFullscreen() { 
+            const modal = document.getElementById('fullscreenModal'); 
+            modal.classList.remove('active'); 
+            setTimeout(() => { document.getElementById('fullscreen-img').src = ""; }, 300); 
+            currentFullscreenIndex = -1;
+        }
+
+        // --- Touch & Keyboard Events for Fullscreen ---
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const fullscreenModal = document.getElementById('fullscreenModal');
+
+        fullscreenModal.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, {passive: true});
+
+        fullscreenModal.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, {passive: true});
+
+        function handleSwipe() {
+            const threshold = 50; // Min distance to be considered a swipe
+            const diff = touchEndX - touchStartX;
+
+            if (Math.abs(diff) > threshold) {
+                if (diff > 0) {
+                    navigateFullscreen(-1); // Swipe Right -> Prev Image
+                } else {
+                    navigateFullscreen(1); // Swipe Left -> Next Image
+                }
+            }
+        }
+
+        document.addEventListener('keydown', (e) => { 
+            if (e.key === "Escape") { 
+                closeModal(); closeGallery(); closeFullscreen(); closeMagazine(); 
+            } 
+            // Only navigate if fullscreen modal is active
+            if (document.getElementById('fullscreenModal').classList.contains('active')) {
+                if (e.key === "ArrowLeft") navigateFullscreen(-1);
+                if (e.key === "ArrowRight") navigateFullscreen(1);
+            }
+        });
+
+        // --- Theme Toggle Logic ---
         function toggleTheme() {
+            if (isAnimating) return; 
+            isAnimating = true;
             const body = document.body;
-            const wipe = document.getElementById('wipe-overlay');
-            const isDark = body.classList.contains('theme-blackboard');
-            wipe.style.backgroundColor = isDark ? '#fffbeb' : '#18181b';
-            document.getElementById('duster').style.display = 'block';
-            wipe.animate([{width:'0%'},{width:'100%'}], {duration:800, fill:'forwards'}).onfinish = () => {
-                body.classList.toggle('theme-whiteboard');
-                body.classList.toggle('theme-blackboard');
-                document.getElementById('btn-theme-toggle').textContent = !isDark ? content[currentLang].themeWhite : content[currentLang].themeBlack;
-                wipe.style.width = '0%'; document.getElementById('duster').style.display = 'none';
+            const wipeOverlay = document.getElementById('wipe-overlay');
+            const duster = document.getElementById('duster');
+            
+            const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            let isCurrentlyBlack = body.classList.contains('theme-blackboard') || (!body.classList.contains('theme-whiteboard') && sysDark);
+            const targetClass = isCurrentlyBlack ? 'theme-whiteboard' : 'theme-blackboard';
+            const targetPaperColor = isCurrentlyBlack ? '#fffbeb' : '#18181b'; 
+            const targetGridColor = isCurrentlyBlack ? '#e5e7eb' : '#27272a'; 
+
+            wipeOverlay.style.backgroundColor = targetPaperColor;
+            wipeOverlay.style.backgroundImage = `linear-gradient(${targetGridColor} 1px, transparent 1px), linear-gradient(90deg, ${targetGridColor} 1px, transparent 1px)`;
+            duster.style.display = 'block';
+
+            const animation = wipeOverlay.animate([{ width: '0%' }, { width: '100%' }], { duration: 1000, easing: 'cubic-bezier(0.25, 1, 0.5, 1)', fill: 'forwards' });
+            animation.onfinish = () => {
+                body.classList.remove('theme-whiteboard', 'theme-blackboard');
+                body.classList.add(targetClass);
+                updateThemeButtonText();
+                animation.cancel();
+                wipeOverlay.style.width = '0%'; 
+                duster.style.display = 'none';
+                isAnimating = false;
             };
         }
         
+        function updateThemeButtonText() {
+            const body = document.body;
+            const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            let isDark = body.classList.contains('theme-blackboard') || (!body.classList.contains('theme-whiteboard') && sysDark);
+            document.getElementById('btn-theme-toggle').textContent = isDark ? content[currentLang].themeWhite : content[currentLang].themeBlack;
+        }
+
         function checkMobileNote() { if (localStorage.getItem('mobileNoteDismissed') === 'true') document.getElementById('mobile-note').style.display = 'none'; }
         function dismissMobileNote() { document.getElementById('mobile-note').style.display = 'none'; localStorage.setItem('mobileNoteDismissed', 'true'); }
         function checkGalleryNote() { document.getElementById('gallery-note').style.display = (localStorage.getItem('galleryNoteDismissed') !== 'true') ? 'block' : 'none'; }
         function dismissGalleryNote() { document.getElementById('gallery-note').style.display = 'none'; localStorage.setItem('galleryNoteDismissed', 'true'); }
 
-        // Context Menu
-        let contextAction = null;
-        const ctxMenu = document.getElementById('custom-context-menu');
-        document.addEventListener('contextmenu', e => {
-            e.preventDefault();
-            const target = e.target.closest('[data-action]');
-            contextAction = target ? target.getAttribute('data-action') : null;
-            ctxMenu.style.left = `${e.clientX}px`; ctxMenu.style.top = `${e.clientY}px`; ctxMenu.style.display = 'block';
-        });
-        document.addEventListener('click', () => ctxMenu.style.display = 'none');
-        document.getElementById('ctx-open').addEventListener('click', () => {
-            if(contextAction === 'magazine') openMagazine();
-            else if(contextAction === 'gallery') openGallery();
-            else if(contextAction === 'messages') openModal('messages');
-            else if(contextAction === 'tour') openModal('tour');
-        });
-
-        // Close on ESC
-        document.addEventListener('keydown', (e) => { 
-            if(e.key === "Escape") { closeModal(); closeGallery(); closeFullscreen(); closeMagazine(); }
-        });
+        let currentContextAction = null;
+        function initCustomContextMenu() {
+            const contextMenu = document.getElementById('custom-context-menu');
+            const openBtn = document.getElementById('ctx-open');
+            const openBtnText = document.getElementById('ctx-open-text');
+            const shareBtn = document.getElementById('ctx-share');
+            document.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                const targetElement = e.target.closest('[data-action]');
+                if (targetElement) {
+                    currentContextAction = targetElement.getAttribute('data-action');
+                    openBtn.classList.remove('disabled'); openBtnText.textContent = "Open / View"; 
+                } else {
+                    currentContextAction = null;
+                    openBtn.classList.add('disabled'); openBtnText.textContent = "Open (Select Item)";
+                }
+                let x = e.clientX, y = e.clientY;
+                if (x + 180 > window.innerWidth) x -= 180;
+                if (y + 150 > window.innerHeight) y -= 150;
+                contextMenu.style.left = `${x}px`; contextMenu.style.top = `${y}px`; contextMenu.style.display = 'block';
+            });
+            openBtn.addEventListener('click', () => {
+                if (openBtn.classList.contains('disabled')) return;
+                hideContextMenu();
+                if (currentContextAction === 'toast') showToast();
+                else if (currentContextAction === 'messages') openModal('messages');
+                else if (currentContextAction === 'tour') openModal('tour');
+                else if (currentContextAction === 'gallery') openGallery();
+                else if (currentContextAction === 'magazine') openMagazineChoice();
+            });
+            shareBtn.addEventListener('click', async () => {
+                hideContextMenu();
+                if (navigator.share) {
+                    try { await navigator.share({ title: 'E-Balarun 2026', text: 'Check out the Digital Edition!', url: window.location.href }); } catch (err) {}
+                } else {
+                    navigator.clipboard.writeText(window.location.href);
+                    const toast = document.getElementById("toast");
+                    const oldText = toast.textContent;
+                    toast.textContent = "Link Copied! 📋"; toast.className = "show";
+                    setTimeout(() => { toast.className = ""; setTimeout(() => { toast.textContent = oldText; }, 500); }, 2000);
+                }
+            });
+            document.addEventListener('click', (e) => { if (!contextMenu.contains(e.target)) hideContextMenu(); });
+            window.addEventListener('scroll', hideContextMenu, { passive: true });
+        }
+        function hideContextMenu() { document.getElementById('custom-context-menu').style.display = 'none'; }
+        const bindModalClose = (id, func) => { document.getElementById(id).addEventListener('click', (e) => { if (e.target === document.getElementById(id)) func(); }); };
+        bindModalClose('videoModal', closeModal); bindModalClose('galleryModal', closeGallery); bindModalClose('fullscreenModal', closeFullscreen);
+        let resizeTimer;
+        window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(updateLangButton, 100); }, { passive: true });
     </script>
 </body>
 </html>
