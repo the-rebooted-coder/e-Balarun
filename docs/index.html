@@ -514,26 +514,58 @@
         .fullscreen-close:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
 
         /* Magazine Specific Styles */
-        #book-flip-wrapper {
+        /* Enable Scrollbars for Zoom */
+        #magazine-scroll-container {
             width: 100%; height: 100%; 
+            overflow: hidden; /* Hidden by default, auto when zoomed */
             display: flex; justify-content: center; align-items: center;
-            overflow: hidden; opacity: 0; transition: opacity 0.5s;
+            position: relative;
+        }
+
+        #book-flip-wrapper {
+            transition: transform 0.2s ease-out; /* Smooth Zoom */
+            transform-origin: center center;
+            opacity: 0; 
         }
         #book-flip-wrapper.loaded { opacity: 1; }
         
         /* Canvas Page styling */
         .my-page {
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
             background-color: white; 
-            /* Fix flickering on mobile */
             -webkit-backface-visibility: hidden; backface-visibility: hidden;
         }
         
         .loading-text {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             color: var(--ink); font-family: var(--font-title); font-size: 2rem;
-            pointer-events: none;
+            pointer-events: none; z-index: 60;
+            background: rgba(255,255,255,0.8); padding: 20px; border-radius: 10px;
         }
+
+        /* TOOLBAR STYLES */
+        .mag-toolbar {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--paper); border: 2px solid var(--ink);
+            padding: 8px 15px; border-radius: 50px;
+            display: flex; gap: 10px; align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+        .mag-btn {
+            background: none; border: none; color: var(--ink);
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .mag-btn:hover { background: rgba(128,128,128,0.2); }
+        .mag-btn svg { width: 20px; height: 20px; stroke-width: 2.5; }
+        .mag-input {
+            width: 50px; text-align: center; border: 1px solid var(--ink-dim);
+            background: transparent; color: var(--ink); font-family: var(--font-body);
+            font-size: 1.1rem; border-radius: 5px; padding: 2px;
+        }
+        .mag-sep { width: 1px; height: 20px; background: var(--ink-dim); margin: 0 5px; }
 
         /* Responsive */
         svg path, svg circle { stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; stroke: currentColor; }
@@ -556,6 +588,7 @@
             
             /* Magazine Mobile */
             .modal-paper { padding: 0; width: 100%; height: 100vh; max-width: 100%; border: none; }
+            .mag-toolbar { width: 90%; justify-content: space-between; bottom: 30px; }
         }
     </style>
 </head>
@@ -690,15 +723,30 @@
     </div>
 
     <div class="modal-overlay" id="magazineModal">
-        <div class="modal-paper" style="width: 100%; height: 95vh; max-width: 1400px; padding: 0; background: transparent; border: none; box-shadow: none;">
-            <button class="close-btn" onclick="closeMagazine()" style="position: absolute; top: 10px; right: 10px; z-index: 50; background: var(--paper); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+        <div class="modal-paper" style="width: 100%; height: 100vh; max-width: 100vw; padding: 0; background: transparent; border: none; box-shadow: none;">
+            
+            <button class="close-btn" onclick="closeMagazine()" style="position: absolute; top: 15px; right: 15px; z-index: 150; background: var(--paper); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 2px solid var(--ink);">
                 <svg width="24" height="24" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" /></svg>
             </button>
             
-            <div class="loading-text" id="mag-loading">Loading Magazine...</div>
+            <div class="loading-text" id="mag-loading">Initializing Book...</div>
             
-            <div id="book-flip-wrapper">
-                <div id="flip-book"></div>
+            <div id="magazine-scroll-container">
+                <div id="book-flip-wrapper">
+                    <div id="flip-book"></div>
+                </div>
+            </div>
+
+            <div class="mag-toolbar">
+                <button class="mag-btn" onclick="zoomBook(-0.2)"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                <button class="mag-btn" onclick="zoomBook(0.2)"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                
+                <div class="mag-sep"></div>
+
+                <button class="mag-btn" onclick="flipBookInstance.flipPrev()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                <input type="number" id="page-num-input" class="mag-input" value="1" min="1" onchange="jumpToPage(this.value)">
+                <span style="font-size: 0.9rem; opacity: 0.7;">/ <span id="page-total">--</span></span>
+                <button class="mag-btn" onclick="flipBookInstance.flipNext()"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
             </div>
         </div>
     </div>
@@ -718,9 +766,7 @@
 
     <script>
         // --- CONFIGURATION ---
-        // ----------------------------------------------------
-        const PDF_URL = "magazine.pdf"; // <--- CHANGE THIS IF YOUR PDF NAME IS DIFFERENT
-        // ----------------------------------------------------
+        const PDF_URL = "magazine.pdf"; 
 
         // --- PRELOAD CRITICAL LOADER ASSETS ---
         (function preloadLoaderAssets() {
@@ -734,14 +780,12 @@
 
         const loader = document.getElementById('loader');
         
-        // Step 1: Trigger the Logo Swap
         setTimeout(() => {
             loader.classList.add('swap-logos');
             phase1Done = true;
             checkFinish(); 
         }, 2000);
 
-        // Step 2: Listen for page load
         window.addEventListener('load', () => {
             pageLoaded = true;
             checkFinish(); 
@@ -758,7 +802,6 @@
             }, 3000);
         });
 
-        // Step 3: Coordinate the Finish (Explosion)
         function checkFinish() {
             if (phase1Done && pageLoaded) {
                 setTimeout(() => {
@@ -768,10 +811,11 @@
             }
         }
 
-        // --- MAGAZINE LOGIC (PDF.JS + PAGEFLIP) ---
+        // --- OPTIMIZED MAGAZINE LOGIC ---
         let flipBookInstance = null;
         let pdfDoc = null;
         let isMagazineLoaded = false;
+        let currentZoom = 1.0;
 
         async function openMagazine() {
             const modal = document.getElementById('magazineModal');
@@ -779,7 +823,7 @@
             const wrapper = document.getElementById('book-flip-wrapper');
             modal.classList.add('active');
 
-            if (isMagazineLoaded) return; // Already loaded
+            if (isMagazineLoaded) return; 
 
             loadingText.style.display = 'block';
             wrapper.classList.remove('loaded');
@@ -788,46 +832,31 @@
                 // Initialize PDF.js
                 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
                 
-                // Fetch PDF
                 const loadingTask = pdfjsLib.getDocument(PDF_URL);
                 pdfDoc = await loadingTask.promise;
                 
                 const bookContainer = document.getElementById('flip-book');
-                bookContainer.innerHTML = ''; // Clear previous if any
+                bookContainer.innerHTML = ''; 
+                document.getElementById('page-total').textContent = pdfDoc.numPages;
 
-                // Render all pages to canvases
-                // Note: For very large PDFs (50+ pages), lazy loading is better, but complexity is higher.
-                // This renders all pages upfront for smooth flipping.
-                const scale = window.innerWidth < 768 ? 1.0 : 1.5; // Adjust quality based on device
-                
+                // Step 1: Create Canvas Elements (Empty placeholders first)
+                // This makes the structure ready instantly
                 for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
-                    const page = await pdfDoc.getPage(pageNum);
-                    const viewport = page.getViewport({ scale: scale });
-                    
                     const canvas = document.createElement('canvas');
                     canvas.className = 'my-page';
-                    const context = canvas.getContext('2d');
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
-                    canvas.dataset.density = "hard"; // Makes pages feel like paper
-
-                    // Render page into canvas
-                    await page.render({ canvasContext: context, viewport: viewport }).promise;
+                    canvas.id = `page-canvas-${pageNum}`;
                     bookContainer.appendChild(canvas);
-                    
-                    // Update loading text
-                    loadingText.textContent = `Loading... ${Math.round((pageNum / pdfDoc.numPages) * 100)}%`;
                 }
 
-                // Initialize PageFlip
-                // We wait a tiny bit to ensure DOM is updated
-                setTimeout(() => {
-                    const width = window.innerWidth < 768 ? window.innerWidth * 0.9 : 500;
-                    const height = window.innerWidth < 768 ? window.innerHeight * 0.7 : 700;
+                // Step 2: Initialize FlipBook immediately
+                setTimeout(async () => {
+                    const isMobile = window.innerWidth < 768;
+                    const width = isMobile ? window.innerWidth * 0.95 : 500;
+                    const height = isMobile ? window.innerHeight * 0.8 : 700;
                     
                     flipBookInstance = new St.PageFlip(document.getElementById('flip-book'), {
-                        width: width, // base width
-                        height: height, // base height
+                        width: width, 
+                        height: height,
                         size: "stretch",
                         minWidth: 300,
                         maxWidth: 1000,
@@ -835,14 +864,26 @@
                         maxHeight: 1200,
                         maxShadowOpacity: 0.5,
                         showCover: true,
-                        mobileScrollSupport: false // disable standard scroll to prevent conflict
+                        mobileScrollSupport: false // We handle scroll ourselves
                     });
 
                     flipBookInstance.loadFromHTML(document.querySelectorAll('.my-page'));
                     
-                    loadingText.style.display = 'none';
+                    // Hook up page change to input box
+                    flipBookInstance.on('flip', (e) => {
+                         document.getElementById('page-num-input').value = e.data + 1; // +1 because index is 0-based
+                    });
+
                     wrapper.classList.add('loaded');
+                    loadingText.style.display = 'none';
                     isMagazineLoaded = true;
+
+                    // Step 3: Render Pages intelligently (Prioritize visible ones)
+                    // Render first 4 pages immediately for speed
+                    await renderPageBatch(1, 4);
+                    
+                    // Render the rest in background
+                    renderPageBatch(5, pdfDoc.numPages);
 
                 }, 100);
 
@@ -852,8 +893,69 @@
             }
         }
 
+        // Helper to render a batch of pages
+        async function renderPageBatch(start, end) {
+            if (start > pdfDoc.numPages) return;
+            end = Math.min(end, pdfDoc.numPages);
+
+            const scale = window.innerWidth < 768 ? 1.0 : 1.5; // Lower scale for mobile speed
+
+            for (let i = start; i <= end; i++) {
+                const canvas = document.getElementById(`page-canvas-${i}`);
+                if (!canvas || canvas.classList.contains('rendered')) continue;
+
+                try {
+                    const page = await pdfDoc.getPage(i);
+                    const viewport = page.getViewport({ scale: scale });
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    
+                    await page.render({ canvasContext: context, viewport: viewport }).promise;
+                    canvas.classList.add('rendered'); // Mark as done
+                } catch(e) { console.error(`Error rendering page ${i}`, e); }
+            }
+        }
+
+        function zoomBook(delta) {
+            currentZoom += delta;
+            // Clamp Zoom levels
+            if (currentZoom < 0.5) currentZoom = 0.5;
+            if (currentZoom > 3.0) currentZoom = 3.0;
+            
+            const wrapper = document.getElementById('book-flip-wrapper');
+            const scrollContainer = document.getElementById('magazine-scroll-container');
+            
+            wrapper.style.transform = `scale(${currentZoom})`;
+            
+            // If zoomed in, enable scroll bars on the parent
+            if (currentZoom > 1.0) {
+                scrollContainer.style.overflow = "auto";
+                scrollContainer.style.alignItems = "flex-start"; // Better for top alignment when scrolling
+            } else {
+                scrollContainer.style.overflow = "hidden";
+                scrollContainer.style.alignItems = "center";
+                // Reset scroll position
+                scrollContainer.scrollTop = 0;
+                scrollContainer.scrollLeft = 0;
+            }
+        }
+
+        function jumpToPage(val) {
+            if(!flipBookInstance) return;
+            const page = parseInt(val, 10);
+            // FlipBook index is 0-based, but we must validate against total
+            if (page >= 1 && page <= pdfDoc.numPages) {
+                flipBookInstance.turnToPage(page - 1);
+            }
+        }
+
         function closeMagazine() {
             document.getElementById('magazineModal').classList.remove('active');
+            // Reset zoom on close
+            currentZoom = 1.0;
+            const wrapper = document.getElementById('book-flip-wrapper');
+            if(wrapper) wrapper.style.transform = `scale(1)`;
         }
 
         // --- Content Configuration ---
