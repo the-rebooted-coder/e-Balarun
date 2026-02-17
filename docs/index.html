@@ -25,6 +25,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Patrick+Hand&family=Noto+Serif+Devanagari:wght@400;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/pdfjs-dist@3.11.174/web/pdf_viewer.css">
     
     <style>
         :root {
@@ -426,7 +430,7 @@
         .gallery-divider {
             width: 100%;
             border-bottom: 2px dashed var(--ink-dim);
-            margin-top: 0px;     
+            margin-top: 0px;      
             margin-bottom: 25px; 
             flex-shrink: 0;
         }
@@ -509,6 +513,28 @@
         }
         .fullscreen-close:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
 
+        /* Magazine Specific Styles */
+        #book-flip-wrapper {
+            width: 100%; height: 100%; 
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; opacity: 0; transition: opacity 0.5s;
+        }
+        #book-flip-wrapper.loaded { opacity: 1; }
+        
+        /* Canvas Page styling */
+        .my-page {
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            background-color: white; 
+            /* Fix flickering on mobile */
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+        }
+        
+        .loading-text {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: var(--ink); font-family: var(--font-title); font-size: 2rem;
+            pointer-events: none;
+        }
+
         /* Responsive */
         svg path, svg circle { stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; stroke: currentColor; }
         @media (max-width: 768px) {
@@ -527,6 +553,9 @@
             .nav-arrow { width: 40px; height: 40px; background: rgba(0,0,0,0.3); }
             .nav-arrow.prev { left: 10px; }
             .nav-arrow.next { right: 10px; }
+            
+            /* Magazine Mobile */
+            .modal-paper { padding: 0; width: 100%; height: 100vh; max-width: 100%; border: none; }
         }
     </style>
 </head>
@@ -582,8 +611,8 @@
         </header>
 
         <main class="hero">
-            <div class="book-container ctx-target" data-action="toast">
-                <div class="book-wrapper" onclick="showToast()">
+            <div class="book-container ctx-target" data-action="magazine">
+                <div class="book-wrapper" onclick="openMagazine()">
                     <div class="book">
                         <div class="book-face book-front"><img src="150_Poster.jpg" alt="E-Balarun Poster Cover"></div>
                         <div class="book-face book-spine"></div>
@@ -660,6 +689,20 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="magazineModal">
+        <div class="modal-paper" style="width: 100%; height: 95vh; max-width: 1400px; padding: 0; background: transparent; border: none; box-shadow: none;">
+            <button class="close-btn" onclick="closeMagazine()" style="position: absolute; top: 10px; right: 10px; z-index: 50; background: var(--paper); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <svg width="24" height="24" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" /></svg>
+            </button>
+            
+            <div class="loading-text" id="mag-loading">Loading Magazine...</div>
+            
+            <div id="book-flip-wrapper">
+                <div id="flip-book"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="fullscreenModal">
         <button class="close-btn fullscreen-close" onclick="closeFullscreen()">×</button>
         
@@ -674,6 +717,11 @@
     </div>
 
     <script>
+        // --- CONFIGURATION ---
+        // ----------------------------------------------------
+        const PDF_URL = "magazine.pdf"; // <--- CHANGE THIS IF YOUR PDF NAME IS DIFFERENT
+        // ----------------------------------------------------
+
         // --- PRELOAD CRITICAL LOADER ASSETS ---
         (function preloadLoaderAssets() {
             const img1 = new Image(); img1.src = "https://i.ibb.co/ymGmHBXm/balarun-logo.png";
@@ -720,6 +768,94 @@
             }
         }
 
+        // --- MAGAZINE LOGIC (PDF.JS + PAGEFLIP) ---
+        let flipBookInstance = null;
+        let pdfDoc = null;
+        let isMagazineLoaded = false;
+
+        async function openMagazine() {
+            const modal = document.getElementById('magazineModal');
+            const loadingText = document.getElementById('mag-loading');
+            const wrapper = document.getElementById('book-flip-wrapper');
+            modal.classList.add('active');
+
+            if (isMagazineLoaded) return; // Already loaded
+
+            loadingText.style.display = 'block';
+            wrapper.classList.remove('loaded');
+
+            try {
+                // Initialize PDF.js
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+                
+                // Fetch PDF
+                const loadingTask = pdfjsLib.getDocument(PDF_URL);
+                pdfDoc = await loadingTask.promise;
+                
+                const bookContainer = document.getElementById('flip-book');
+                bookContainer.innerHTML = ''; // Clear previous if any
+
+                // Render all pages to canvases
+                // Note: For very large PDFs (50+ pages), lazy loading is better, but complexity is higher.
+                // This renders all pages upfront for smooth flipping.
+                const scale = window.innerWidth < 768 ? 1.0 : 1.5; // Adjust quality based on device
+                
+                for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+                    const page = await pdfDoc.getPage(pageNum);
+                    const viewport = page.getViewport({ scale: scale });
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.className = 'my-page';
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    canvas.dataset.density = "hard"; // Makes pages feel like paper
+
+                    // Render page into canvas
+                    await page.render({ canvasContext: context, viewport: viewport }).promise;
+                    bookContainer.appendChild(canvas);
+                    
+                    // Update loading text
+                    loadingText.textContent = `Loading... ${Math.round((pageNum / pdfDoc.numPages) * 100)}%`;
+                }
+
+                // Initialize PageFlip
+                // We wait a tiny bit to ensure DOM is updated
+                setTimeout(() => {
+                    const width = window.innerWidth < 768 ? window.innerWidth * 0.9 : 500;
+                    const height = window.innerWidth < 768 ? window.innerHeight * 0.7 : 700;
+                    
+                    flipBookInstance = new St.PageFlip(document.getElementById('flip-book'), {
+                        width: width, // base width
+                        height: height, // base height
+                        size: "stretch",
+                        minWidth: 300,
+                        maxWidth: 1000,
+                        minHeight: 400,
+                        maxHeight: 1200,
+                        maxShadowOpacity: 0.5,
+                        showCover: true,
+                        mobileScrollSupport: false // disable standard scroll to prevent conflict
+                    });
+
+                    flipBookInstance.loadFromHTML(document.querySelectorAll('.my-page'));
+                    
+                    loadingText.style.display = 'none';
+                    wrapper.classList.add('loaded');
+                    isMagazineLoaded = true;
+
+                }, 100);
+
+            } catch (error) {
+                console.error("Error loading PDF:", error);
+                loadingText.innerHTML = "Could not load PDF.<br>Please ensure 'magazine.pdf' is in the root folder.";
+            }
+        }
+
+        function closeMagazine() {
+            document.getElementById('magazineModal').classList.remove('active');
+        }
+
         // --- Content Configuration ---
         const content = {
             en: {
@@ -732,7 +868,7 @@
                 messagesTitle: "Video Messages",
                 tourTitle: "Virtual Campus Tour",
                 galleryTitle: "Photo Scrapbook", 
-                langBtn: "हिन्दी", langBtnMobile: "हिं",         
+                langBtn: "हिन्दी", langBtnMobile: "हिं",          
                 footerHtml: 'Published with ❤️ in <span class="loc-text">Jabalpur</span>',
                 themeWhite: "Switch to Whiteboard", themeBlack: "Switch to Blackboard",
                 archiveBtn: "📂 2021-22 Archive", readLabel: "Click to Read 📖",
@@ -752,7 +888,7 @@
                 messagesTitle: "वीडियो संदेश",
                 tourTitle: "कैंपस का भ्रमण",
                 galleryTitle: "फ़ोटो एल्बम", 
-                langBtn: "English", langBtnMobile: "En",     
+                langBtn: "English", langBtnMobile: "En",      
                 footerHtml: '<span class="loc-text">जबलपुर</span> से ❤️ प्रकाशित',
                 themeWhite: "व्हाइटबोर्ड पर जाएं", themeBlack: "ब्लैकबोर्ड पर जाएं",
                 archiveBtn: "📂 २०२१-२२ संग्रह", readLabel: "पढ़ने के लिए क्लिक करें 📖",
@@ -968,8 +1104,8 @@
         let currentLang = 'en';
         let isAnimating = false;
         let galleryData = rawGalleryData;
-        let filteredImages = [];         
-        let currentGalleryIndex = 0;     
+        let filteredImages = [];          
+        let currentGalleryIndex = 0;      
         const galleryBatchSize = 12;
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -1038,7 +1174,7 @@
             for (let i = currentGalleryIndex; i < nextIndex; i++) {
                 const imgObj = filteredImages[i];
                 const thumbPath = `gallery/thumbnails/${imgObj.src}`; 
-                const fullPath = `gallery/${imgObj.src}`;             
+                const fullPath = `gallery/${imgObj.src}`;              
                 const frame = document.createElement('div');
                 frame.className = 'photo-frame';
                 // Pass the index 'i' to openFullscreen
@@ -1191,7 +1327,7 @@
 
         document.addEventListener('keydown', (e) => { 
             if (e.key === "Escape") { 
-                closeModal(); closeGallery(); closeFullscreen(); 
+                closeModal(); closeGallery(); closeFullscreen(); closeMagazine(); 
             } 
             // Only navigate if fullscreen modal is active
             if (document.getElementById('fullscreenModal').classList.contains('active')) {
@@ -1270,6 +1406,7 @@
                 else if (currentContextAction === 'messages') openModal('messages');
                 else if (currentContextAction === 'tour') openModal('tour');
                 else if (currentContextAction === 'gallery') openGallery();
+                else if (currentContextAction === 'magazine') openMagazine();
             });
             shareBtn.addEventListener('click', async () => {
                 hideContextMenu();
