@@ -547,11 +547,22 @@
         /* The Book Flip Element */
         #flip-book { display: none; /* Hidden until loaded */ box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
 
-        /* Page Canvas Styling */
-        .page-canvas {
+        /* Page Wrapper Logic (Memory Safety) */
+        .my-page {
             display: block; background-color: white; 
             -webkit-font-smoothing: antialiased;
             backface-visibility: hidden;
+            width: 100%; height: 100%;
+            position: relative;
+        }
+        /* The canvas inside the page wrapper */
+        .my-page canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: contain;
+        }
+        .page-loading-txt {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: #ccc; font-family: var(--font-body);
         }
         
         /* Floating Controls Dock */
@@ -845,7 +856,7 @@
         }
 
         // ============================================
-        // NEW MAGAZINE ENGINE (PDF.js + PageFlip + Panzoom)
+        // NEW MAGAZINE ENGINE (CRASH-PROOF MEMORY MANAGEMENT)
         // ============================================
         let flipBook = null;
         let pdfDoc = null;
@@ -880,21 +891,21 @@
                 const isMobile = window.innerWidth < 768;
                 
                 // Set book dimensions based on screen
-                // Mobile: Portrait (Single Page)
-                // Desktop: Landscape (Double Page)
                 const bookWidth = isMobile ? window.innerWidth * 0.95 : 450;
                 const bookHeight = isMobile ? window.innerHeight * 0.75 : 600;
 
-                // Create Canvas Elements for all pages immediately (Empty shells)
+                // 1. Create Placeholder DIVs (Wrappers) instead of Canvases immediately
+                // This prevents memory spike
                 bookElem.innerHTML = "";
                 for(let i = 1; i <= pdfDoc.numPages; i++) {
-                    const canvas = document.createElement('canvas');
-                    canvas.className = 'page-canvas';
-                    canvas.id = `page-${i}`;
-                    bookElem.appendChild(canvas);
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'my-page';
+                    wrapper.id = `page-wrapper-${i}`;
+                    wrapper.innerHTML = `<div class="page-loading-txt">Page ${i}</div>`;
+                    bookElem.appendChild(wrapper);
                 }
 
-                // Initialize PageFlip
+                // 2. Initialize PageFlip
                 flipBook = new St.PageFlip(bookElem, {
                     width: bookWidth,
                     height: bookHeight,
@@ -903,13 +914,13 @@
                     minHeight: 400, maxHeight: 1200,
                     showCover: true,
                     mobileScrollSupport: false, // We use Panzoom instead
-                    usePortrait: isMobile, // Single page on mobile
+                    usePortrait: isMobile, // FORCE single page on mobile
                     startPage: 0
                 });
 
-                flipBook.loadFromHTML(document.querySelectorAll('.page-canvas'));
+                flipBook.loadFromHTML(document.querySelectorAll('.my-page'));
 
-                // Initialize Panzoom for smooth zoom gestures
+                // 3. Initialize Panzoom for smooth zoom gestures
                 const panContainer = document.getElementById('panzoom-container');
                 panzoomInstance = Panzoom(panContainer, {
                     maxScale: 4,
@@ -918,7 +929,6 @@
                     cursor: 'default' // Don't change cursor
                 });
                 
-                // Allow mouse wheel to zoom
                 panContainer.parentElement.addEventListener('wheel', panzoomInstance.zoomWithWheel);
                 
                 // Double tap to zoom
@@ -933,12 +943,13 @@
                     lastTap = currentTime;
                 });
 
-                // Update Page Numbers UI
+                // 4. SMART RENDER ON FLIP (Just-In-Time Rendering)
                 flipBook.on('flip', (e) => {
-                    // PageFlip uses index 0 based.
-                    // On desktop (double), e.data is index of left page.
-                    let pageNum = e.data + 1;
+                    let pageNum = e.data + 1; // e.data is index 0-based
                     document.getElementById('curr-page').textContent = pageNum;
+                    
+                    // Render current page + neighbors, CLEAN up others
+                    manageMemoryAndRender(pageNum);
                 });
 
                 // Hide Loader & Show Book
@@ -946,18 +957,8 @@
                 bookElem.style.display = 'block';
                 isBookInitialized = true;
 
-                // Render Pages Strategy:
-                // 1. Render Cover (Page 1) immediately
-                // 2. Render Page 2-3
-                // 3. Render rest in background
-                await renderPage(1, isMobile);
-                renderPage(2, isMobile);
-                renderPage(3, isMobile);
-                
-                // Background render the rest
-                for(let i = 4; i <= pdfDoc.numPages; i++) {
-                    renderPage(i, isMobile);
-                }
+                // Initial Render (Cover)
+                manageMemoryAndRender(1);
 
             } catch (err) {
                 console.error(err);
@@ -965,34 +966,53 @@
             }
         }
 
-        async function renderPage(num, isMobile) {
-            if(num > pdfDoc.numPages) return;
-            const canvas = document.getElementById(`page-${num}`);
-            if(!canvas) return;
+        // --- THE MAGIC FUNCTION TO PREVENT CRASHES ---
+        async function manageMemoryAndRender(currentP) {
+            // Define range to keep in memory (Current +/- 2 pages)
+            const range = 2;
+            
+            for (let i = 1; i <= pdfDoc.numPages; i++) {
+                const wrapper = document.getElementById(`page-wrapper-${i}`);
+                if (!wrapper) continue;
 
+                if (i >= currentP - range && i <= currentP + range) {
+                    // Page is near: RENDER IT if not already there
+                    if (!wrapper.querySelector('canvas')) {
+                        await renderPageToWrapper(i, wrapper);
+                    }
+                } else {
+                    // Page is far: KILL IT (Clear DOM) to free RAM
+                    if (wrapper.querySelector('canvas')) {
+                        wrapper.innerHTML = `<div class="page-loading-txt">Page ${i}</div>`;
+                    }
+                }
+            }
+        }
+
+        async function renderPageToWrapper(num, wrapper) {
             try {
                 const page = await pdfDoc.getPage(num);
+                
                 // High Quality Rendering: Adjust scale based on device pixel ratio
-                // Desktop: 1.5x, Mobile: 2.0x (for sharpness when zoomed)
+                const isMobile = window.innerWidth < 768;
                 const pixelRatio = window.devicePixelRatio || 1;
                 const scale = isMobile ? 1.5 : 1.2; 
                 
                 const viewport = page.getViewport({ scale: scale * pixelRatio });
+                
+                const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
 
                 canvas.width = viewport.width;
                 canvas.height = viewport.height;
                 
-                // Scale back down via CSS to fit the flipbook container
-                canvas.style.width = "100%";
-                canvas.style.height = "100%";
-
-                await page.render({
-                    canvasContext: context,
-                    viewport: viewport
-                }).promise;
+                // Render
+                await page.render({ canvasContext: context, viewport: viewport }).promise;
                 
-                canvas.classList.add('rendered');
+                // Insert into DOM
+                wrapper.innerHTML = ''; // Remove "Page X" text
+                wrapper.appendChild(canvas);
+                
             } catch(e) { console.error("Render error page " + num, e); }
         }
 
