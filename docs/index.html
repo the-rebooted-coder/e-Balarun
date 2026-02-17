@@ -26,9 +26,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Patrick+Hand&family=Noto+Serif+Devanagari:wght@400;700&display=swap" rel="stylesheet">
 
-    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/pdfjs-dist@3.11.174/web/pdf_viewer.css">
     
     <style>
@@ -515,77 +513,85 @@
         .fullscreen-close:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
 
         /* =================================================================
-           NEW ULTRA-PREMIUM MAGAZINE STYLES 
+           NEW "LAUNCH CARD" MAGAZINE UI (Replicates Archive Card Style)
            ================================================================= */
         #mag-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #111; /* Dark immersive background */
+            background: #0f172a; /* Slate 900 */
             z-index: 99999;
-            display: flex; flex-direction: column;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
             opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
         }
         #mag-overlay.active { opacity: 1; pointer-events: all; }
 
-        /* Top Bar (Title + Close) */
-        .mag-topbar {
-            height: 60px; display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 10;
+        /* Close Button */
+        .mag-close {
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(255,255,255,0.1); border: none; color: #fff;
+            width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s ease; z-index: 10;
         }
-        .mag-title { color: #facc15; font-family: var(--font-title); font-size: 1.8rem; letter-spacing: 1px; }
-        .mag-close { background: none; border: none; color: #fff; opacity: 0.8; cursor: pointer; transition: transform 0.2s; }
-        .mag-close:hover { transform: scale(1.1); opacity: 1; }
+        .mag-close:hover { background: rgba(255,255,255,0.2); transform: rotate(90deg); }
 
-        /* Selection Screen */
-        #mag-selection {
-            flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 30px;
-            background: #111; z-index: 20; color: #fff;
+        /* The Card */
+        .mag-card {
+            background: #ffffff;
+            width: 90%; max-width: 420px;
+            padding: 2.5rem 2rem;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5);
+            text-align: center;
+            position: relative; overflow: hidden;
+            border: 4px solid #fff;
+            animation: slideUpMag 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-        .sel-btn {
-            background: rgba(255,255,255,0.1); border: 2px solid #facc15; color: #fff;
-            padding: 15px 30px; font-family: var(--font-title); font-size: 2rem;
-            cursor: pointer; border-radius: 10px; transition: all 0.3s; min-width: 280px;
-            display: flex; flex-direction: column; align-items: center;
-        }
-        .sel-btn:hover { background: #facc15; color: #111; transform: scale(1.05); }
-        .sel-small { font-family: var(--font-body); font-size: 1rem; opacity: 0.8; margin-top: 5px; }
+        @keyframes slideUpMag { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* MODE 1: Flip Container */
-        #mag-flip-container { display: none; flex: 1; justify-content: center; align-items: center; overflow: hidden; background: #222; }
-        #flip-book { display: none; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .my-page { display: block; background-color: white; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+        /* Decorative Stripe */
+        .mag-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
+            height: 6px; background: linear-gradient(90deg, #facc15, #fbbf24);
+        }
 
-        /* MODE 2: Scroll Container (Mobile Efficient) */
-        #mag-scroll-container { 
-            display: none; flex: 1; overflow-y: scroll; overflow-x: hidden; 
-            background: #222; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; 
-            padding-bottom: 100px; flex-direction: column; align-items: center;
+        /* Typography inside Card */
+        .mag-badge {
+            display: inline-block; background-color: #fefce8; color: #b45309;
+            font-size: 0.8rem; font-weight: 700; padding: 6px 14px;
+            border-radius: 50px; margin-bottom: 1.5rem; text-transform: uppercase;
+            font-family: var(--font-body); letter-spacing: 1px;
         }
-        .pdf-page-container {
-            position: relative; background: #fff; margin: 20px auto;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5); min-height: 300px;
-            width: 800px; max-width: 95%;
-        }
-        .pdf-canvas { display: block; width: 100%; height: auto; }
-        .page-loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #888; font-family: var(--font-body); }
         
-        /* Global Loader */
-        #global-loader-text {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            color: #facc15; font-family: var(--font-title); font-size: 2rem; z-index: 5; display: none;
+        .mag-h1 {
+            font-family: var(--font-title); color: #1e293b; font-size: 3rem;
+            line-height: 1; margin-bottom: 1rem;
+        }
+        
+        .mag-sub {
+            font-family: var(--font-body); color: #64748b; font-size: 1.1rem;
+            margin-bottom: 2rem; line-height: 1.4;
         }
 
-        /* Controls */
-        .mag-controls {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: rgba(30, 30, 30, 0.9); backdrop-filter: blur(10px);
-            padding: 10px 20px; border-radius: 30px;
-            display: none; gap: 15px; align-items: center;
-            border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 20;
+        /* The Button */
+        .mag-btn-launch {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            background-color: #facc15; color: #1e1e1e;
+            text-decoration: none; font-weight: 700; font-family: var(--font-body);
+            font-size: 1.2rem; padding: 14px 20px; border-radius: 12px;
+            transition: all 0.3s ease; width: 100%; border: none; cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(250, 204, 21, 0.4);
         }
-        .mag-pg-text { color: #fff; font-family: var(--font-body); font-size: 1.1rem; min-width: 80px; text-align: center; }
-        .ctrl-btn { background: transparent; border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .ctrl-btn:hover { background: rgba(255,255,255,0.2); }
+        .mag-btn-launch:hover {
+            background-color: #eab308; transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(250, 204, 21, 0.5);
+        }
+        
+        /* Iframe Container (Hidden by default, shown after click) */
+        #mag-reader-frame {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff; z-index: 99998; border: none;
+            display: none; /* Hidden initially */
+        }
 
         /* Responsive */
         svg path, svg circle { stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; stroke: currentColor; }
@@ -605,12 +611,6 @@
             .nav-arrow { width: 40px; height: 40px; background: rgba(0,0,0,0.3); }
             .nav-arrow.prev { left: 10px; }
             .nav-arrow.next { right: 10px; }
-            
-            /* Magazine Mobile Specifics */
-            .mag-controls { width: 90%; justify-content: space-between; bottom: 20px; }
-            .mag-topbar { padding: 0 10px; }
-            .mag-title { font-size: 1.4rem; }
-            .pdf-page-container { width: 100%; margin: 10px 0; }
         }
     </style>
 </head>
@@ -667,7 +667,7 @@
 
         <main class="hero">
             <div class="book-container ctx-target" data-action="magazine">
-                <div class="book-wrapper" onclick="openMagazineChoice()">
+                <div class="book-wrapper" onclick="openMagazine()">
                     <div class="book">
                         <div class="book-face book-front"><img src="150_Poster.jpg" alt="E-Balarun Poster Cover"></div>
                         <div class="book-face book-spine"></div>
@@ -703,46 +703,6 @@
                 <button class="theme-toggle-btn" id="btn-theme-toggle" onclick="toggleTheme()">Switch to Whiteboard</button>
             </div>
         </footer>
-    </div>
-
-    <div id="mag-overlay">
-        <div class="mag-topbar">
-            <span class="mag-title">E-Balarun Digital</span>
-            <button class="mag-close" onclick="closeMagazine()">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-        </div>
-
-        <div id="mag-selection">
-            <h2 style="font-family: var(--font-title); font-size: 3rem; color: #facc15;">Choose Reading Mode</h2>
-            <button class="sel-btn" onclick="startFlipMode()">
-                📖 Interactive Flipbook
-                <span class="sel-small">3D Experience • Best for Desktop</span>
-                <span class="sel-small" style="color:#ff6b6b; font-size:0.8rem; margin-top:5px;">⚠️ High Performance Required</span>
-            </button>
-            <button class="sel-btn" onclick="startScrollMode()">
-                📜 Vertical Scroll
-                <span class="sel-small">Fast & Fluid • Best for Mobile</span>
-            </button>
-        </div>
-
-        <div id="global-loader-text">Loading Book...</div>
-
-        <div id="mag-flip-container">
-             <div id="flip-book"></div>
-        </div>
-
-        <div id="mag-scroll-container"></div>
-
-        <div class="mag-controls" id="mag-controls-flip">
-            <button class="ctrl-btn" onclick="if(flipBook) flipBook.flipPrev()">←</button>
-            <span class="mag-pg-text" id="page-indicator-flip">1</span>
-            <button class="ctrl-btn" onclick="if(flipBook) flipBook.flipNext()">→</button>
-        </div>
-        
-        <div class="mag-controls" id="mag-controls-scroll">
-            <span class="mag-pg-text" id="page-indicator-scroll">Page 1</span>
-        </div>
     </div>
 
     <div class="modal-overlay" id="videoModal">
@@ -784,6 +744,28 @@
         </div>
     </div>
 
+    <div id="mag-overlay">
+        <button class="mag-close" onclick="closeMagazine()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+
+        <div class="mag-card" id="mag-card">
+            <span class="mag-badge">Digital Edition</span>
+            <div class="mag-h1">Read E-Balarun</div>
+            <p class="mag-sub">
+                Experience the 2026 Edition.<br>
+                Optimized for all devices.
+            </p>
+            
+            <button class="mag-btn-launch" onclick="launchPDF()">
+                Open Reader
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+            </button>
+        </div>
+
+        <iframe id="mag-reader-frame" src="about:blank"></iframe>
+    </div>
+
     <div class="modal-overlay" id="fullscreenModal">
         <button class="close-btn fullscreen-close" onclick="closeFullscreen()">×</button>
         
@@ -798,9 +780,6 @@
     </div>
 
     <script>
-        // --- CONFIGURATION ---
-        const PDF_URL = "magazine.pdf"; 
-
         // --- PRELOAD CRITICAL LOADER ASSETS ---
         (function preloadLoaderAssets() {
             const img1 = new Image(); img1.src = "https://i.ibb.co/ymGmHBXm/balarun-logo.png";
@@ -844,152 +823,51 @@
             }
         }
 
-        // ============================================
-        // DUAL MODE MAGAZINE ENGINE
-        // ============================================
-        let pdfDoc = null;
-        let flipBook = null;
-        let isBookLoaded = false;
-
-        function openMagazineChoice() {
-            document.getElementById('mag-overlay').classList.add('active');
-            document.getElementById('mag-selection').style.display = 'flex';
-            document.getElementById('mag-flip-container').style.display = 'none';
-            document.getElementById('mag-scroll-container').style.display = 'none';
-            document.getElementById('mag-controls-flip').style.display = 'none';
-            document.getElementById('mag-controls-scroll').style.display = 'none';
-            document.getElementById('global-loader-text').style.display = 'none';
-        }
-
-        async function loadPdfDoc() {
-            if (pdfDoc) return pdfDoc;
-            document.getElementById('mag-selection').style.display = 'none';
-            document.getElementById('global-loader-text').style.display = 'block';
+        // --- MAGAZINE LOGIC START ---
+        // ----------------------------------------------------
+        // IMPORTANT: Ensure 'magazine.pdf' is in the ROOT folder
+        // ----------------------------------------------------
+        function openMagazine() {
+            const overlay = document.getElementById('mag-overlay');
+            const card = document.getElementById('mag-card');
+            const frame = document.getElementById('mag-reader-frame');
             
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
-            const loadingTask = pdfjsLib.getDocument(PDF_URL);
-            pdfDoc = await loadingTask.promise;
-            return pdfDoc;
+            // Reset state
+            frame.style.display = 'none';
+            frame.src = 'about:blank'; // Unload PDF to save memory
+            card.style.display = 'block'; // Show launch card
+            
+            overlay.classList.add('active');
         }
 
-        // --- MODE 1: FLIPBOOK (With Just-In-Time Rendering) ---
-        async function startFlipMode() {
-            try {
-                await loadPdfDoc();
-                document.getElementById('global-loader-text').style.display = 'none';
-                document.getElementById('mag-flip-container').style.display = 'flex';
-                document.getElementById('mag-controls-flip').style.display = 'flex';
-                document.getElementById('flip-book').style.display = 'block';
-
-                if(!flipBook) {
-                    const bookElem = document.getElementById('flip-book');
-                    bookElem.innerHTML = "";
-                    
-                    // Create Placeholders
-                    for(let i=1; i<=pdfDoc.numPages; i++) {
-                        const div = document.createElement('div');
-                        div.className = 'my-page'; // Reusing style from CSS
-                        div.innerHTML = `<div style="display:flex;width:100%;height:100%;align-items:center;justify-content:center;background:#fff;color:#ccc;">Page ${i}</div>`;
-                        div.id = `flip-page-${i}`;
-                        bookElem.appendChild(div);
-                    }
-
-                    // Init Flip
-                    const isMobile = window.innerWidth < 768;
-                    flipBook = new St.PageFlip(bookElem, {
-                        width: isMobile ? 350 : 550, height: isMobile ? 500 : 800,
-                        size: "stretch", minWidth: 300, maxWidth: 1000, minHeight: 400, maxHeight: 1200,
-                        showCover: true, usePortrait: isMobile
-                    });
-
-                    flipBook.loadFromHTML(document.querySelectorAll('.my-page'));
-                    
-                    // Smart Render
-                    flipBook.on('flip', (e) => {
-                        document.getElementById('page-indicator-flip').innerText = (e.data + 1) + " / " + pdfDoc.numPages;
-                        renderFlipPage(e.data + 1);
-                    });
-                    
-                    // Initial
-                    renderFlipPage(1);
-                }
-            } catch(e) { alert("Error: " + e.message); }
-        }
-
-        async function renderFlipPage(num) {
-            // Render Current, Prev, Next only
-            [num, num-1, num+1].forEach(async (n) => {
-                if(n < 1 || n > pdfDoc.numPages) return;
-                const wrapper = document.getElementById(`flip-page-${n}`);
-                if(wrapper.querySelector('canvas')) return; // Already rendered
-
-                const page = await pdfDoc.getPage(n);
-                const viewport = page.getViewport({ scale: 1.5 });
-                const canvas = document.createElement('canvas');
-                canvas.width = viewport.width; canvas.height = viewport.height;
-                canvas.style.width = "100%"; canvas.style.height = "100%";
-                
-                await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
-                wrapper.innerHTML = "";
-                wrapper.appendChild(canvas);
-            });
-        }
-
-        // --- MODE 2: SCROLL (Crash Proof) ---
-        async function startScrollMode() {
-            try {
-                await loadPdfDoc();
-                document.getElementById('global-loader-text').style.display = 'none';
-                document.getElementById('mag-scroll-container').style.display = 'flex';
-                document.getElementById('mag-controls-scroll').style.display = 'flex';
-                
-                const container = document.getElementById('mag-scroll-container');
-                if(container.children.length === 0) {
-                    // Setup Intersection Observer
-                    const observer = new IntersectionObserver((entries) => {
-                        entries.forEach(entry => {
-                            const pNum = entry.target.getAttribute('data-num');
-                            if(entry.isIntersecting) {
-                                renderScrollPage(entry.target, parseInt(pNum));
-                                document.getElementById('page-indicator-scroll').innerText = `Page ${pNum} / ${pdfDoc.numPages}`;
-                            } else {
-                                // Clear memory when scrolled away
-                                if(entry.target.querySelector('canvas')) {
-                                    entry.target.innerHTML = `<div class="page-loader">Loading Page ${pNum}...</div>`;
-                                }
-                            }
-                        });
-                    }, { root: container, rootMargin: "200px" });
-
-                    // Create Placeholders
-                    for(let i=1; i<=pdfDoc.numPages; i++) {
-                        const div = document.createElement('div');
-                        div.className = 'pdf-page-container';
-                        div.setAttribute('data-num', i);
-                        div.innerHTML = `<div class="page-loader">Loading Page ${i}...</div>`;
-                        container.appendChild(div);
-                        observer.observe(div);
-                    }
-                }
-            } catch(e) { alert(e.message); }
-        }
-
-        async function renderScrollPage(wrapper, num) {
-            if(wrapper.querySelector('canvas')) return;
-            const page = await pdfDoc.getPage(num);
-            const scale = window.innerWidth < 768 ? 1.0 : 1.5; 
-            const viewport = page.getViewport({ scale: scale });
-            const canvas = document.createElement('canvas');
-            canvas.className = 'pdf-canvas';
-            canvas.width = viewport.width; canvas.height = viewport.height;
-            await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
-            wrapper.innerHTML = "";
-            wrapper.appendChild(canvas);
+        function launchPDF() {
+            const card = document.getElementById('mag-card');
+            const frame = document.getElementById('mag-reader-frame');
+            
+            // Hide card
+            card.style.display = 'none';
+            
+            // Show frame
+            frame.style.display = 'block';
+            
+            // Load PDF.js default viewer (It's built-in to modern browsers or we use the library)
+            // Ideally, for the "Best Experience", we simply load the PDF directly in the iframe.
+            // Modern browsers have excellent built-in PDF readers with zoom/scroll.
+            frame.src = "magazine.pdf"; 
         }
 
         function closeMagazine() {
-            document.getElementById('mag-overlay').classList.remove('active');
+            const overlay = document.getElementById('mag-overlay');
+            const frame = document.getElementById('mag-reader-frame');
+            
+            overlay.classList.remove('active');
+            
+            // Wait for animation to finish then clear iframe to free RAM
+            setTimeout(() => {
+                frame.src = "about:blank";
+            }, 500);
         }
+        // --- MAGAZINE LOGIC END ---
 
         // --- Content Configuration ---
         const content = {
@@ -1541,7 +1419,7 @@
                 else if (currentContextAction === 'messages') openModal('messages');
                 else if (currentContextAction === 'tour') openModal('tour');
                 else if (currentContextAction === 'gallery') openGallery();
-                else if (currentContextAction === 'magazine') openMagazineChoice();
+                else if (currentContextAction === 'magazine') openMagazine();
             });
             shareBtn.addEventListener('click', async () => {
                 hideContextMenu();
